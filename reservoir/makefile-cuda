@@ -1,0 +1,66 @@
+# makefile-cuda of swooz-avatar project using Visual C++
+# Florian Lance
+# lyon sept 2013
+
+
+!IF "$(CFG)" != "Release" &&  "$(CFG)" != "Debug"
+!ERROR Invalid CFG "($CFG)
+!ENDIF
+
+!IF "$(ARCH)" != "x86" &&  "$(ARCH)" != "amd64"
+!ERROR Invalid ARCH "($ARCH)
+!ENDIF
+
+
+
+CUDA=
+
+!IF  "$(CFG)" == "Release"
+
+!IF "$(ARCH)" == "x86"
+CUDA=nvcc --shared --machine 32 -gencode arch=compute_20,code=sm_20 -gencode arch=compute_20,code=sm_21 -gencode arch=compute_30,code=sm_30 -gencode arch=compute_35,code=sm_35
+!ENDIF
+
+!IF "$(ARCH)" == "amd64"
+CUDA=nvcc --shared --machine 64 -gencode arch=compute_20,code=sm_20 -gencode arch=compute_20,code=sm_21 -gencode arch=compute_30,code=sm_30 -gencode arch=compute_35,code=sm_35
+!ENDIF
+
+!ENDIF
+
+!IF  "$(CFG)" == "Debug"
+
+!IF "$(ARCH)" == "x86"
+CUDA=nvcc --shared --debug --device-debug  --machine 32 -gencode arch=compute_20,code=sm_20 -gencode arch=compute_20,code=sm_21 -gencode arch=compute_30,code=sm_30
+!ENDIF
+
+!IF "$(ARCH)" == "amd64"
+CUDA=nvcc --shared --debug --device-debug  --machine 64 -gencode arch=compute_20,code=sm_20 -gencode arch=compute_20,code=sm_21 -gencode arch=compute_30,code=sm_30
+!ENDIF
+
+!ENDIF
+
+
+LINK=link
+
+!INCLUDE <./makefile-include>
+
+
+
+################################################  MAKEFILE COMMAND
+
+!IF "$(ARCH)" == "x86"
+all: $(LIBDIR)/inversions.obj $(LIBDIR)/multiplications.obj \
+!ENDIF
+
+!IF "$(ARCH)" == "amd64"
+all: $(LIBDIR)/inversions.obj  $(LIBDIR)/multiplications.obj \
+!ENDIF
+
+################################################ GPUMAT
+
+$(LIBDIR)/inversions.obj: ./src/gpuMat/inversions.cu
+    $(CUDA) -c ./src/gpuMat/inversions.cu $(CFLAGS_CUDA_GPUMAT) -o "$(LIBDIR)/inversions.obj
+
+$(LIBDIR)/multiplications.obj: ./src/gpuMat/multiplications.cu
+    $(CUDA) -c ./src/gpuMat/multiplications.cu $(CFLAGS_CUDA_GPUMAT) -o "$(LIBDIR)/multiplications.obj
+

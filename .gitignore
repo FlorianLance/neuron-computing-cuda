@@ -1,28 +1,36 @@
 # Compiled Object files
-*.slo
-*.lo
 *.o
 *.obj
 
-# Precompiled Headers
-*.gch
-*.pch
-
 # Compiled Dynamic libraries
-*.so
-*.dylib
 *.dll
 
 # Fortran module files
 *.mod
 
 # Compiled Static libraries
-*.lai
-*.la
-*.a
 *.lib
 
 # Executables
 *.exe
-*.out
-*.app
+
+qt-proj/
+
+releases/
+
+dist/bin/
+dist/data/
+dist/doc/
+dist/examples/
+dist/include/
+dist/lib/
+dist/log/
+dist/src/
+
+reservoir/data/
+reservoir/bin/
+reservoir/genUI/
+reservoir/lib/
+reservoir/moc/
+
+3rdParty/

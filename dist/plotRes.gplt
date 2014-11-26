@@ -1,0 +1,369 @@
+
+set macros
+
+# define styles
+set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 70 ps 1.1   # --- blue
+set style line 2 lc rgb '#0060ad' lt 1 lw 5 pt 70 ps 5   # --- blue
+set style line 3 lc rgb '#FF0000' lt 1 lw 5 pt 70 ps 5   # --- red
+
+# enable the multiplot
+
+
+# define display macros
+display1 = 'set pm3d; set view map; unset contour; unset grid; set dgrid3d;set key outside; unset surface'
+display2 = 'set pm3d; set view 49, 28, 1, 1.48 ; set contour; set grid; set dgrid3d;set key outside; set surface; set hidden3d'
+
+
+# define labels
+neuron_leakrate_res1 = 'set xlabel "neurons_id"; set ylabel "leakrate_id"; set zlabel "res1_id"; set ztics 0,10,100; set zrange [0:100]'
+neuron_leakrate_res2 = 'set xlabel "neurons_id"; set ylabel "leakrate_id"; set zlabel "res2_id"; set ztics 0,10,100; set zrange [0:100]'
+neuron_leakrate_res3 = 'set xlabel "neurons_id"; set ylabel "leakrate_id"; set zlabel "res3_id"; set ztics 0,10,100; set zrange [0:100]'
+
+neuron_spectral_res1 = 'set xlabel "neurons_id"; set ylabel "spectral_radius_id"; set zlabel "res1_id"; set ztics 0,10,100; set zrange [0:100]'
+neuron_spectral_res2 = 'set xlabel "neurons_id"; set ylabel "spectral_radius_id"; set zlabel "res2_id"; set ztics 0,10,100; set zrange [0:100]'
+neuron_spectral_res3 = 'set xlabel "neurons_id"; set ylabel "spectral_radius_id"; set zlabel "res3_id"; set ztics 0,10,100; set zrange [0:100]'
+
+neuron_time = 'set xlabel "neurons_id"; set ylabel "time_id"'
+neuron_res1 = 'set xlabel "neurons_id"; set ylabel "res1_id"; set ytics 0,10,100; set yrange [0:100]'
+
+
+neuron_iss_res1 = 'set xlabel "neurons_id"; set ylabel "input_scaling_id"; set zlabel "TS_Success"; set ztics 0,10,100; set zrange [0:100]'
+neuron_iss_res2 = 'set xlabel "neurons_id"; set ylabel "input_scaling_id"; set zlabel "TX_NonReplaced"; set ztics 0,10,100; set zrange [0:100]'
+neuron_iss_res3 = 'set xlabel "neurons_id"; set ylabel "input_scaling_id"; set zlabel "TW_Success"; set ztics 0,10,100; set zrange [0:100]'
+
+neuron_sparcity_res1 = 'set xlabel "neurons_id"; set ylabel "sparcity_id"; set zlabel "TS_Success"; set ztics 0,10,100; set zrange [0:100]'
+neuron_sparcity_res2 = 'set xlabel "neurons_id"; set ylabel "sparcity_id"; set zlabel "TX_NonReplaced"; set ztics 0,10,100; set zrange [0:100]'
+neuron_sparcity_res3 = 'set xlabel "neurons_id"; set ylabel "sparcity_id"; set zlabel "TW_Success"; set ztics 0,10,100; set zrange [0:100]'
+
+
+# data id
+corpus_id = "1"
+neurons_id = "2"
+leakrate_id = "3"
+sparcity_id = "4"
+input_scaling_id = "5"
+ridge_id = "6"
+spectral_radius_id = "7"
+time_id = "8"
+res1_id = "9"
+TS_Success = "9"
+res2_id = "10"
+TX_NonReplaced = "10"
+res3_id = "11"
+TW_Success = "11"
+res4_id = "12"
+res5_id = "13"
+
+# define files
+file1  = "../dist/data/Results/reservoir_grid_search/grid_search_raw_0.txt"
+file2  = "../dist/data/Results/reservoir_grid_search/grid_search_raw_1.txt"
+file3  = "../dist/data/Results/reservoir_grid_search/grid_search_raw_2.txt"
+file4  = "../dist/data/Results/reservoir_grid_search/grid_search_raw_3.txt"
+
+file5  = "../dist/data/Results/reservoir_grid_search/cuda_mult/grid_search_cuda_mul_raw_1.txt"
+file6  = "../dist/data/Results/reservoir_grid_search/grid_search_raw_8.txt"
+
+file7  = "../dist/data/Results/g0.txt"
+file8  = "../dist/data/Results/g1.txt"
+file9  = "../dist/data/Results/g2.txt"
+file10  = "../dist/data/Results/g3.txt"
+
+
+# define titles
+title1 = "Corpus 0"
+title2 = "Corpus 1"
+title3 = "Corpus 2"
+title4 = "Corpus 3"
+
+######################################################################### grid search 1
+#set output "../dist/data/Results/grid_search_0.png"
+#set terminal png size 4000,2000
+#set multiplot layout 2, 3 title "Reservoir Grid-search 0"
+#file = file1
+#eval(display1)
+#eval(neuron_leakrate_res1)
+#splot file u @neurons_id:@leakrate_id:@res1_id t title1 w l ls 1
+#eval(neuron_leakrate_res2)
+#splot file u @neurons_id:@leakrate_id:@res2_id t title1 w l ls 1
+#eval(neuron_leakrate_res3)
+#splot file u @neurons_id:@leakrate_id:@res3_id t title1 w l ls 1
+#eval(display2)
+#eval(neuron_leakrate_res1)
+#splot file u @neurons_id:@leakrate_id:@res1_id t title1 w boxes ls 1
+#eval(neuron_leakrate_res2)
+#splot file u @neurons_id:@leakrate_id:@res2_id t title1 w boxes ls 1
+#eval(neuron_leakrate_res3)
+#splot file u @neurons_id:@leakrate_id:@res3_id t title1 w boxes ls 1
+#unset multiplot
+
+######################################################################### grid search 2
+#set output "../dist/data/Results/grid_search_1.png"
+#set terminal png size 6000,6000
+#set multiplot layout 6, 3 title "Reservoir Grid-search 1"
+#file = file2
+######################################## corpus 0
+#eval(display1)
+#eval(neuron_leakrate_res1)
+#splot file index 0 u @neurons_id:@leakrate_id:@res1_id t title1 w p ls 1
+#eval(neuron_leakrate_res2)
+#splot file index 0 u @neurons_id:@leakrate_id:@res2_id t title1 w p ls 1
+#eval(neuron_leakrate_res3)
+#splot file index 0 u @neurons_id:@leakrate_id:@res3_id t title1 w p ls 1
+#eval(display2)
+#eval(neuron_leakrate_res1)
+#splot file index 0 u @neurons_id:@leakrate_id:@res1_id t title1 w boxes ls 1
+#eval(neuron_leakrate_res2)
+#splot file index 0 u @neurons_id:@leakrate_id:@res2_id t title1 w boxes ls 1
+#eval(neuron_leakrate_res3)
+#splot file index 0 u @neurons_id:@leakrate_id:@res3_id t title1 w boxes ls 1
+######################################## corpus 1
+#eval(display1)
+#eval(neuron_leakrate_res1)
+#splot file index 1 u @neurons_id:@leakrate_id:@res1_id t title2 w p ls 1
+#eval(neuron_leakrate_res2)
+#splot file index 1 u @neurons_id:@leakrate_id:@res2_id t title2 w p ls 1
+#eval(neuron_leakrate_res3)
+#splot file index 1 u @neurons_id:@leakrate_id:@res3_id t title2 w p ls 1
+#eval(display2)
+#eval(neuron_leakrate_res1)
+#splot file index 1 u @neurons_id:@leakrate_id:@res1_id t title2 w boxes ls 1
+#eval(neuron_leakrate_res2)
+#splot file index 1 u @neurons_id:@leakrate_id:@res2_id t title2 w boxes ls 1
+#eval(neuron_leakrate_res3)
+#splot file index 1 u @neurons_id:@leakrate_id:@res3_id t title2 w boxes ls 1
+######################################## corpus 2
+#eval(display1)
+#eval(neuron_leakrate_res1)
+#splot file index 2 u @neurons_id:@leakrate_id:@res1_id t title3 w p ls 1
+#eval(neuron_leakrate_res2)
+#splot file index 2 u @neurons_id:@leakrate_id:@res2_id t title3 w p ls 1
+#eval(neuron_leakrate_res3)
+#splot file index 2 u @neurons_id:@leakrate_id:@res3_id t title3 w p ls 1
+#eval(display2)
+#eval(neuron_leakrate_res1)
+#splot file index 2 u @neurons_id:@leakrate_id:@res1_id t title3 w boxes ls 1
+#eval(neuron_leakrate_res2)
+#splot file index 2 u @neurons_id:@leakrate_id:@res2_id t title3 w boxes ls 1
+#eval(neuron_leakrate_res3)
+#splot file index 2 u @neurons_id:@leakrate_id:@res3_id t title3 w boxes ls 1
+#unset multiplot
+
+######################################################################### grid search 3
+#set output "../dist/data/Results/grid_search_2.png"
+#set terminal png size 6000,6000
+#set multiplot layout 6, 3 title "Reservoir Grid-search 2 : neurons_id - spectral_radius_id -> 3 corpus(10,20,50)"
+#file = file3
+######################################## corpus 0
+#eval(display1)
+#eval(neuron_spectral_res1)
+#splot file index 0 u @neurons_id:@spectral_radius_id:@res1_id t title1 w p ls 1
+#eval(neuron_spectral_res2)
+#splot file index 0 u @neurons_id:@spectral_radius_id:@res2_id t title1 w p ls 1
+#eval(neuron_spectral_res3)
+#splot file index 0 u @neurons_id:@spectral_radius_id:@res3_id t title1 w p ls 1
+#eval(display2)
+#eval(neuron_spectral_res1)
+#splot file index 0 u @neurons_id:@spectral_radius_id:@res1_id t title1 w boxes ls 1
+#eval(neuron_spectral_res2)
+#splot file index 0 u @neurons_id:@spectral_radius_id:@res2_id t title1 w boxes ls 1
+#eval(neuron_spectral_res3)
+#splot file index 0 u @neurons_id:@spectral_radius_id:@res3_id t title1 w boxes ls 1
+######################################## corpus 1
+#eval(display1)
+#eval(neuron_spectral_res1)
+#splot file index 1 u @neurons_id:@spectral_radius_id:@res1_id t title2 w p ls 1
+#eval(neuron_spectral_res2)
+#splot file index 1 u @neurons_id:@spectral_radius_id:@res2_id t title2 w p ls 1
+#eval(neuron_spectral_res3)
+#splot file index 1 u @neurons_id:@spectral_radius_id:@res3_id t title2 w p ls 1
+#eval(display2)
+#eval(neuron_spectral_res1)
+#splot file index 1 u @neurons_id:@spectral_radius_id:@res1_id t title2 w boxes ls 1
+#eval(neuron_spectral_res2)
+#splot file index 1 u @neurons_id:@spectral_radius_id:@res2_id t title2 w boxes ls 1
+#eval(neuron_spectral_res3)
+#splot file index 1 u @neurons_id:@spectral_radius_id:@res3_id t title2 w boxes ls 1
+######################################## corpus 2
+#eval(display1)
+#eval(neuron_spectral_res1)
+#splot file index 2 u @neurons_id:@spectral_radius_id:@res1_id t title3 w p ls 1
+#eval(neuron_spectral_res2)
+#splot file index 2 u @neurons_id:@spectral_radius_id:@res2_id t title3 w p ls 1
+#eval(neuron_spectral_res3)
+#splot file index 2 u @neurons_id:@spectral_radius_id:@res3_id t title3 w p ls 1
+#eval(display2)
+#eval(neuron_spectral_res1)
+#splot file index 2 u @neurons_id:@spectral_radius_id:@res1_id t title3 w boxes ls 1
+#eval(neuron_spectral_res2)
+#splot file index 2 u @neurons_id:@spectral_radius_id:@res2_id t title3 w boxes ls 1
+#eval(neuron_spectral_res3)
+#splot file index 2 u @neurons_id:@spectral_radius_id:@res3_id t title3 w boxes ls 1
+#unset multiplot
+
+
+
+######################################################################### grid search 5
+#set output "../dist/data/Results/grid_search_4.png"
+#set terminal png size 6000,6000
+#set multiplot layout 6, 3 title "Reservoir Grid-search 4 : neurons_id - iss -> 3 corpus(10,20,50)"
+#file = file6
+
+##set yrange [0.000001:1]
+#set ytics 0.2,0.1,0.8
+
+######################################## corpus 0
+#eval(display1)
+#eval(neuron_iss_res1)
+#splot file index 0 u @neurons_id:@input_scaling_id:@res1_id t title1 w p ls 1
+#eval(neuron_iss_res2)
+#splot file index 0 u @neurons_id:@input_scaling_id:@res2_id t title1 w p ls 1
+#eval(neuron_iss_res3)
+#splot file index 0 u @neurons_id:@input_scaling_id:@res3_id t title1 w p ls 1
+#eval(display2)
+#eval(neuron_iss_res1)
+#splot file index 0 u @neurons_id:@input_scaling_id:@res1_id t title1 w boxes ls 1
+#eval(neuron_iss_res2)
+#splot file index 0 u @neurons_id:@input_scaling_id:@res2_id t title1 w boxes ls 1
+#eval(neuron_iss_res3)
+#splot file index 0 u @neurons_id:@input_scaling_id:@res3_id t title1 w boxes ls 1
+######################################## corpus 1
+#eval(display1)
+#eval(neuron_iss_res1)
+#splot file index 1 u @neurons_id:@input_scaling_id:@res1_id t title2 w p ls 1
+#eval(neuron_iss_res2)
+#splot file index 1 u @neurons_id:@input_scaling_id:@res2_id t title2 w p ls 1
+#eval(neuron_iss_res3)
+#splot file index 1 u @neurons_id:@input_scaling_id:@res3_id t title2 w p ls 1
+#eval(display2)
+#eval(neuron_iss_res1)
+#splot file index 1 u @neurons_id:@input_scaling_id:@res1_id t title2 w boxes ls 1
+#eval(neuron_iss_res2)
+#splot file index 1 u @neurons_id:@input_scaling_id:@res2_id t title2 w boxes ls 1
+#eval(neuron_iss_res3)
+#splot file index 1 u @neurons_id:@input_scaling_id:@res3_id t title2 w boxes ls 1
+######################################## corpus 2
+#eval(display1)
+#eval(neuron_iss_res1)
+#splot file index 2 u @neurons_id:@input_scaling_id:@res1_id t title3 w p ls 1
+#eval(neuron_iss_res2)
+#splot file index 2 u @neurons_id:@input_scaling_id:@res2_id t title3 w p ls 1
+#eval(neuron_iss_res3)
+#splot file index 2 u @neurons_id:@input_scaling_id:@res3_id t title3 w p ls 1
+#eval(display2)
+#eval(neuron_iss_res1)
+#splot file index 2 u @neurons_id:@input_scaling_id:@res1_id t title3 w boxes ls 1
+#eval(neuron_iss_res2)
+#splot file index 2 u @neurons_id:@input_scaling_id:@res2_id t title3 w boxes ls 1
+#eval(neuron_iss_res3)
+#splot file index 2 u @neurons_id:@input_scaling_id:@res3_id t title3 w boxes ls 1
+#unset multiplot
+
+
+
+######################################################################## grid search 5
+set output "../dist/data/Results/grid_search_5.png"
+set terminal png size 6000,6000
+set multiplot layout 6, 3 title "Reservoir Grid-search (cuda mult) 5 : neurons_id - sparcity -> 3 corpus(10,20,50)"
+file = file5
+
+set yrange [0.000001:1]
+set ytics scale 10
+
+####################################### corpus 0
+eval(display1)
+eval(neuron_sparcity_res1)
+splot file index 0 u @neurons_id:@sparcity_id:@res1_id t title1 w p ls 1
+eval(neuron_sparcity_res2)
+splot file index 0 u @neurons_id:@sparcity_id:@res2_id t title1 w p ls 1
+eval(neuron_sparcity_res3)
+splot file index 0 u @neurons_id:@sparcity_id:@res3_id t title1 w p ls 1
+eval(display2)
+eval(neuron_sparcity_res1)
+splot file index 0 u @neurons_id:@sparcity_id:@res1_id t title1 w boxes ls 1
+eval(neuron_sparcity_res2)
+splot file index 0 u @neurons_id:@sparcity_id:@res2_id t title1 w boxes ls 1
+eval(neuron_sparcity_res3)
+splot file index 0 u @neurons_id:@sparcity_id:@res3_id t title1 w boxes ls 1
+####################################### corpus 1
+eval(display1)
+eval(neuron_sparcity_res1)
+splot file index 1 u @neurons_id:@sparcity_id:@res1_id t title2 w p ls 1
+eval(neuron_sparcity_res2)
+splot file index 1 u @neurons_id:@sparcity_id:@res2_id t title2 w p ls 1
+eval(neuron_sparcity_res3)
+splot file index 1 u @neurons_id:@sparcity_id:@res3_id t title2 w p ls 1
+eval(display2)
+eval(neuron_sparcity_res1)
+splot file index 1 u @neurons_id:@sparcity_id:@res1_id t title2 w boxes ls 1
+eval(neuron_sparcity_res2)
+splot file index 1 u @neurons_id:@sparcity_id:@res2_id t title2 w boxes ls 1
+eval(neuron_sparcity_res3)
+splot file index 1 u @neurons_id:@sparcity_id:@res3_id t title2 w boxes ls 1
+####################################### corpus 2
+eval(display1)
+eval(neuron_sparcity_res1)
+splot file index 2 u @neurons_id:@sparcity_id:@res1_id t title3 w p ls 1
+eval(neuron_sparcity_res2)
+splot file index 2 u @neurons_id:@sparcity_id:@res2_id t title3 w p ls 1
+eval(neuron_sparcity_res3)
+splot file index 2 u @neurons_id:@sparcity_id:@res3_id t title3 w p ls 1
+eval(display2)
+eval(neuron_sparcity_res1)
+splot file index 2 u @neurons_id:@sparcity_id:@res1_id t title3 w boxes ls 1
+eval(neuron_sparcity_res2)
+splot file index 2 u @neurons_id:@sparcity_id:@res2_id t title3 w boxes ls 1
+eval(neuron_sparcity_res3)
+splot file index 2 u @neurons_id:@sparcity_id:@res3_id t title3 w boxes ls 1
+unset multiplot
+
+
+######################################################################### grid search 4
+#set output "../dist/data/Results/grid_search_3.png"
+#set terminal png size 4000,5000
+#set multiplot layout 3, 2 title "Reservoir Grid-search 3 : neurons -> 3 corpus(10,20,50)"
+#file = file4
+######################################## corpus 0
+#eval(display2)
+#eval(neuron_res1)
+#plot file index 0 u @neurons_id:@res1_id t title1 w lp ls 2
+#eval(neuron_time)
+#plot file index 0 u @neurons_id:@time_id t title1 w lp ls 3
+######################################## corpus 1
+#eval(display2)
+#eval(neuron_res1)
+#plot file index 1 u @neurons_id:@res1_id t title2 w lp ls 2
+#eval(neuron_time)
+#plot file index 1 u @neurons_id:@time_id t title2 w lp ls 3
+######################################## corpus 2
+#eval(display2)
+#eval(neuron_res1)
+#plot file index 2 u @neurons_id:@res1_id t title3 w lp ls 2
+#eval(neuron_time)
+#plot file index 2 u @neurons_id:@time_id t title3 w lp ls 3
+#unset multiplot
+
+######################################################################## grid search 5  # ,120-30s,120-60s,120-90s,120-120s,120-30m,120-60m,120-90m,120-120m)"
+set output "../dist/data/Results/grid_search_6.png"
+set terminal png size 4000,5000
+set multiplot layout 3, 2 title "Reservoir Grid-search 6 : neurons - sepctral raduis - iss  -> 3 corpus(120)"
+file = file7
+#set yrange [0.000001:1]
+#set ytics scale 10
+
+####################################### corpus 0
+eval(display1)
+eval(neuron_iss_res1)
+splot file index 0 u @neurons_id:@input_scaling_id:@res1_id t title1 w p ls 1
+eval(neuron_iss_res2)
+splot file index 0 u @neurons_id:@input_scaling_id:@res2_id t title1 w p ls 1
+eval(neuron_iss_res3)
+splot file index 0 u @neurons_id:@input_scaling_id:@res3_id t title1 w p ls 1
+eval(display2)
+eval(neuron_sparcity_res1)
+splot file index 0 u @neurons_id:@input_scaling_id:@res1_id t title1 w boxes ls 1
+eval(neuron_sparcity_res2)
+splot file index 0 u @neurons_id:@input_scaling_id:@res2_id t title1 w boxes ls 1
+eval(neuron_sparcity_res3)
+splot file index 0 u @neurons_id:@input_scaling_id:@res3_id t title1 w boxes ls 1
+
+unset multiplot

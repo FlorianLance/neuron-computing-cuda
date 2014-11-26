@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>724</width>
+    <height>591</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Neurons-Reservoir-Computing-Interface</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="0">
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QGroupBox" name="groupBox">
+        <property name="title">
+         <string>Parameters</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_4">
+         <item row="0" column="0">
+          <layout class="QGridLayout" name="gridLayout_3">
+           <item row="0" column="0">
+            <widget class="QGroupBox" name="groupBox_3">
+             <property name="title">
+              <string>Corpus list</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_5">
+              <item row="0" column="0" rowspan="3">
+               <widget class="QListView" name="listView"/>
+              </item>
+              <item row="0" column="1">
+               <widget class="QPushButton" name="pushButton">
+                <property name="text">
+                 <string>Add corpus</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QPushButton" name="pushButton_2">
+                <property name="text">
+                 <string>Remove corpus</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="0">
+          <widget class="QGroupBox" name="groupBox_5">
+           <property name="title">
+            <string>Grid of reservoir parameters</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_6">
+            <item row="4" column="2">
+             <widget class="QDoubleSpinBox" name="sbStartIS"/>
+            </item>
+            <item row="4" column="4">
+             <widget class="QDoubleSpinBox" name="sbEndIS"/>
+            </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="label_7">
+              <property name="text">
+               <string>Input scaling</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>Leak rate</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Neurons number</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Start value</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="3" rowspan="8">
+             <widget class="Line" name="line_2">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="2">
+             <widget class="QDoubleSpinBox" name="sbStartLeakRate"/>
+            </item>
+            <item row="3" column="4">
+             <widget class="QDoubleSpinBox" name="sbEndLeakRate"/>
+            </item>
+            <item row="0" column="1" rowspan="8">
+             <widget class="Line" name="line">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="4">
+             <widget class="Line" name="line_3">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="4">
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>End value</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_5">
+              <property name="text">
+               <string>Name parameter</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2">
+             <widget class="Line" name="line_4">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="6">
+             <widget class="QLabel" name="label_6">
+              <property name="text">
+               <string>Operation on the values</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="Line" name="line_5">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="5" rowspan="8">
+             <widget class="Line" name="line_6">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="6">
+             <widget class="Line" name="line_7">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2">
+             <widget class="QSpinBox" name="sbStartNeurons"/>
+            </item>
+            <item row="2" column="6">
+             <widget class="QLineEdit" name="leNeuonsOperation">
+              <property name="text">
+               <string>+500</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="4">
+             <widget class="QSpinBox" name="sbEndNeurons"/>
+            </item>
+            <item row="3" column="6">
+             <widget class="QLineEdit" name="leLeakRateOperation">
+              <property name="text">
+               <string>+0.05</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="6">
+             <widget class="QLineEdit" name="leISOperation">
+              <property name="text">
+               <string>*10</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="0">
+             <widget class="QLabel" name="label_8">
+              <property name="text">
+               <string>Spectral radius</string>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="0">
+             <widget class="QLabel" name="label_9">
+              <property name="text">
+               <string>Ridge</string>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="0">
+             <widget class="QLabel" name="label_10">
+              <property name="text">
+               <string>Sparcity</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="6">
+             <widget class="QLineEdit" name="leSpectralRadiusOperation">
+              <property name="text">
+               <string>*10</string>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="6">
+             <widget class="QLineEdit" name="leRidgeOperation">
+              <property name="text">
+               <string>*10</string>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="6">
+             <widget class="QLineEdit" name="leSparcityOperation">
+              <property name="text">
+               <string>+0.0006</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="7" rowspan="8">
+             <widget class="Line" name="line_8">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="8">
+             <widget class="QLabel" name="label_11">
+              <property name="text">
+               <string>Current value</string>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="8" alignment="Qt::AlignHCenter">
+             <widget class="QLabel" name="laSparcityValue">
+              <property name="text">
+               <string>0</string>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="8" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+             <widget class="QLabel" name="laRidgeValue">
+              <property name="text">
+               <string>0</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="8" alignment="Qt::AlignHCenter">
+             <widget class="QLabel" name="laSpectralRadiusValue">
+              <property name="text">
+               <string>0</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="8" alignment="Qt::AlignHCenter">
+             <widget class="QLabel" name="laISValue">
+              <property name="text">
+               <string>0</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="8" alignment="Qt::AlignHCenter">
+             <widget class="QLabel" name="laLeakRateValue">
+              <property name="text">
+               <string>0</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="8" alignment="Qt::AlignHCenter">
+             <widget class="QLabel" name="laNeuronsValue">
+              <property name="text">
+               <string>0</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="8">
+             <widget class="Line" name="line_9">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="10">
+             <widget class="QLabel" name="label_18">
+              <property name="text">
+               <string>Enabled</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="9">
+             <widget class="Line" name="line_10">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="9" rowspan="6">
+             <widget class="Line" name="line_11">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="10">
+             <widget class="Line" name="line_12">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="10" alignment="Qt::AlignHCenter">
+             <widget class="QCheckBox" name="cbNeurons">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="10" alignment="Qt::AlignHCenter">
+             <widget class="QCheckBox" name="cbLeakRate">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="10" alignment="Qt::AlignHCenter">
+             <widget class="QCheckBox" name="cbIS">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="10" alignment="Qt::AlignHCenter">
+             <widget class="QCheckBox" name="cbSpectralRadius">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="10" alignment="Qt::AlignHCenter">
+             <widget class="QCheckBox" name="cbRidge">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="10" alignment="Qt::AlignHCenter">
+             <widget class="QCheckBox" name="cbSparcity">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="2" alignment="Qt::AlignHCenter">
+             <widget class="QDoubleSpinBox" name="sbStartSpectralRadius"/>
+            </item>
+            <item row="5" column="4">
+             <widget class="QDoubleSpinBox" name="sbEndSpectralRadius"/>
+            </item>
+            <item row="6" column="2" alignment="Qt::AlignVCenter">
+             <widget class="QDoubleSpinBox" name="sbStartRidge"/>
+            </item>
+            <item row="6" column="4">
+             <widget class="QDoubleSpinBox" name="sbEndRidge"/>
+            </item>
+            <item row="7" column="2">
+             <widget class="QDoubleSpinBox" name="sbStartSparcity"/>
+            </item>
+            <item row="7" column="4">
+             <widget class="QDoubleSpinBox" name="sbEndSparcity"/>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>724</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QDockWidget" name="dockWidget_2">
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2">
+    <layout class="QGridLayout" name="gridLayout_7">
+     <item row="1" column="0">
+      <widget class="QTextBrowser" name="textBrowser"/>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_12">
+       <property name="text">
+        <string>Results :</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget_3">
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_3"/>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

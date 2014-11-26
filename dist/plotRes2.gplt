@@ -1,0 +1,938 @@
+
+set macros
+
+# define styles
+set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 70 ps 1.1   # --- blue
+set style line 2 lc rgb '#FF0000' lt 1 lw 2 pt 71 ps 1.1   # --- red
+set style line 3 lc rgb '#00FF00' lt 1 lw 2 pt 72 ps 1.1   # --- green
+set style line 4 lc rgb '#B33ECD' lt 1 lw 2 pt 73 ps 1.1   # --- violet
+set style line 5 lc rgb '#c8cc29' lt 1 lw 2 pt 74 ps 1.1   #
+set style line 6 lc rgb '#b6fcd5' lt 1 lw 2 pt 75 ps 1.1   #
+set style line 7 lc rgb '#cbc4dc' lt 1 lw 2 pt 76 ps 1.1   #
+set style line 8 lc rgb '#dd4563' lt 1 lw 2 pt 77 ps 1.1   #
+set style line 9 lc rgb '#66092f' lt 1 lw 2 pt 78 ps 1.1   #
+
+# define display macros
+display1 = 'set pm3d; set view map; unset contour; unset grid; set dgrid3d;set key outside; unset surface'
+display2 = 'set pm3d; set view 49, 28, 1, 1.48 ; set contour; set grid; set dgrid3d;set key outside; set surface; set hidden3d'
+
+# define labels
+neuron_leakrate_res1 = 'set xlabel "neurons_id"; set ylabel "spectral_radius_id"; set zlabel "res1_id"; # set ztics 0,10,100; set zrange [0:100]'
+neuron_leakrate_res2 = 'set xlabel "neurons_id"; set ylabel "spectral_radius_id"; set zlabel "res2_id"; #set ztics 0,10,100; set zrange [0:100]'
+neuron_leakrate_res3 = 'set xlabel "neurons_id"; set ylabel "spectral_radius_id"; set zlabel "res3_id"; #set ztics 0,10,100; set zrange [0:100]'
+neuron_leakrate_res4 = 'set xlabel "neurons_id"; set ylabel "spectral_radius_id"; set zlabel "res4_id"; # set ztics 0,10,100; set zrange [0:100]'
+neuron_leakrate_res5 = 'set xlabel "neurons_id"; set ylabel "spectral_radius_id"; set zlabel "res5_id"; #set ztics 0,10,100; set zrange [0:100]'
+
+corpus_neurons_res1 = 'set xlabel "corpus_id"; set ylabel "neurons_id"; set zlabel "res1_id"; # set ztics 0,10,100; set zrange [0:100]'
+corpus_neurons_res2 = 'set xlabel "corpus_id"; set ylabel "neurons_id"; set zlabel "res2_id"; # set ztics 0,10,100; set zrange [0:100]'
+corpus_neurons_res3 = 'set xlabel "corpus_id"; set ylabel "neurons_id"; set zlabel "res3_id"; # set ztics 0,10,100; set zrange [0:100]'
+corpus_neurons_res4 = 'set xlabel "corpus_id"; set ylabel "neurons_id"; set zlabel "res4_id"; # set ztics 0,10,100; set zrange [0:100]'
+corpus_neurons_res5 = 'set xlabel "corpus_id"; set ylabel "neurons_id"; set zlabel "res5_id"; # set ztics 0,10,100; set zrange [0:100]'
+
+
+# data id
+corpus_id = "1"
+neurons_id = "2"
+leakrate_id = "3"
+sparcity_id = "4"
+input_scaling_id = "5"
+ridge_id = "6"
+spectral_radius_id = "7"
+time_id = "8"
+res1_id = "9"
+res2_id = "10"
+res3_id = "11"
+res4_id = "12"
+res5_id = "13"
+
+# define files
+file0  = "../dist/data/Results/random_res/grid_search_raw.txt"
+file01  = "../dist/data/Results/random_res/all_rand_sentence.txt"
+file02  = "../dist/data/Results/random_res/all_rand_meaning.txt"
+
+file1  = "../dist/data/Results/random_res/all_corpus_iss_0_25_sr_4.txt"
+file2  = "../dist/data/Results/random_res/corpus_0_iss_0_25_sr_4.txt"
+file3  = "../dist/data/Results/random_res/corpus_1_iss_0_25_sr_4.txt"
+file4  = "../dist/data/Results/random_res/corpus_2_iss_0_25_sr_4.txt"
+file5  = "../dist/data/Results/random_res/corpus_3_iss_0_25_sr_4.txt"
+file6  = "../dist/data/Results/random_res/corpus_4_iss_0_25_sr_4.txt"
+file7  = "../dist/data/Results/random_res/corpus_5_iss_0_25_sr_4.txt"
+file8  = "../dist/data/Results/random_res/corpus_6_iss_0_25_sr_4.txt"
+file9  = "../dist/data/Results/random_res/corpus_7_iss_0_25_sr_4.txt"
+file10  = "../dist/data/Results/random_res/corpus_8_iss_0_25_sr_4.txt"
+
+file11  = "../dist/data/Results/random_res/corpus_0.txt"
+file12  = "../dist/data/Results/random_res/corpus_1.txt"
+file13  = "../dist/data/Results/random_res/corpus_2.txt"
+file14  = "../dist/data/Results/random_res/corpus_3.txt"
+file15  = "../dist/data/Results/random_res/corpus_4.txt"
+file16  = "../dist/data/Results/random_res/corpus_5.txt"
+file17  = "../dist/data/Results/random_res/corpus_6.txt"
+file18  = "../dist/data/Results/random_res/corpus_7.txt"
+file19  = "../dist/data/Results/random_res/corpus_8.txt"
+
+# define titles
+title1 = "Corpus 0 -> 120.txt"
+title2 = "Corpus 1 -> 120-30-meaning.txt"
+title3 = "Corpus 2 -> 120-60-meaning.txt"
+title4 = "Corpus 3 -> 120-90-meaning.txt"
+title5 = "Corpus 4 -> 120-120-meaning.txt"
+title6 = "Corpus 5 -> 120-30-sentence.txt"
+title7 = "Corpus 6 -> 120-60-sentence.txt"
+title8 = "Corpus 7 -> 120-90-sentence.txt"
+title9 = "Corpus 8 -> 120-120-sentence.txt"
+
+#RES 1 : average for all sentences of : correct position and word percentage (between 0% and 100%)
+#RES 2 : average for all sentences of : sentence right and absolute position (0% or 100%)
+#RES 3 : average for all sentences of : correct position and word percentage
+#RES 4 : average for all sentences of : correct position and word percentage (between 0% and 100%), CCW only
+#RES 5 : average for all sentences of : sentence right and absolute position (0% or 100%) CCW only
+
+################################ defines functions
+
+f(x)=a*x+b  #The fit functions
+g(x)=c*x+d
+
+################################ compute min/max/mean/std for random meaning corpuses
+#file = file02
+#plot file u @res1_id:@res4_id
+#min_y = GPVAL_DATA_Y_MIN
+#max_y = GPVAL_DATA_Y_MAX
+#ylen = max_y - min_y
+#min_x = GPVAL_DATA_X_MIN
+#max_x = GPVAL_DATA_X_MAX
+#set table "../dist/data/Results/mean.txt" # put the mean value out
+#plot file u ((min_x + max_x)/2.0):@res4_id smooth unique w p
+#unset table
+#set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
+#plot file u ((max_x + min_x)/2.0):(@res4_id**2) smooth unique w p
+#unset table
+#fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
+#fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
+#mean=f(0)               #mean value
+#mean_squared=g(0)	#mean of the squared value
+#standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
+#standard_deviation2 = sqrt(-(mean_squared-mean**2))
+
+#random_meaning_min_x = min_x
+#random_meaning_max_x = max_x
+#random_meaning_min_y = min_y
+#random_meaning_max_y = max_y
+#random_meaning_mean  = mean
+#random_meaning_std   = standard_deviation2
+
+################################# compute min/max/mean/std for random sentences corpuses
+#file = file01
+#plot file u @res1_id:@res4_id
+#min_y = GPVAL_DATA_Y_MIN
+#max_y = GPVAL_DATA_Y_MAX
+#ylen = max_y - min_y
+#min_x = GPVAL_DATA_X_MIN
+#max_x = GPVAL_DATA_X_MAX
+#set table "../dist/data/Results/mean.txt" # put the mean value out
+#plot file u ((min_x + max_x)/2.0):@res4_id smooth unique w p
+#unset table
+#set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
+#plot file u ((max_x + min_x)/2.0):(@res4_id**2) smooth unique w p
+#unset table
+#fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
+#fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
+#mean=f(0)               #mean value
+#mean_squared=g(0)	#mean of the squared value
+#standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
+#standard_deviation2 = sqrt(-(mean_squared-mean**2))
+
+#random_sentence_min_x = min_x
+#random_sentence_max_x = max_x
+#random_sentence_min_y = min_y
+#random_sentence_max_y = max_y
+#random_sentence_mean  = mean
+#random_sentence_std   = standard_deviation2
+
+################################# compute min/max/mean/std for all corpuses
+#file = file0
+#plot file u @res1_id:@res4_id
+#min_y = GPVAL_DATA_Y_MIN
+#max_y = GPVAL_DATA_Y_MAX
+#ylen = max_y - min_y
+#min_x = GPVAL_DATA_X_MIN
+#max_x = GPVAL_DATA_X_MAX
+#set table "../dist/data/Results/mean.txt" # put the mean value out
+#plot file u ((min_x + max_x)/2.0):@res4_id smooth unique w p
+#unset table
+#set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
+#plot file u ((max_x + min_x)/2.0):(@res4_id**2) smooth unique w p
+#unset table
+#fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
+#fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
+#mean=f(0)               #mean value
+#mean_squared=g(0)	#mean of the squared value
+#standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
+#standard_deviation2 = sqrt(-(mean_squared-mean**2))
+
+#all_min_x = min_x
+#all_max_x = max_x
+#all_min_y = min_y
+#all_max_y = max_y
+#all_mean  = mean
+#all_std   = standard_deviation2
+
+############################### test
+
+#file = file0
+#plot file u @corpus_id:@res5_id
+#min_y = GPVAL_DATA_Y_MIN
+#max_y = GPVAL_DATA_Y_MAX
+#ylen = max_y - min_y
+#min_x = GPVAL_DATA_X_MIN
+#max_x = GPVAL_DATA_X_MAX
+#set table "../dist/data/Results/mean.txt" # put the mean value out
+#plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
+#unset table
+#set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
+#plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
+#unset table
+#fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
+#fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
+#mean=f(0)               #mean value
+#mean_squared=g(0)	#mean of the squared value
+#standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
+#standard_deviation2 = sqrt(-(mean_squared-mean**2))
+
+#test_sentence_min_x = min_x
+#test_sentence_max_x = max_x
+#test_sentence_min_y = min_y
+#test_sentence_max_y = max_y
+#test_sentence_mean  = mean
+#test_sentence_std   = standard_deviation2
+
+#print standard_deviation2
+
+
+
+#set output "../dist/data/Results/random1.png"
+#set terminal png size 3000,3000
+#set multiplot layout 3, 2 title "Analyse random sentence/meaning influence"
+
+####################### corpus 1
+file = file11
+plot file u @corpus_id:@res5_id
+min_y = GPVAL_DATA_Y_MIN
+max_y = GPVAL_DATA_Y_MAX
+ylen = max_y - min_y
+min_x = GPVAL_DATA_X_MIN
+max_x = GPVAL_DATA_X_MAX
+set table "../dist/data/Results/mean.txt" # put the mean value out
+plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
+unset table
+set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
+plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
+unset table
+fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
+fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
+mean=f(0)               #mean value
+mean_squared=g(0)	#mean of the squared value
+standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
+standard_deviation2 = sqrt(-(mean_squared-mean**2))
+c1_min_y = min_y
+c1_max_y = max_y
+c1_mean  = mean
+c1_std   = standard_deviation2
+####################### corpus 2
+file = file12
+plot file u @corpus_id:@res5_id
+min_y = GPVAL_DATA_Y_MIN
+max_y = GPVAL_DATA_Y_MAX
+ylen = max_y - min_y
+min_x = GPVAL_DATA_X_MIN
+max_x = GPVAL_DATA_X_MAX
+set table "../dist/data/Results/mean.txt" # put the mean value out
+plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
+unset table
+set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
+plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
+unset table
+fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
+fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
+mean=f(0)               #mean value
+mean_squared=g(0)	#mean of the squared value
+standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
+standard_deviation2 = sqrt(-(mean_squared-mean**2))
+c2_min_y = min_y
+c2_max_y = max_y
+c2_mean  = mean
+c2_std   = standard_deviation2
+####################### corpus 3
+file = file13
+plot file u @corpus_id:@res5_id
+min_y = GPVAL_DATA_Y_MIN
+max_y = GPVAL_DATA_Y_MAX
+ylen = max_y - min_y
+min_x = GPVAL_DATA_X_MIN
+max_x = GPVAL_DATA_X_MAX
+set table "../dist/data/Results/mean.txt" # put the mean value out
+plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
+unset table
+set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
+plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
+unset table
+fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
+fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
+mean=f(0)               #mean value
+mean_squared=g(0)	#mean of the squared value
+standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
+standard_deviation2 = sqrt(-(mean_squared-mean**2))
+c3_min_y = min_y
+c3_max_y = max_y
+c3_mean  = mean
+c3_std   = standard_deviation2
+####################### corpus 4
+file = file14
+plot file u @corpus_id:@res5_id
+min_y = GPVAL_DATA_Y_MIN
+max_y = GPVAL_DATA_Y_MAX
+ylen = max_y - min_y
+min_x = GPVAL_DATA_X_MIN
+max_x = GPVAL_DATA_X_MAX
+set table "../dist/data/Results/mean.txt" # put the mean value out
+plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
+unset table
+set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
+plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
+unset table
+fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
+fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
+mean=f(0)               #mean value
+mean_squared=g(0)	#mean of the squared value
+standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
+standard_deviation2 = sqrt(-(mean_squared-mean**2))
+c4_min_y = min_y
+c4_max_y = max_y
+c4_mean  = mean
+c4_std   = standard_deviation2
+####################### corpus 5
+file = file15
+plot file u @corpus_id:@res5_id
+min_y = GPVAL_DATA_Y_MIN
+max_y = GPVAL_DATA_Y_MAX
+ylen = max_y - min_y
+min_x = GPVAL_DATA_X_MIN
+max_x = GPVAL_DATA_X_MAX
+set table "../dist/data/Results/mean.txt" # put the mean value out
+plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
+unset table
+set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
+plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
+unset table
+fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
+fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
+mean=f(0)               #mean value
+mean_squared=g(0)	#mean of the squared value
+standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
+standard_deviation2 = sqrt(-(mean_squared-mean**2))
+c5_min_y = min_y
+c5_max_y = max_y
+c5_mean  = mean
+c5_std   = standard_deviation2
+####################### corpus 6
+file = file16
+plot file u @corpus_id:@res5_id
+min_y = GPVAL_DATA_Y_MIN
+max_y = GPVAL_DATA_Y_MAX
+ylen = max_y - min_y
+min_x = GPVAL_DATA_X_MIN
+max_x = GPVAL_DATA_X_MAX
+set table "../dist/data/Results/mean.txt" # put the mean value out
+plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
+unset table
+set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
+plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
+unset table
+fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
+fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
+mean=f(0)               #mean value
+mean_squared=g(0)	#mean of the squared value
+standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
+standard_deviation2 = sqrt(-(mean_squared-mean**2))
+c6_min_y = min_y
+c6_max_y = max_y
+c6_mean  = mean
+c6_std   = standard_deviation2
+####################### corpus 7
+file = file17
+plot file u @corpus_id:@res5_id
+min_y = GPVAL_DATA_Y_MIN
+max_y = GPVAL_DATA_Y_MAX
+ylen = max_y - min_y
+min_x = GPVAL_DATA_X_MIN
+max_x = GPVAL_DATA_X_MAX
+set table "../dist/data/Results/mean.txt" # put the mean value out
+plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
+unset table
+set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
+plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
+unset table
+fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
+fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
+mean=f(0)               #mean value
+mean_squared=g(0)	#mean of the squared value
+standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
+standard_deviation2 = sqrt(-(mean_squared-mean**2))
+c7_min_y = min_y
+c7_max_y = max_y
+c7_mean  = mean
+c7_std   = standard_deviation2
+####################### corpus 7
+file = file18
+plot file u @corpus_id:@res5_id
+min_y = GPVAL_DATA_Y_MIN
+max_y = GPVAL_DATA_Y_MAX
+ylen = max_y - min_y
+min_x = GPVAL_DATA_X_MIN
+max_x = GPVAL_DATA_X_MAX
+set table "../dist/data/Results/mean.txt" # put the mean value out
+plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
+unset table
+set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
+plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
+unset table
+fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
+fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
+mean=f(0)               #mean value
+mean_squared=g(0)	#mean of the squared value
+standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
+standard_deviation2 = sqrt(-(mean_squared-mean**2))
+c8_min_y = min_y
+c8_max_y = max_y
+c8_mean  = mean
+c8_std   = standard_deviation2
+####################### corpus 7
+file = file19
+plot file u @corpus_id:@res5_id
+min_y = GPVAL_DATA_Y_MIN
+max_y = GPVAL_DATA_Y_MAX
+ylen = max_y - min_y
+min_x = GPVAL_DATA_X_MIN
+max_x = GPVAL_DATA_X_MAX
+set table "../dist/data/Results/mean.txt" # put the mean value out
+plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
+unset table
+set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
+plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
+unset table
+fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
+fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
+mean=f(0)               #mean value
+mean_squared=g(0)	#mean of the squared value
+standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
+standard_deviation2 = sqrt(-(mean_squared-mean**2))
+c9_min_y = min_y
+c9_max_y = max_y
+c9_mean  = mean
+c9_std   = standard_deviation2
+
+
+set output "../dist/data/Results/random1.png"
+set terminal png size 1200,1500
+set multiplot layout 2, 1 title "Analyse random sentence/meaning influence"
+
+
+
+################################ test
+
+
+#min_x = random_sentence_min_x
+#max_x = random_sentence_max_x
+#min_y = random_sentence_min_y
+#max_y = random_sentence_max_y
+#mean  = random_sentence_mean
+#std   = random_sentence_std
+
+#set xlabel "word correct position %";
+#set ylabel "gramar correct position %";
+#set label 1 at (min_x+max_x)/7.,max_y "max" offset 0,0.5
+#set label 2 at (min_x+max_x)/7.,min_y "min" offset 0,-0.5
+#set label 3 at (min_x+max_x)/7.,mean "mean" offset 0,0.5
+#set label 4 at (min_x+max_x)/9.,std "std" offset 0,0.5
+
+#set style boxplot nooutliers
+print c1_min_y
+print c1_max_y
+print c1_mean
+print c1_std
+print c1_mean-c1_std
+print c1_std-c1_mean
+print c1_mean + c1_mean - c1_std
+print c1_std + c1_std - c1_mean
+
+
+set xrange [-1:10]
+set yrange [-20:120]
+
+set xlabel "corpus id"
+set ylabel "gramar absolute correct position %"
+
+
+
+
+plot file11 u @corpus_id:@res5_id:(0.1) t title1 w boxplot, \
+     file12 u @corpus_id:@res5_id:(0.1) t title2 w boxplot, \
+     file13 u @corpus_id:@res5_id:(0.1) t title3 w boxplot, \
+     file14 u @corpus_id:@res5_id:(0.1) t title4 w boxplot, \
+     file15 u @corpus_id:@res5_id:(0.1) t title5 w boxplot, \
+     file16 u @corpus_id:@res5_id:(0.1) t title6 w boxplot, \
+     file17 u @corpus_id:@res5_id:(0.1) t title7 w boxplot, \
+     file18 u @corpus_id:@res5_id:(0.1) t title8 w boxplot, \
+     file19 u @corpus_id:@res5_id:(0.1) t title9 w boxplot
+
+
+set label 1 at 4,5 "box min -> mean - 3*(mean-std)" offset 0,0.5
+set label 2 at 4,1 "box hight -> mean + 3*(mean-std)" offset 0,0.5
+set label 3 at 4,-2 "whisker min -> min value" offset 0,0.5
+set label 4 at 4,-5 "whisker hight -> max value" offset 0,0.5
+
+plot file11 u @corpus_id:(c1_mean - 3*(c1_mean - c1_std)):(c1_min_y):(c1_max_y):(c1_mean + 3*(c1_mean - c1_std)) t title1 w candlesticks, \
+     file12 u @corpus_id:(c2_mean - 3*(c2_mean - c2_std)):(c2_min_y):(c2_max_y):(c2_mean + 3*(c2_mean - c2_std)) t title2 w candlesticks, \
+     file13 u @corpus_id:(c3_mean - 3*(c3_mean - c3_std)):(c3_min_y):(c3_max_y):(c3_mean + 3*(c3_mean - c3_std)) t title2 w candlesticks, \
+     file14 u @corpus_id:(c4_mean - 3*(c4_mean - c4_std)):(c4_min_y):(c4_max_y):(c4_mean + 3*(c4_mean - c4_std)) t title2 w candlesticks, \
+     file15 u @corpus_id:(c5_mean - 3*(c5_mean - c5_std)):(c5_min_y):(c5_max_y):(c5_mean + 3*(c5_mean - c5_std)) t title2 w candlesticks, \
+     file16 u @corpus_id:(c6_mean - 3*(c6_mean - c6_std)):(c6_min_y):(c6_max_y):(c6_mean + 3*(c6_mean - c6_std)) t title2 w candlesticks, \
+     file17 u @corpus_id:(c7_mean - 3*(c7_mean - c7_std)):(c7_min_y):(c7_max_y):(c7_mean + 3*(c7_mean - c7_std)) t title2 w candlesticks, \
+     file18 u @corpus_id:(c8_mean - 3*(c8_mean - c8_std)):(c8_min_y):(c8_max_y):(c8_mean + 3*(c8_mean - c8_std)) t title2 w candlesticks, \
+     file19 u @corpus_id:(c9_mean - 3*(c9_mean - c9_std)):(c9_min_y):(c9_max_y):(c9_mean + 3*(c9_mean - c9_std)) t title2 w candlesticks
+
+
+#plot file11 u @corpus_id:(c1_mean + 3*(c1_mean - c1_std)):(c1_min_y):(c1_max_y):(c1_mean - 3*(c1_mean - c1_std)) t title1 w candlesticks, \
+#     file12 u @corpus_id:(c2_mean + 3*(c2_mean - c2_std)):(c2_min_y):(c2_max_y):(c2_mean - 3*(c2_mean - c2_std)) t title2 w candlesticks, \
+#     file13 u @corpus_id:(c3_mean + 3*(c3_mean - c3_std)):(c3_min_y):(c3_max_y):(c3_mean - 3*(c3_mean - c3_std)) t title2 w candlesticks, \
+#     file14 u @corpus_id:(c4_mean + 3*(c4_mean - c4_std)):(c4_min_y):(c4_max_y):(c4_mean - 3*(c4_mean - c4_std)) t title2 w candlesticks, \
+#     file15 u @corpus_id:(c5_mean + 3*(c5_mean - c5_std)):(c5_min_y):(c5_max_y):(c5_mean - 3*(c5_mean - c5_std)) t title2 w candlesticks, \
+#     file16 u @corpus_id:(c6_mean + 3*(c6_mean - c6_std)):(c6_min_y):(c6_max_y):(c6_mean - 3*(c6_mean - c6_std)) t title2 w candlesticks, \
+#     file17 u @corpus_id:(c7_mean + 3*(c7_mean - c7_std)):(c7_min_y):(c7_max_y):(c7_mean - 3*(c7_mean - c7_std)) t title2 w candlesticks, \
+#     file18 u @corpus_id:(c8_mean + 3*(c8_mean - c8_std)):(c8_min_y):(c8_max_y):(c8_mean - 3*(c8_mean - c8_std)) t title2 w candlesticks, \
+#     file19 u @corpus_id:(c9_mean + 3*(c9_mean - c9_std)):(c9_min_y):(c9_max_y):(c9_mean - 3*(c9_mean - c9_std)) t title2 w candlesticks
+
+
+
+
+
+
+################################ start plot random sentences
+
+#min_x = random_sentence_min_x
+#max_x = random_sentence_max_x
+#min_y = random_sentence_min_y
+#max_y = random_sentence_max_y
+#mean  = random_sentence_mean
+#std   = random_sentence_std
+
+#set xlabel "word correct position %";
+#set ylabel "gramar correct position %";
+#set label 1 at (min_x+max_x)/7.,max_y "max" offset 0,0.5
+#set label 2 at (min_x+max_x)/7.,min_y "min" offset 0,-0.5
+#set label 3 at (min_x+max_x)/7.,mean "mean" offset 0,0.5
+#set label 4 at (min_x+max_x)/9.,std "std" offset 0,0.5
+
+#plot    file16 u @res1_id:@res4_id:(1.0) smooth acsplines t title6 w p ls 2, \
+#        file17 u @res1_id:@res4_id:(1.0) smooth acsplines t title7 w p ls 3, \
+#        file18 u @res1_id:@res4_id:(1.0) smooth acsplines t title8 w p ls 4, \
+#        file19 u @res1_id:@res4_id:(1.0) smooth acsplines t title9 w p ls 5, \
+#        mean w l lt 1 notitle "Mean",\
+#        max_y w l lt 2 notitle "Maximum",\
+#        min_y w l lt 3 notitle "Minimum",\
+#        std w l lt 4 notitle
+
+################################# start plot random meaning
+
+#min_x = random_meaning_min_x
+#max_x = random_meaning_max_x
+#min_y = random_meaning_min_y
+#max_y = random_meaning_max_y
+#mean  = random_meaning_mean
+#std   = random_meaning_std
+
+#set xlabel "word correct position %";
+#set ylabel "gramar correct position %";
+#set label 1 at (min_x+max_x)/7.,max_y "max" offset 0,0.5
+#set label 2 at (min_x+max_x)/7.,min_y "min" offset 0,-0.5
+#set label 3 at (min_x+max_x)/7.,mean "mean" offset 0,0.5
+#set label 4 at (min_x+max_x)/9.,std "std" offset 0,0.5
+
+#plot    file12 u @res1_id:@res4_id:(1.0) smooth acsplines t title2 w p ls 2, \
+#        file13 u @res1_id:@res4_id:(1.0) smooth acsplines t title3 w p ls 3, \
+#        file14 u @res1_id:@res4_id:(1.0) smooth acsplines t title4 w p ls 4, \
+#        file15 u @res1_id:@res4_id:(1.0) smooth acsplines t title5 w p ls 5, \
+#        mean w l lt 1 notitle "Mean",\
+#        max_y w l lt 2 notitle "Maximum",\
+#        min_y w l lt 3 notitle "Minimum",\
+#        std w l lt 4 notitle
+
+################################# start plot all
+
+#min_x = all_min_x
+#max_x = all_max_x
+#min_y = all_min_y
+#max_y = all_max_y
+#mean  = all_mean
+#std   = all_std
+
+#set xlabel "word correct position %";
+#set ylabel "gramar correct position %";
+#set label 1 at (min_x+max_x)/7.,max_y "max" offset 0,0.5
+#set label 2 at (min_x+max_x)/7.,min_y "min" offset 0,-0.5
+#set label 3 at (min_x+max_x)/7.,mean "mean" offset 0,0.5
+#set label 4 at (min_x+max_x)/9.,std "std" offset 0,0.5
+
+#plot    file12 u @res1_id:@res4_id:(1.0) smooth acsplines t title2 w p ls 2, \
+#        file13 u @res1_id:@res4_id:(1.0) smooth acsplines t title3 w p ls 3, \
+#        file14 u @res1_id:@res4_id:(1.0) smooth acsplines t title4 w p ls 4, \
+#        file15 u @res1_id:@res4_id:(1.0) smooth acsplines t title5 w p ls 5, \
+#        file16 u @res1_id:@res4_id:(1.0) smooth acsplines t title6 w p ls 6, \
+#        file17 u @res1_id:@res4_id:(1.0) smooth acsplines t title7 w p ls 7, \
+#        file18 u @res1_id:@res4_id:(1.0) smooth acsplines t title8 w p ls 8, \
+#        file19 u @res1_id:@res4_id:(1.0) smooth acsplines t title9 w p ls 9, \
+#        mean w l lt 1 notitle "Mean",\
+#        max_y w l lt 2 notitle "Maximum",\
+#        min_y w l lt 3 notitle "Minimum",\
+#        std w l lt 4 notitle
+
+
+################################# start plot random sentences
+
+#min_x = random_sentence_min_x
+#max_x = random_sentence_max_x
+#min_y = random_sentence_min_y
+#max_y = random_sentence_max_y
+#mean  = random_sentence_mean
+#std   = random_sentence_std
+
+#unset label
+#set xlabel "word correct position %";
+#set ylabel "gramar correct position %";
+#set label 1 at (min_x+max_x)/7.,max_y "max" offset 0,0.5
+#set label 2 at (min_x+max_x)/7.,min_y "min" offset 0,-0.5
+#set label 3 at (min_x+max_x)/7.,mean "mean" offset 0,0.5
+
+#plot    file16 u @res1_id:@res4_id:(mean-std) t title2 w errorbars ls 1, \
+#        file17 u @res1_id:@res4_id:(mean-std) t title3 w errorbars ls 2, \
+#        file18 u @res1_id:@res4_id:(mean-std) t title4 w errorbars ls 3, \
+#        file19 u @res1_id:@res4_id:(mean-std) t title5 w errorbars ls 4, \
+#        mean w l lt 1 notitle "Mean",\
+#        max_y w l lt 2 notitle "Maximum",\
+#        min_y w l lt 3 notitle "Minimum"
+
+################################# start plot random meaning
+
+#min_x = random_meaning_min_x
+#max_x = random_meaning_max_x
+#min_y = random_meaning_min_y
+#max_y = random_meaning_max_y
+#mean  = random_meaning_mean
+#std   = random_meaning_std
+
+#unset label
+#set xlabel "word correct position %";
+#set ylabel "gramar correct position %";
+#set label 1 at (min_x+max_x)/7.,max_y "max" offset 0,0.5
+#set label 2 at (min_x+max_x)/7.,min_y "min" offset 0,-0.5
+#set label 3 at (min_x+max_x)/7.,mean "mean" offset 0,0.5
+
+#plot    file12 u @res1_id:@res4_id:(mean-std) t title2 w errorbars ls 1, \
+#        file13 u @res1_id:@res4_id:(mean-std) t title3 w errorbars ls 2, \
+#        file14 u @res1_id:@res4_id:(mean-std) t title4 w errorbars ls 3, \
+#        file15 u @res1_id:@res4_id:(mean-std) t title5 w errorbars ls 4, \
+#        mean w l lt 1 notitle "Mean",\
+#        max_y w l lt 2 notitle "Maximum",\
+#        min_y w l lt 3 notitle "Minimum"
+
+################################# start plot all
+
+
+#min_x = all_min_x
+#max_x = all_max_x
+#min_y = all_min_y
+#max_y = all_max_y
+#mean  = all_mean
+#std   = all_std
+
+#unset label
+#set xlabel "word correct position %";
+#set ylabel "gramar correct position %";
+#set label 1 at (min_x+max_x)/7.,max_y "max" offset 0,0.5
+#set label 2 at (min_x+max_x)/7.,min_y "min" offset 0,-0.5
+#set label 3 at (min_x+max_x)/7.,mean "mean" offset 0,0.5
+
+#plot    file12 u @res1_id:@res4_id:(mean-std) t title2 w errorbars ls 1, \
+#        file13 u @res1_id:@res4_id:(mean-std) t title3 w errorbars ls 2, \
+#        file14 u @res1_id:@res4_id:(mean-std) t title4 w errorbars ls 3, \
+#        file15 u @res1_id:@res4_id:(mean-std) t title5 w errorbars ls 4, \
+#        file16 u @res1_id:@res4_id:(mean-std) t title2 w errorbars ls 5, \
+#        file17 u @res1_id:@res4_id:(mean-std) t title3 w errorbars ls 6, \
+#        file18 u @res1_id:@res4_id:(mean-std) t title4 w errorbars ls 7, \
+#        file19 u @res1_id:@res4_id:(mean-std) t title5 w errorbars ls 8, \
+#        mean w l lt 1 notitle "Mean",\
+#        max_y w l lt 2 notitle "Maximum",\
+#        min_y w l lt 3 notitle "Minimum"
+
+
+
+
+
+
+
+
+
+#set label 2 at (min_x+max_x)/2.,min_y "Minimum" offset 0,-0.5
+#set label 3 at (min_x+max_x)/2.,mean "Mean" offset 0,0.5
+#set label 4 at (min_x+max_x)/3.,mean+0.1* standard_deviation2 \
+#    "Mean+0.1*std" offset 0,0.5
+#set label 5 at (min_x+max_x)/3.,mean-0.1* standard_deviation2 \
+#    "Mean-0.1*std" offset 0,-0.5
+
+#        file16 u @res1_id:@res4_id t title6 w p ls 6, \
+#        file17 u @res1_id:@res4_id t title7 w p ls 7, \
+#        file18 u @res1_id:@res4_id t title8 w p ls 8, \
+#        file19 u @res1_id:@res4_id t title9 w p ls 9, \
+#        mean w l lt 2 notitle "Mean",\
+#        max_y w l lt 3 notitle "Maximum",\
+#        min_y w l lt 3 notitle "Minimum"
+
+
+##To get the max and min value
+#plot file0 u @res1_id:@res4_id
+#min_y = GPVAL_DATA_Y_MIN
+#max_y = GPVAL_DATA_Y_MAX
+#ylen = max_y - min_y
+#min_x = GPVAL_DATA_X_MIN
+#max_x = GPVAL_DATA_X_MAX
+#xlen = max_x - min_x
+#set table "../dist/data/Results/mean.txt" # put the mean value out
+#plot file0 u ((min_x + max_x)/2.0):@res4_id smooth unique w p
+#unset table
+#set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
+#plot file0 u ((max_x + min_x)/2.0):(@res4_id**2) smooth unique w p
+#unset table
+
+#f(x)=a*x+b  #The fit functions
+#g(x)=c*x+d
+
+#fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
+#fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
+#mean=f(0)               #mean value
+#mean_squared=g(0)	#mean of the squared value
+
+
+#standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
+#standard_deviation2 = sqrt(-(mean_squared-mean**2))
+
+#print "The mean value is ",mean		#print the mean and standard deviation
+#print "The standard deviation is ",standard_deviation
+
+#set term post eps enhanced color lw 1.5 font ",20"
+#set output "../dist/data/Results/statistic.png"
+#set terminal png size 1000,1000
+
+
+
+#plot file0 u @res1_id:@res4_id w p pt 7 ps 0.5 notitle,\
+#     mean w l lt 2 notitle "Mean",\
+#     max_y w l lt 3 notitle "Maximum",\
+#     min_y w l lt 3 notitle,"Minimum"\
+#     mean+0.1*standard_deviation2 w l lt 4 notitle,\
+#     mean-0.1*standard_deviation2 w l lt 4 notitle
+#the six plot stand for raw data, mean, maximum, minimum,
+#3-sigma upper line and 3-sigma lower line
+
+
+
+
+
+
+
+#set output "../dist/data/Results/random1.png"
+#set terminal png size 4000,2000
+#set multiplot layout 3, 2 title "Analyse random sentence/meaning influence"
+
+#labels = 'set xlabel "res1_id"; set ylabel "res4_id";
+#eval(labels)
+#plot    file11 u @res1_id:@res4_id t title1 w p ls 1, \
+#        file12 u @res1_id:@res4_id t title2 w p ls 2, \
+#        file13 u @res1_id:@res4_id t title3 w p ls 3, \
+#        file14 u @res1_id:@res4_id t title4 w p ls 4, \
+#        file15 u @res1_id:@res4_id t title5 w p ls 5, \
+#        file16 u @res1_id:@res4_id t title6 w p ls 6, \
+#        file17 u @res1_id:@res4_id t title7 w p ls 7, \
+#        file18 u @res1_id:@res4_id t title8 w p ls 8, \
+#        file19 u @res1_id:@res4_id t title9 w p ls 9, \
+#        mean w l lt 2 notitle "Mean",\
+#        max_y w l lt 3 notitle "Maximum",\
+#        min_y w l lt 3 notitle "Minimum"
+
+#plot    file11 u @res2_id:@res5_id t title1 w p ls 1, \
+#        file12 u @res2_id:@res5_id t title2 w p ls 2, \
+#        file13 u @res2_id:@res5_id t title3 w p ls 3, \
+#        file14 u @res2_id:@res5_id t title4 w p ls 4, \
+#        file15 u @res2_id:@res5_id t title5 w p ls 5, \
+#        file16 u @res2_id:@res5_id t title6 w p ls 6, \
+#        file17 u @res2_id:@res5_id t title7 w p ls 7, \
+#        file18 u @res2_id:@res5_id t title8 w p ls 8, \
+#        file19 u @res2_id:@res5_id t title9 w p ls 9
+
+#plot    file11 u @res1_id:@res4_id:(1.0) smooth acsplines t title1 w errorbars ls 1, \
+#        file12 u @res1_id:@res4_id:(1.0) smooth acsplines t title2 w errorbars ls 2, \
+#        file13 u @res1_id:@res4_id:(1.0) smooth acsplines t title3 w errorbars ls 3, \
+#        file14 u @res1_id:@res4_id:(1.0) smooth acsplines t title4 w errorbars ls 4, \
+#        file15 u @res1_id:@res4_id:(1.0) smooth acsplines t title5 w errorbars ls 5, \
+#        file16 u @res1_id:@res4_id:(1.0) smooth acsplines t title6 w errorbars ls 6, \
+#        file17 u @res1_id:@res4_id:(1.0) smooth acsplines t title7 w errorbars ls 7, \
+#        file18 u @res1_id:@res4_id:(1.0) smooth acsplines t title8 w errorbars ls 8, \
+#        file19 u @res1_id:@res4_id:(1.0) smooth acsplines t title9 w errorbars ls 9
+
+
+
+
+#plot    file11 u @res1_id:@res4_id:(max_y-min_y) t title1 w yerrorbars ls 1
+
+#plot    file11 u @res1_id:@res4_id:($1-min_y,max_y-$2) t title1 w yerrorbars ls 1
+#, \
+#        file12 u @res1_id:@res4_id:2 t title2 w yerrorbars ls 2, \
+#        file13 u @res1_id:@res4_id:3 t title4 w yerrorbars ls 4, \
+#        file15 u @res1_id:@res4_id:4 t title5 w yerrorbars ls 5, \
+#        file16 u @res1_id:@res4_id:5 t title6 w yerrorbars ls 6, \
+#        file17 u @res1_id:@res4_id:6 t title7 w yerrorbars ls 7, \
+#        file18 u @res1_id:@res4_id:7 t title8 w yerrorbars ls 8, \
+#        file19 u @res1_id:@res4_id:8 t title9 w yerrorbars ls 9
+
+#plot    file11 u @res1_id:@res4_id:(1.0) smooth acsplines t title1 w lp ls 1, \
+#        file12 u @res1_id:@res4_id:(1.0) smooth acsplines t title2 w lp ls 2, \
+#        file13 u @res1_id:@res4_id:(1.0) smooth acsplines t title3 w lp ls 3, \
+#        file14 u @res1_id:@res4_id:(1.0) smooth acsplines t title4 w lp ls 4, \
+#        file15 u @res1_id:@res4_id:(1.0) smooth acsplines t title5 w lp ls 5, \
+#        file16 u @res1_id:@res4_id:(1.0) smooth acsplines t title6 w lp ls 6, \
+#        file17 u @res1_id:@res4_id:(1.0) smooth acsplines t title7 w lp ls 7, \
+#        file18 u @res1_id:@res4_id:(1.0) smooth acsplines t title8 w lp ls 8, \
+#        file19 u @res1_id:@res4_id:(1.0) smooth acsplines t title9 w lp ls 9
+
+#unset multiplot
+#set output "../dist/data/Results/random2.png"
+#set terminal png size 4000,2000
+#set multiplot layout 3, 3 title "Analyse random sentence/meaning influence"
+
+
+#eval(display2)
+#splot file11 index 0 u @res4_id:@neurons_id:@res1_id t title1 w boxes ls 1, \
+#      file12 index 0 u @res4_id:@neurons_id:@res1_id t title1 w boxes ls 2
+
+#plot    file11 u @neurons_id:@res4_id:(1.0) smooth acsplines t title1 ls 1, \
+#        file12 u @neurons_id:@res1_id:(1.0) smooth acsplines t title2 ls 2, \
+#        file13 u @neurons_id:@res1_id:(1.0) smooth acsplines t title3 ls 3, \
+#        file14 u @neurons_id:@res1_id:(1.0) smooth acsplines t title4 ls 4, \
+#        file15 u @neurons_id:@res1_id:(1.0) smooth acsplines t title5 ls 5, \
+#        file16 u @neurons_id:@res1_id:(1.0) smooth acsplines t title6 ls 6, \
+#        file17 u @neurons_id:@res1_id:(1.0) smooth acsplines t title7 ls 7, \
+#        file18 u @neurons_id:@res1_id:(1.0) smooth acsplines t title8 ls 8, \
+#        file19 u @neurons_id:@res1_id:(1.0) smooth acsplines t title9 ls 9
+
+#plot    file11 u @neurons_id:@res2_id:(1.0) smooth acsplines t title1 ls 1, \
+#        file12 u @neurons_id:@res2_id:(1.0) smooth acsplines t title2 ls 2, \
+#        file13 u @neurons_id:@res2_id:(1.0) smooth acsplines t title3 ls 3, \
+#        file14 u @neurons_id:@res2_id:(1.0) smooth acsplines t title4 ls 4, \
+#        file15 u @neurons_id:@res2_id:(1.0) smooth acsplines t title5 ls 5, \
+#        file16 u @neurons_id:@res2_id:(1.0) smooth acsplines t title6 ls 6, \
+#        file17 u @neurons_id:@res2_id:(1.0) smooth acsplines t title7 ls 7, \
+#        file18 u @neurons_id:@res2_id:(1.0) smooth acsplines t title8 ls 8, \
+#        file19 u @neurons_id:@res2_id:(1.0) smooth acsplines t title9 ls 9
+
+#plot    file11 u @neurons_id:@res3_id:(1.0) smooth acsplines t title1 ls 1, \
+#        file12 u @neurons_id:@res3_id:(1.0) smooth acsplines t title2 ls 2, \
+#        file13 u @neurons_id:@res3_id:(1.0) smooth acsplines t title3 ls 3, \
+#        file14 u @neurons_id:@res3_id:(1.0) smooth acsplines t title4 ls 4, \
+#        file15 u @neurons_id:@res3_id:(1.0) smooth acsplines t title5 ls 5, \
+#        file16 u @neurons_id:@res3_id:(1.0) smooth acsplines t title6 ls 6, \
+#        file17 u @neurons_id:@res3_id:(1.0) smooth acsplines t title7 ls 7, \
+#        file18 u @neurons_id:@res3_id:(1.0) smooth acsplines t title8 ls 8, \
+#        file19 u @neurons_id:@res3_id:(1.0) smooth acsplines t title9 ls 9
+
+#plot    file11 u @neurons_id:@res4_id:(1.0) smooth acsplines t title1 ls 1, \
+#        file12 u @neurons_id:@res4_id:(1.0) smooth acsplines t title2 ls 2, \
+#        file13 u @neurons_id:@res4_id:(1.0) smooth acsplines t title3 ls 3, \
+#        file14 u @neurons_id:@res4_id:(1.0) smooth acsplines t title4 ls 4, \
+#        file15 u @neurons_id:@res4_id:(1.0) smooth acsplines t title5 ls 5, \
+#        file16 u @neurons_id:@res4_id:(1.0) smooth acsplines t title6 ls 6, \
+#        file17 u @neurons_id:@res4_id:(1.0) smooth acsplines t title7 ls 7, \
+#        file18 u @neurons_id:@res4_id:(1.0) smooth acsplines t title8 ls 8, \
+#        file19 u @neurons_id:@res4_id:(1.0) smooth acsplines t title9 ls 9
+
+#plot    file11 u @neurons_id:@res5_id:(1.0) smooth acsplines t title1 ls 1, \
+#        file12 u @neurons_id:@res5_id:(1.0) smooth acsplines t title2 ls 2, \
+#        file13 u @neurons_id:@res5_id:(1.0) smooth acsplines t title3 ls 3, \
+#        file14 u @neurons_id:@res5_id:(1.0) smooth acsplines t title4 ls 4, \
+#        file15 u @neurons_id:@res5_id:(1.0) smooth acsplines t title5 ls 5, \
+#        file16 u @neurons_id:@res5_id:(1.0) smooth acsplines t title6 ls 6, \
+#        file17 u @neurons_id:@res5_id:(1.0) smooth acsplines t title7 ls 7, \
+#        file18 u @neurons_id:@res5_id:(1.0) smooth acsplines t title8 ls 8, \
+#        file19 u @neurons_id:@res5_id:(1.0) smooth acsplines t title9 ls 9
+
+
+#plot    file11 u @neurons_id:@res4_id t title1 w histeps ls 1, \
+#        file12 u @neurons_id:@res4_id t title2 w histeps ls 2, \
+#        file13 u @neurons_id:@res4_id t title3 w histeps ls 3, \
+#        file14 u @neurons_id:@res4_id t title4 w histeps ls 4, \
+#        file15 u @neurons_id:@res4_id t title5 w histeps ls 5, \
+#        file16 u @neurons_id:@res4_id t title6 w histeps ls 6, \
+#        file17 u @neurons_id:@res4_id t title7 w histeps ls 7, \
+#        file18 u @neurons_id:@res4_id t title8 w histeps ls 8, \
+#        file19 u @neurons_id:@res4_id t title9 w histeps ls 9
+
+#plot file11 u @neurons_id:@res4_id
+#c0_r4_min_y = GPVAL_DATA_Y_MIN
+#c0_r4_max_y = GPVAL_DATA_Y_MAX
+#co_r4_f(x) = mean_y
+#fit co_r4_f(x) file11 u @neurons_id:@res4_id via mean_y
+
+#plot c0_r4_min_y with filledcurves y1=mean_y lt 1 lc rgb "#bbbbdd", \
+#     c0_r4_max_y with filledcurves y1=mean_y lt 1 lc rgb "#bbddbb", \
+#     file11 u @neurons_id:@res4_id t title1 w lp ls 1
+
+
+#plot    file11 u @neurons_id:@res4_id t title1 w p  ls 1, \
+#        file12 u @neurons_id:@res4_id t title2 w p  ls 2, \
+#        file13 u @neurons_id:@res4_id t title3 w p  ls 3, \
+#        file14 u @neurons_id:@res4_id t title4 w p  ls 4, \
+#        file15 u @neurons_id:@res4_id t title5 w p  ls 5, \
+#        file16 u @neurons_id:@res4_id t title6 w p  ls 6, \
+#        file17 u @neurons_id:@res4_id t title7 w p  ls 7, \
+#        file18 u @neurons_id:@res4_id t title8 w p  ls 8, \
+#        file19 u @neurons_id:@res4_id t title9 w p  ls 9
+
+
+#plot    file11 u @neurons_id:( (@res1_id + @res2_id + @res3_id + @res4_id + @res5_id )/5 ) t title1 w p  ls 1, \
+#        file12 u @neurons_id:( (@res1_id + @res2_id + @res3_id + @res4_id + @res5_id )/5 ) t title2 w p  ls 2, \
+#        file13 u @neurons_id:( (@res1_id + @res2_id + @res3_id + @res4_id + @res5_id )/5 ) t title3 w p  ls 3, \
+#        file14 u @neurons_id:( (@res1_id + @res2_id + @res3_id + @res4_id + @res5_id )/5 ) t title4 w p  ls 4, \
+#        file15 u @neurons_id:( (@res1_id + @res2_id + @res3_id + @res4_id + @res5_id )/5 ) t title5 w p  ls 5, \
+#        file16 u @neurons_id:( (@res1_id + @res2_id + @res3_id + @res4_id + @res5_id )/5 ) t title6 w p  ls 6, \
+#        file17 u @neurons_id:( (@res1_id + @res2_id + @res3_id + @res4_id + @res5_id )/5 ) t title7 w p  ls 7, \
+#        file18 u @neurons_id:( (@res1_id + @res2_id + @res3_id + @res4_id + @res5_id )/5 ) t title8 w p  ls 8, \
+#        file19 u @neurons_id:( (@res1_id + @res2_id + @res3_id + @res4_id + @res5_id )/5 ) t title9 w p  ls 9
+
+#eval(display2)
+#eval(corpus_neurons_res1)
+#splot file u @corpus_id:@neurons_id:@res1_id t title1 w l ls 1
+#eval(corpus_neurons_res2)
+#splot file u @corpus_id:@neurons_id:@res2_id t title1 w l ls 1
+#eval(corpus_neurons_res3)
+#splot file u @corpus_id:@neurons_id:@res3_id t title1 w l ls 1
+#eval(corpus_neurons_res4)
+#splot file u @corpus_id:@neurons_id:@res4_id t title1 w l ls 1
+#eval(corpus_neurons_res5)
+#splot file u @corpus_id:@neurons_id:@res5_id t title1 w l ls 1
+#eval(display2)
+#eval(neuron_leakrate_res1)
+#splot file u @neurons_id:@spectral_radius_id:@res1_id t title1 w boxes ls 1
+#eval(neuron_leakrate_res2)
+#splot file u @neurons_id:@spectral_radius_id:@res2_id t title1 w boxes ls 1
+#eval(neuron_leakrate_res3)
+#splot file u @neurons_id:@spectral_radius_id:@res3_id t title1 w boxes ls 1
+
+unset multiplot
