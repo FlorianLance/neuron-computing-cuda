@@ -71,6 +71,21 @@ file17  = "../dist/data/Results/random_res/corpus_6.txt"
 file18  = "../dist/data/Results/random_res/corpus_7.txt"
 file19  = "../dist/data/Results/random_res/corpus_8.txt"
 
+file20  = "../dist/data/Results/random_res/26_11_c0.txt"
+file21  = "../dist/data/Results/random_res/26_11_c1.txt"
+file22  = "../dist/data/Results/random_res/26_11_c2.txt"
+file23  = "../dist/data/Results/random_res/26_11_c3.txt"
+file24  = "../dist/data/Results/random_res/26_11_c4.txt"
+file25  = "../dist/data/Results/random_res/26_11_c5.txt"
+file26  = "../dist/data/Results/random_res/26_11_c6.txt"
+file27  = "../dist/data/Results/random_res/26_11_c7.txt"
+file28  = "../dist/data/Results/random_res/26_11_c8.txt"
+
+
+file29  = "../dist/data/Results/mat_out/curve.txt"
+
+
+
 # define titles
 title1 = "Corpus 0 -> 120.txt"
 title2 = "Corpus 1 -> 120-30-meaning.txt"
@@ -81,6 +96,12 @@ title6 = "Corpus 5 -> 120-30-sentence.txt"
 title7 = "Corpus 6 -> 120-60-sentence.txt"
 title8 = "Corpus 7 -> 120-90-sentence.txt"
 title9 = "Corpus 8 -> 120-120-sentence.txt"
+
+
+title_6 = "Corpus 1 -> 120-30-sentence.txt"
+title_7 = "Corpus 2 -> 120-60-sentence.txt"
+title_8 = "Corpus 3 -> 120-90-sentence.txt"
+title_9 = "Corpus 4 -> 120-120-sentence.txt"
 
 #RES 1 : average for all sentences of : correct position and word percentage (between 0% and 100%)
 #RES 2 : average for all sentences of : sentence right and absolute position (0% or 100%)
@@ -433,8 +454,8 @@ c9_std   = standard_deviation2
 
 
 set output "../dist/data/Results/random1.png"
-set terminal png size 1200,1500
-set multiplot layout 2, 1 title "Analyse random sentence/meaning influence"
+set terminal png size 2500,1500
+set multiplot layout 2, 2 title "Analyse random sentence/meaning influence"
 
 
 
@@ -466,13 +487,14 @@ print c1_mean + c1_mean - c1_std
 print c1_std + c1_std - c1_mean
 
 
-set xrange [-1:10]
-set yrange [-20:120]
+set xrange [-1:9]
+set yrange [-5:105]
+set ytics 0,10,100
+
+set xtics 0,1,8;
 
 set xlabel "corpus id"
 set ylabel "gramar absolute correct position %"
-
-
 
 
 plot file11 u @corpus_id:@res5_id:(0.1) t title1 w boxplot, \
@@ -485,6 +507,25 @@ plot file11 u @corpus_id:@res5_id:(0.1) t title1 w boxplot, \
      file18 u @corpus_id:@res5_id:(0.1) t title8 w boxplot, \
      file19 u @corpus_id:@res5_id:(0.1) t title9 w boxplot
 
+set xrange [-1:5]
+set xtics 0,1,4;
+plot file11 u @corpus_id:@res5_id:(0.1) t title1 w boxplot, \
+     file16 u (1):@res5_id:(0.1) t title_6 w boxplot, \
+     file17 u (2):@res5_id:(0.1) t title_7 w boxplot, \
+     file18 u (3):@res5_id:(0.1) t title_8 w boxplot, \
+     file19 u (4):@res5_id:(0.1) t title_9 w boxplot
+
+set xrange [-1:5]
+set xtics 0,1,4;
+plot file11 u @corpus_id:@res5_id:(0.1) t title1 w boxplot, \
+     file12 u (1):@res5_id:(0.1) t title2 w boxplot, \
+     file13 u (2):@res5_id:(0.1) t title3 w boxplot, \
+     file14 u (3):@res5_id:(0.1) t title4 w boxplot, \
+     file15 u (4):@res5_id:(0.1) t title5 w boxplot
+
+
+set xrange [-1:9]
+set xtics 0,1,8;
 
 set label 1 at 4,5 "box min -> mean - 3*(mean-std)" offset 0,0.5
 set label 2 at 4,1 "box hight -> mean + 3*(mean-std)" offset 0,0.5
@@ -493,13 +534,80 @@ set label 4 at 4,-5 "whisker hight -> max value" offset 0,0.5
 
 plot file11 u @corpus_id:(c1_mean - 3*(c1_mean - c1_std)):(c1_min_y):(c1_max_y):(c1_mean + 3*(c1_mean - c1_std)) t title1 w candlesticks, \
      file12 u @corpus_id:(c2_mean - 3*(c2_mean - c2_std)):(c2_min_y):(c2_max_y):(c2_mean + 3*(c2_mean - c2_std)) t title2 w candlesticks, \
-     file13 u @corpus_id:(c3_mean - 3*(c3_mean - c3_std)):(c3_min_y):(c3_max_y):(c3_mean + 3*(c3_mean - c3_std)) t title2 w candlesticks, \
-     file14 u @corpus_id:(c4_mean - 3*(c4_mean - c4_std)):(c4_min_y):(c4_max_y):(c4_mean + 3*(c4_mean - c4_std)) t title2 w candlesticks, \
-     file15 u @corpus_id:(c5_mean - 3*(c5_mean - c5_std)):(c5_min_y):(c5_max_y):(c5_mean + 3*(c5_mean - c5_std)) t title2 w candlesticks, \
-     file16 u @corpus_id:(c6_mean - 3*(c6_mean - c6_std)):(c6_min_y):(c6_max_y):(c6_mean + 3*(c6_mean - c6_std)) t title2 w candlesticks, \
-     file17 u @corpus_id:(c7_mean - 3*(c7_mean - c7_std)):(c7_min_y):(c7_max_y):(c7_mean + 3*(c7_mean - c7_std)) t title2 w candlesticks, \
-     file18 u @corpus_id:(c8_mean - 3*(c8_mean - c8_std)):(c8_min_y):(c8_max_y):(c8_mean + 3*(c8_mean - c8_std)) t title2 w candlesticks, \
-     file19 u @corpus_id:(c9_mean - 3*(c9_mean - c9_std)):(c9_min_y):(c9_max_y):(c9_mean + 3*(c9_mean - c9_std)) t title2 w candlesticks
+     file13 u @corpus_id:(c3_mean - 3*(c3_mean - c3_std)):(c3_min_y):(c3_max_y):(c3_mean + 3*(c3_mean - c3_std)) t title3 w candlesticks, \
+     file14 u @corpus_id:(c4_mean - 3*(c4_mean - c4_std)):(c4_min_y):(c4_max_y):(c4_mean + 3*(c4_mean - c4_std)) t title4 w candlesticks, \
+     file15 u @corpus_id:(c5_mean - 3*(c5_mean - c5_std)):(c5_min_y):(c5_max_y):(c5_mean + 3*(c5_mean - c5_std)) t title5 w candlesticks, \
+     file16 u @corpus_id:(c6_mean - 3*(c6_mean - c6_std)):(c6_min_y):(c6_max_y):(c6_mean + 3*(c6_mean - c6_std)) t title6 w candlesticks, \
+     file17 u @corpus_id:(c7_mean - 3*(c7_mean - c7_std)):(c7_min_y):(c7_max_y):(c7_mean + 3*(c7_mean - c7_std)) t title7 w candlesticks, \
+     file18 u @corpus_id:(c8_mean - 3*(c8_mean - c8_std)):(c8_min_y):(c8_max_y):(c8_mean + 3*(c8_mean - c8_std)) t title8 w candlesticks, \
+     file19 u @corpus_id:(c9_mean - 3*(c9_mean - c9_std)):(c9_min_y):(c9_max_y):(c9_mean + 3*(c9_mean - c9_std)) t title9 w candlesticks
+
+unset multiplot
+set output "../dist/data/Results/random2.png"
+set terminal png size 1500,2000
+set multiplot layout 2, 1 title "Analyse random sentence/meaning influence"
+
+unset label
+set xlabel "corpus id"
+set ylabel "gramar absolute correct position %"
+
+set key left bottom
+
+plot file20 u @corpus_id:@res5_id:(0.1) t title1 w boxplot, \
+     file21 u @corpus_id:@res5_id:(0.1) t title2 w boxplot, \
+     file22 u @corpus_id:@res5_id:(0.1) t title3 w boxplot, \
+     file23 u @corpus_id:@res5_id:(0.1) t title4 w boxplot, \
+     file24 u @corpus_id:@res5_id:(0.1) t title5 w boxplot, \
+     file25 u @corpus_id:@res5_id:(0.1) t title6 w boxplot, \
+     file26 u @corpus_id:@res5_id:(0.1) t title7 w boxplot, \
+     file27 u @corpus_id:@res5_id:(0.1) t title8 w boxplot, \
+     file28 u @corpus_id:@res5_id:(0.1) t title9 w boxplot
+
+set xlabel "corpus id"
+set ylabel "all words absolute correct position %"
+
+plot file20 u @corpus_id:@res2_id:(0.1) t title1 w boxplot, \
+     file21 u @corpus_id:@res2_id:(0.1) t title2 w boxplot, \
+     file22 u @corpus_id:@res2_id:(0.1) t title3 w boxplot, \
+     file23 u @corpus_id:@res2_id:(0.1) t title4 w boxplot, \
+     file24 u @corpus_id:@res2_id:(0.1) t title5 w boxplot, \
+     file25 u @corpus_id:@res2_id:(0.1) t title6 w boxplot, \
+     file26 u @corpus_id:@res2_id:(0.1) t title7 w boxplot, \
+     file27 u @corpus_id:@res2_id:(0.1) t title8 w boxplot, \
+     file28 u @corpus_id:@res2_id:(0.1) t title9 w boxplot
+
+
+
+unset label
+unset xlabel
+unset ylabel
+unset xrange
+unset xtics
+unset yrange
+unset ytics
+unset multiplot
+
+set xrange [-1:101]
+set xtics 0,10,100
+set yrange [-0.2:1.5]
+set ytics -0.2,0.1,1.5
+
+set key right top
+
+
+set output "../dist/data/Results/mat_out.png"
+set terminal png size 1500,2000
+set multiplot layout 2, 1 title "Gramar / time"
+
+plot file29 u 0:1 t "-ga" w linespoint ls 1, \
+     file29 u 0:2 t "-ni" w linespoint ls 2, \
+     file29 u 0:3 t "-wo" w linespoint ls 3, \
+     file29 u 0:4 t "-yotte" w linespoint ls 4, \
+     file29 u 0:5 t "-o" w linespoint ls 5, \
+     file29 u 0:6 t "-to" w linespoint ls 6, \
+     file29 u 0:7 t "sore" w linespoint ls 7, \
+     file29 u 0:8 t "X" w linespoint ls 8
+
 
 
 #plot file11 u @corpus_id:(c1_mean + 3*(c1_mean - c1_std)):(c1_min_y):(c1_max_y):(c1_mean - 3*(c1_mean - c1_std)) t title1 w candlesticks, \

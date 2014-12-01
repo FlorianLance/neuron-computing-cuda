@@ -202,6 +202,24 @@ class Model
                                                 std::vector<double> &sizeDifferencePercentage,
                                                 int &totalWordNumber, int &totalWordCorrectNumber);
 
+
+        /**
+         * @brief computeResultsData
+         * @param trainResults
+         * @param pathSaveAllSentenceRest
+         * @param diffSizeOCW
+         * @param absoluteCorrectPositionAndWordCCW
+         * @param correctPositionAndWordCCW
+         * @param meanDiffSizeOCW
+         * @param meanAbsoluteCorrectPositionAndWordCCW
+         * @param meanCorrectPositionAndWordCCW
+         */
+        void computeResultsData(cbool trainResults, const std::string &pathSaveAllSentenceRest,
+                                std::vector<double> diffSizeOCW, std::vector<double> absoluteCorrectPositionAndWordCCW, std::vector<double> correctPositionAndWordCCW,
+                                double &meanDiffSizeOCW, double &meanAbsoluteCorrectPositionAndWordCCW, double &meanCorrectPositionAndWordCCW);
+
+
+
         /**
          * @brief saveResults
          */

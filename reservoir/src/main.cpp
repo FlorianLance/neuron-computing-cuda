@@ -6,6 +6,8 @@
 #include "gpuMat/cudaMultiplications.h"
 
 
+#include "Interface.h"
+
 template<typename T>
 void fillRandomStdVec(std::vector<T> vec)
 {
@@ -38,103 +40,103 @@ void fillRandomMat(cv::Mat &mat)
 
 void testPerfs()
 {
-//    cv::Mat mat10D(10, 10, CV_64FC1);
-//    cv::Mat mat100D(100, 100, CV_64FC1);
-    cv::Mat mat1000D(3000, 3000, CV_32FC1);
-    fillRandomMat(mat1000D);
-//    while(true)
-//    {
+////    cv::Mat mat10D(10, 10, CV_64FC1);
+////    cv::Mat mat100D(100, 100, CV_64FC1);
+//    cv::Mat mat1000D(3000, 3000, CV_32FC1);
+//    fillRandomMat(mat1000D);
+////    while(true)
+////    {
 
-//    }
+////    }
 
-//    cv::Mat mat2000D(2000, 2000, CV_64FC1);
+////    cv::Mat mat2000D(2000, 2000, CV_64FC1);
 
-//    fillRandomMat(mat10D);
-//    fillRandomMat(mat100D);
+////    fillRandomMat(mat10D);
+////    fillRandomMat(mat100D);
 
-//    fillRandomMat(mat2000D);
-
-
-    clock_t time = clock();
-
-    int nb;
-    cv::Mat resCuda,resCV;
-
-//    {
-//        cv::Mat matCudaS,matCudaU,matCudaVT;
-//        swUtil::swCuda::squareMatrixSingularValueDecomposition(mat1000D,matCudaS,matCudaU,matCudaVT);
-//        save2DMatrixToTextStd("../data/a1.txt", matCudaS);
-//        save2DMatrixToTextStd("../data/a2.txt", matCudaU);
-//        save2DMatrixToTextStd("../data/a2.txt", matCudaVT);
-
-//        cv::Mat l_tempCudaMult, invCuda1;
-//        swUtil::swCuda::blockMatrixMultiplicationD(matCudaS, matCudaU.t(), l_tempCudaMult, 4);
-
-//        save2DMatrixToTextStd("../data/a3.txt", l_tempCudaMult);
-
-//        swUtil::swCuda::blockMatrixMultiplicationD(matCudaVT.t(), l_tempCudaMult, invCuda1, 4);
-//        save2DMatrixToTextStd("../data/a4.txt", invCuda1);
-
-//    }
-
-//    displayTime("_2", time); time = clock();
-//    swUtil::swCuda::squareMatrixSingularValueDecomposition(mat2000D,matCudaS,matCudaU,matCudaVT);
+////    fillRandomMat(mat2000D);
 
 
-    time = clock();
-    {
-        cv::Mat S, U, VT, invCuda1 , SUt;
-        swCuda::squareMatrixSingularValueDecomposition(mat1000D, S, U, VT);
-//        swCuda::new_squareMatrixSingularValueDecomposition(mat1000D, SUt, VT);
-//        swCuda::low_memory_squareMatrixSingularValueDecomposition<float>(mat1000D, SUt, VT);
-//        save2DMatrixToTextStd("../data/1.txt", VT);
-    }
+//    clock_t time = clock();
+
+//    int nb;
+//    cv::Mat resCuda,resCV;
+
+////    {
+////        cv::Mat matCudaS,matCudaU,matCudaVT;
+////        swUtil::swCuda::squareMatrixSingularValueDecomposition(mat1000D,matCudaS,matCudaU,matCudaVT);
+////        save2DMatrixToTextStd("../data/a1.txt", matCudaS);
+////        save2DMatrixToTextStd("../data/a2.txt", matCudaU);
+////        save2DMatrixToTextStd("../data/a2.txt", matCudaVT);
+
+////        cv::Mat l_tempCudaMult, invCuda1;
+////        swUtil::swCuda::blockMatrixMultiplicationD(matCudaS, matCudaU.t(), l_tempCudaMult, 4);
+
+////        save2DMatrixToTextStd("../data/a3.txt", l_tempCudaMult);
+
+////        swUtil::swCuda::blockMatrixMultiplicationD(matCudaVT.t(), l_tempCudaMult, invCuda1, 4);
+////        save2DMatrixToTextStd("../data/a4.txt", invCuda1);
+
+////    }
+
+////    displayTime("_2", time); time = clock();
+////    swUtil::swCuda::squareMatrixSingularValueDecomposition(mat2000D,matCudaS,matCudaU,matCudaVT);
 
 
-//    displayTime("_2", time); time = clock();
-//    {
-//        cv::Mat SUt, VT, invCuda2;
-//        swCuda::low_memory_squareMatrixSingularValueDecomposition<double>(mat1000D, SUt, VT);
-//        save2DMatrixToTextStd("../data/2.txt", VT);
-
-////        save2DMatrixToTextStd("../data/b1.txt", SUt);
-////        save2DMatrixToTextStd("../data/b2.txt", Vt);
-
-//        swCuda::blockMatrixMultiplicationD(VT.t(), SUt, invCuda2, 4);
-////        save2DMatrixToTextStd("../data/b3.txt", invCuda2);
-//    }
-
-    displayTime("_2", time); time = clock();
-//    resCV = mat1000D * mat1000D;
-//    displayTime("_1", time); time = clock();
-//    swUtil::swCuda::blockMatrixMultiplicationD(mat1000D,mat1000D,resCuda,2);
-//    displayTime("_2", time); time = clock();
-//    compareMatrices<double>(resCV, resCuda, nb, 10); time = clock();
-//    qDebug() << "-> 2" << " " << nb << " prec : 10 \n";
 //    time = clock();
-//    swUtil::swCuda::blockMatrixMultiplicationD(mat1000D,mat1000D,resCuda,3);
-//    displayTime("_3", time); time = clock();
-//    compareMatrices<double>(resCV, resCuda, nb, 10); time = clock();
-//    qDebug() << "-> 4" << " " << nb << " prec : 10 \n";
-
-//    swUtil::swCuda::blockMatrixMultiplicationD(mat1000D,mat1000D,resCuda,4);
-//    displayTime("_4", time); time = clock();
-//    compareMatrices<double>(resCV, resCuda, nb, 10); time = clock();
-//    qDebug() << "-> 8" << " " << nb << " prec : 10 \n";
-
-//    swUtil::swCuda::blockMatrixMultiplicationD(mat1000D,mat1000D,resCuda,5);
-//    displayTime("_5", time); time = clock();
-//    compareMatrices<double>(resCV, resCuda, nb, 10); time = clock();
-//    qDebug() << "-> 8" << " " << nb << " prec : 10 \n";
+//    {
+//        cv::Mat S, U, VT, invCuda1 , SUt;
+//        swCuda::squareMatrixSingularValueDecomposition(mat1000D, S, U, VT);
+////        swCuda::new_squareMatrixSingularValueDecomposition(mat1000D, SUt, VT);
+////        swCuda::low_memory_squareMatrixSingularValueDecomposition<float>(mat1000D, SUt, VT);
+////        save2DMatrixToTextStd("../data/1.txt", VT);
+//    }
 
 
-//    swUtil::swCuda::blockMatrixMultiplicationD(mat1000D,mat1000D,resCuda,6);
-//    displayTime("_5", time); time = clock();
-//    compareMatrices<double>(resCV, resCuda, nb, 10); time = clock();
-//    qDebug() << "-> 8" << " " << nb << " prec : 10 \n";
+////    displayTime("_2", time); time = clock();
+////    {
+////        cv::Mat SUt, VT, invCuda2;
+////        swCuda::low_memory_squareMatrixSingularValueDecomposition<double>(mat1000D, SUt, VT);
+////        save2DMatrixToTextStd("../data/2.txt", VT);
+
+//////        save2DMatrixToTextStd("../data/b1.txt", SUt);
+//////        save2DMatrixToTextStd("../data/b2.txt", Vt);
+
+////        swCuda::blockMatrixMultiplicationD(VT.t(), SUt, invCuda2, 4);
+//////        save2DMatrixToTextStd("../data/b3.txt", invCuda2);
+////    }
+
+//    displayTime("_2", time); time = clock();
+////    resCV = mat1000D * mat1000D;
+////    displayTime("_1", time); time = clock();
+////    swUtil::swCuda::blockMatrixMultiplicationD(mat1000D,mat1000D,resCuda,2);
+////    displayTime("_2", time); time = clock();
+////    compareMatrices<double>(resCV, resCuda, nb, 10); time = clock();
+////    qDebug() << "-> 2" << " " << nb << " prec : 10 \n";
+////    time = clock();
+////    swUtil::swCuda::blockMatrixMultiplicationD(mat1000D,mat1000D,resCuda,3);
+////    displayTime("_3", time); time = clock();
+////    compareMatrices<double>(resCV, resCuda, nb, 10); time = clock();
+////    qDebug() << "-> 4" << " " << nb << " prec : 10 \n";
+
+////    swUtil::swCuda::blockMatrixMultiplicationD(mat1000D,mat1000D,resCuda,4);
+////    displayTime("_4", time); time = clock();
+////    compareMatrices<double>(resCV, resCuda, nb, 10); time = clock();
+////    qDebug() << "-> 8" << " " << nb << " prec : 10 \n";
+
+////    swUtil::swCuda::blockMatrixMultiplicationD(mat1000D,mat1000D,resCuda,5);
+////    displayTime("_5", time); time = clock();
+////    compareMatrices<double>(resCV, resCuda, nb, 10); time = clock();
+////    qDebug() << "-> 8" << " " << nb << " prec : 10 \n";
 
 
-//    save2DMatrixToTextStd("../data/2.txt", resCV);
+////    swUtil::swCuda::blockMatrixMultiplicationD(mat1000D,mat1000D,resCuda,6);
+////    displayTime("_5", time); time = clock();
+////    compareMatrices<double>(resCV, resCuda, nb, 10); time = clock();
+////    qDebug() << "-> 8" << " " << nb << " prec : 10 \n";
+
+
+////    save2DMatrixToTextStd("../data/2.txt", resCV);
 }
 
 
@@ -142,6 +144,16 @@ int main(int argc, char* argv[])
 {
     srand(1);
     culaWarmup(1);
+
+    // ############################################## INTERFACE
+
+    QApplication l_oApp(argc, argv);
+    Interface l_oViewerInterface;
+    l_oViewerInterface.resize(1800, 900);
+    l_oViewerInterface.move(50,50);
+    l_oViewerInterface.show();
+
+    return l_oApp.exec();
 
     // ############################################## TESTS
 
@@ -154,40 +166,50 @@ int main(int argc, char* argv[])
 
     // ############################################## GENERALISATION 1
 
-    //    ModelParameters l_parameters;
-    //    l_parameters.m_nbNeurons = 1000;
-    //    l_parameters.m_leakRate  = 0.25;
-    //    l_parameters.m_inputScaling = 0.2;
-    //    l_parameters.m_spectralRadius = 7.0;
-    //    l_parameters.m_ridge = 1e-5;
-    //    l_parameters.m_corpusFilePath = "../data/input/Corpus/120.txt";
+//        ModelParameters l_parameters;
+//        l_parameters.m_nbNeurons = 1000;
+//        l_parameters.m_leakRate  = 0.25;
+//        l_parameters.m_inputScaling = 0.2;
+//        l_parameters.m_spectralRadius = 7.0;
+//        l_parameters.m_ridge = 1e-5;
+//        l_parameters.m_corpusFilePath = "../data/input/Corpus/120.txt";
+////        l_parameters.m_corpusFilePath = "../data/input/Corpus/462.txt";
 
-    //    l_parameters.m_sparcity = 10.0 / l_parameters.m_nbNeurons;
-    //    l_parameters.m_useCudaInv= true;
-    //    l_parameters.m_useCudaMult = true;
+//        l_parameters.m_sparcity = 10.0 / l_parameters.m_nbNeurons;
+//        l_parameters.m_useCudaInv= true;
+//        l_parameters.m_useCudaMult = true;
 
-    //    Model l_modelGeneralization(l_parameters);
+//        Model l_modelGeneralization(l_parameters);
 
-    //    std::string l_grammarStd[] ={"and","is","of","the","to",".","-ed","-ing","-s","by","it","that","was","did",",","from"};
-    //    std::string l_structureStd[] = {"P0","A1","O2","R3"};
+//        std::string l_grammarStd[] ={"and","is","of","the","to",".","-ed","-ing","-s","by","it","that","was","did",",","from"};
+//        std::string l_structureStd[] = {"P0","A1","O2","R3"};
 
-    ////    std::string l_grammarStd[] ={"-ga","-ni","-wo","-yotte","-o","-to","sore"};
-    ////    std::string l_structureStd[] = {"P0","A1","O2","R3", "Q0"};
+//    //    std::string l_grammarStd[] ={"-ga","-ni","-wo","-yotte","-o","-to","sore"};
+//    //    std::string l_structureStd[] = {"P0","A1","O2","R3", "Q0"};
 
-    //    Sentence l_grammar = Sentence(l_grammarStd, l_grammarStd + sizeof(l_grammarStd) / sizeof(std::string));
-    //    Sentence l_structure = Sentence(l_structureStd, l_structureStd + sizeof(l_structureStd) / sizeof(std::string));
-    //    l_modelGeneralization.setGrammar(l_grammar, l_structure);
+//        Sentence l_grammar = Sentence(l_grammarStd, l_grammarStd + sizeof(l_grammarStd) / sizeof(std::string));
+//        Sentence l_structure = Sentence(l_structureStd, l_structureStd + sizeof(l_structureStd) / sizeof(std::string));
+//        l_modelGeneralization.setGrammar(l_grammar, l_structure);
 
-    //    Generalization l_generalization(l_modelGeneralization);
+//        Generalization l_generalization(l_modelGeneralization);
 
-    //    l_generalization.randomChangeCorpusGeneralization(30, "../data/input/Corpus/randomizedCorpus_120_30.txt");
-    //    l_generalization.randomChangeCorpusGeneralization(60, "../data/input/Corpus/randomizedCorpus_120_60.txt");
-    //    l_generalization.randomChangeCorpusGeneralization(90, "../data/input/Corpus/randomizedCorpus_120_90.txt");
-    //    l_generalization.randomChangeCorpusGeneralization(120, "../data/input/Corpus/randomizedCorpus_120_120.txt");
-    //    l_generalization.randomChangeCorpusGeneralization(30, "../data/input/Corpus/randomizedCorpus_120_30_s.txt", false);
-    //    l_generalization.randomChangeCorpusGeneralization(60, "../data/input/Corpus/randomizedCorpus_120_60_s.txt", false);
-    //    l_generalization.randomChangeCorpusGeneralization(90, "../data/input/Corpus/randomizedCorpus_120_90_s.txt", false);
-    //    l_generalization.randomChangeCorpusGeneralization(120, "../data/input/Corpus/randomizedCorpus_120_120_s.txt", false);
+//        l_generalization.randomChangeCorpusGeneralization(30, "../data/input/Corpus/randomizedCorpus_120_30.txt");
+//        l_generalization.randomChangeCorpusGeneralization(60, "../data/input/Corpus/randomizedCorpus_120_60.txt");
+//        l_generalization.randomChangeCorpusGeneralization(90, "../data/input/Corpus/randomizedCorpus_120_90.txt");
+//        l_generalization.randomChangeCorpusGeneralization(120, "../data/input/Corpus/randomizedCorpus_120_120.txt");
+//        l_generalization.randomChangeCorpusGeneralization(30, "../data/input/Corpus/randomizedCorpus_120_30_s.txt", false);
+//        l_generalization.randomChangeCorpusGeneralization(60, "../data/input/Corpus/randomizedCorpus_120_60_s.txt", false);
+//        l_generalization.randomChangeCorpusGeneralization(90, "../data/input/Corpus/randomizedCorpus_120_90_s.txt", false);
+//        l_generalization.randomChangeCorpusGeneralization(120, "../data/input/Corpus/randomizedCorpus_120_120_s.txt", false);
+
+//        l_generalization.randomChangeCorpusGeneralization(100, "../data/input/Corpus/randomizedCorpus_462_100.txt");
+//        l_generalization.randomChangeCorpusGeneralization(200, "../data/input/Corpus/randomizedCorpus_462_200.txt");
+//        l_generalization.randomChangeCorpusGeneralization(300, "../data/input/Corpus/randomizedCorpus_462_300.txt");
+//        l_generalization.randomChangeCorpusGeneralization(462, "../data/input/Corpus/randomizedCorpus_462_462.txt");
+//        l_generalization.randomChangeCorpusGeneralization(100, "../data/input/Corpus/randomizedCorpus_462_100_s.txt", false);
+//        l_generalization.randomChangeCorpusGeneralization(200, "../data/input/Corpus/randomizedCorpus_462_200_s.txt", false);
+//        l_generalization.randomChangeCorpusGeneralization(300, "../data/input/Corpus/randomizedCorpus_462_300_s.txt", false);
+//        l_generalization.randomChangeCorpusGeneralization(462, "../data/input/Corpus/randomizedCorpus_462_462_s.txt", false);
 
 
     //    GridSearch l_gridSearch(l_modelGeneralization);
@@ -215,8 +237,8 @@ int main(int argc, char* argv[])
     //    l_gridSearch.launchTrainWithAllParameters("../data/Results/random_res/grid_search_4.txt", "../data/Results/random_res/grid_search_raw_4.txt");
     //    l_gridSearch.launchTrainWithAllParameters("../data/Results/random_res/grid_search_5.txt", "../data/Results/random_res/grid_search_raw_5.txt");
 
-    //    culaStop();
-    //    return 0;
+//        culaStop();
+//        return 0;
 
     // ############################################## GENERALISATION 2
 
@@ -268,7 +290,7 @@ int main(int argc, char* argv[])
 
     l_gridSearch.setCudaParameters(true, true);
 //    l_gridSearch.setParameterValues(GridSearch::NEURONS_NB,     100, 1000, "+100");
-    l_gridSearch.setParameterValues(GridSearch::NEURONS_NB,     100, 1000, "+100");
+    l_gridSearch.setParameterValues(GridSearch::NEURONS_NB,     1000, 1000, "+100");
 //    l_gridSearch.setParameterValues(GridSearch::NEURONS_NB,     1000, 6000, "+1000");
 //    l_gridSearch.setParameterValues(GridSearch::NEURONS_NB,     500, 1000, "+100");
     l_gridSearch.setParameterValues(GridSearch::LEAK_RATE,      0.25, 0.25,   "+0.05");

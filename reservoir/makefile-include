@@ -159,8 +159,6 @@ CFLAGS_CUDA_GPUMAT = $(INC_RES) $(INC_CUDA) $(INC_CULA) $(COMMON_CUDA_FLAGS) -od
 ############################ LIBS
 
 
-##$(DIST_LIBDIR)/SWToolkit_d.lib\
-
 LIBS_QT 	= $(THIRD_PARTY_QT)/lib/QtOpenGL4.lib $(THIRD_PARTY_QT)/lib/QtCore4.lib $(THIRD_PARTY_QT)/lib/QtGui4.lib $(THIRD_PARTY_QT)/lib/qtmain.lib\
 
 LIBS_CV		= $(THIRD_PARTY_OPENCV)/build/lib/Release/opencv_highgui249.lib $(THIRD_PARTY_OPENCV)/build/lib/Release/opencv_core249.lib\

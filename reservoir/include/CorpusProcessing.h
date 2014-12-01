@@ -503,32 +503,26 @@ static void convertOneOutputActivityInConstruction(cv::Mat &outAct, const Senten
 
     for(int ii = 0; ii < l_signalIndicesMax.rows; ++ii)
     {
-//        std::cout << "ii : " << ii;
         if(l_signalIndicesMax.at<int>(ii) != l_previous)
         {
-//            std::cout << " 1>";
             // if the new signal was the same that the one kept in memory
             if(l_signalIndicesMax.at<int>(ii) == l_keepInMemory)
             {
-//                std::cout << " 2>";
                 // increment the counter
                 ++l_nbOccurrenceSameIndex;
             }
 
             if(minNbValUpperThres - 1 - l_nbOccurrenceSameIndex > 0)
             {
-//                std::cout << " 3>";
                 // keep the index in memory
                 l_keepInMemory = l_signalIndicesMax.at<int>(ii);
             }
             else
             {
-//                std::cout << " 4>";
                 // add the word corresponding to this index in the final sentence
                 if(l_signalIndicesMax.at<int>(ii) != -1)
                 {
                     sent.push_back(constructionWords[l_signalIndicesMax.at<int>(ii)]);
-//                    std::cout << " ajout " << l_signalIndicesMax.at<int>(ii) << " " <<  constructionWords[l_signalIndicesMax.at<int>(ii)] << " ";
                 }
 
                 l_previous = l_signalIndicesMax.at<int>(ii);
@@ -538,12 +532,6 @@ static void convertOneOutputActivityInConstruction(cv::Mat &outAct, const Senten
                 l_keepInMemory = -1;
             }
         }
-        else
-        {
-//            std::cout << " 5>";
-        }
-
-//        std::cout << std::endl;
     }
 }
 

@@ -57,8 +57,8 @@ Reservoir::Reservoir(cuint nbNeurons, cdouble spectralRadius, cdouble inputScali
     }
     m_initialized = true;
 
-    cvNamedWindow("reservoir_display", CV_WINDOW_AUTOSIZE | CV_GUI_NORMAL);
-    cvMoveWindow("reservoir_display",200,200);
+//    cvNamedWindow("reservoir_display", CV_WINDOW_AUTOSIZE | CV_GUI_NORMAL);
+//    cvMoveWindow("reservoir_display",200,200);
 }
 
 void Reservoir::setCudaProperties(cbool cudaInv, cbool cudaMult)
@@ -528,7 +528,6 @@ Reservoir::Reservoir(cuint nbNeurons, cfloat spectralRadius, cfloat inputScaling
     m_initialized = true;
 
 
-    std::cout << "########################################################################" << std::endl;
     cvNamedWindow("reservoir_display", CV_WINDOW_AUTOSIZE | CV_GUI_NORMAL);
     cvMoveWindow("reservoir_display",200,200);
 }
@@ -749,6 +748,8 @@ void Reservoir::trainF(const cv::Mat &meaningInputTrain, const cv::Mat &teacher,
 
         int l_sizeTot[3] = {meaningInputTrain.size[0], 1 + meaningInputTrain.size[2] + m_nbNeurons,  meaningInputTrain.size[1]};
         xTot = cv::Mat (3,l_sizeTot, CV_32FC1, cv::Scalar(0.f)); //  will contain the internal states of the reservoir for all sentences and all timesteps
+
+        std::cout << "xTot : " << xTot.size[0] << " " << xTot.size[1] << " " << xTot.size[2] << std::endl;
 
         cv::Mat l_X2Copy = cv::Mat::zeros(1 + meaningInputTrain.size[2] + m_nbNeurons, meaningInputTrain.size[1], CV_32FC1); // OPTI
 

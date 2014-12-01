@@ -516,6 +516,65 @@ static void save2DMatrixToTextStd(const std::string &pathFile, const cv::Mat &ma
     }
 }
 
+/**
+ * @brief save3Channel2DMatrixToTextStd
+ * @param pathFile
+ * @param mat2D
+ */
+static void save3Channel2DMatrixToTextStd(const std::string &pathFile, const cv::Mat &mat2D)
+{
+    std::ofstream l_oFlowFile(pathFile);
+
+    // check depth input data
+        bool l_32b = false;
+        if(mat2D.depth() == CV_32FC1)
+        {
+            l_32b = true;
+        }
+
+    if(l_oFlowFile)
+    {
+        if(l_32b)
+        {
+            for(int ii = 0; ii < mat2D.size[0]; ++ii)
+            {
+                for(int jj = 0; jj < mat2D.size[1]; ++jj)
+                {
+                    cv::Vec3f l_value =  mat2D.at<cv::Vec3f>(ii,jj);
+
+                    std::ostringstream l_osV1;
+                    l_osV1.precision(15);
+                    l_osV1 << "[ " << l_value[0] << " " << l_value[1] << " " << l_value[2] << " ] ";
+                    l_oFlowFile << l_osV1.str();
+                }
+
+                l_oFlowFile << "\n";
+            }
+        }
+        else
+        {
+            for(int ii = 0; ii < mat2D.size[0]; ++ii)
+            {
+                for(int jj = 0; jj < mat2D.size[1]; ++jj)
+                {
+                    cv::Vec3d l_value =  mat2D.at<cv::Vec3d>(ii,jj);
+
+                    std::ostringstream l_osV1;
+                    l_osV1.precision(15);
+                    l_osV1 << "[ " << l_value[0] << " " << l_value[1] << " " << l_value[2] << " ] ";
+                    l_oFlowFile << l_osV1.str();
+                }
+
+                l_oFlowFile << "\n";
+            }
+        }
+    }
+    else
+    {
+        std::cerr << "Can not write 3D matrix in file. " << std::endl;
+    }
+}
+
 
 /**
  * @brief save3DMatrixToTextStd

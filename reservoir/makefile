@@ -19,19 +19,19 @@ LINK=link
 ############################################################################## OBJ LISTS
 
 RESERVOIR_OBJ=\
-    $(LIBDIR)/Reservoir.obj $(LIBDIR)/Model.obj $(LIBDIR)/inversions.obj $(LIBDIR)/multiplications.obj $(LIBDIR)/GridSearch.obj $(LIBDIR)/Generalization.obj $(LIBDIR)/main.obj\
+    $(LIBDIR)/Reservoir.obj $(LIBDIR)/Model.obj $(LIBDIR)/inversions.obj $(LIBDIR)/multiplications.obj $(LIBDIR)/GridSearch.obj $(LIBDIR)/Generalization.obj $(LIBDIR)/main.obj $(LIBDIR)/Interface.obj\
 
 RESERVOIR_OBJ_S=\
-    $(LIBDIR)/Reservoir-s.obj $(LIBDIR)/Model-s.obj $(LIBDIR)/inversions.obj $(LIBDIR)/multiplications.obj $(LIBDIR)/GridSearch-s.obj $(LIBDIR)/Generalization-s.obj $(LIBDIR)/main-s.obj\
+    $(LIBDIR)/Reservoir-s.obj $(LIBDIR)/Model-s.obj $(LIBDIR)/inversions.obj $(LIBDIR)/multiplications.obj $(LIBDIR)/GridSearch-s.obj $(LIBDIR)/Generalization-s.obj $(LIBDIR)/main-s.obj $(LIBDIR)/Interface-s.obj\
 
 ############################################################################## Makefile commands
 
 !if "$(ARCH)" == "x86"
-all: $(BINDIR)/reservoir-test.exe
+all: $(QTGENW)/UI_Interface.h $(MOCDIR)/moc_Interface.cpp $(BINDIR)/reservoir-test.exe
 !endif
 
 !if "$(ARCH)" == "amd64"
-all: $(BINDIR)/reservoir-test-x64.exe
+all: $(QTGENW)/UI_Interface.h $(MOCDIR)/moc_Interface.cpp $(BINDIR)/reservoir-test-x64.exe
 !endif
 
 ############################################################################## exe files
@@ -80,5 +80,22 @@ $(LIBDIR)/main.obj: ./src/main.cpp
 
 $(LIBDIR)/main-s.obj: ./src/main.cpp
         $(CC) -c ./src/main.cpp $(CFLAGS_STA) $(RESERVOIR_INC) -Fo"$(LIBDIR)/main-s.obj"
+
+
+$(LIBDIR)/Interface.obj: ./src/Interface.cpp
+        $(CC) -c ./src/Interface.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/Interface.obj"
+
+$(LIBDIR)/Interface-s.obj: ./src/Interface.cpp
+        $(CC) -c ./src/Interface.cpp $(CFLAGS_STA) $(RESERVOIR_INC) -Fo"$(LIBDIR)/Interface-s.obj"
+
+############################################################################## Qt ui files
+
+$(QTGENW)/UI_Interface.h: $(FORMDIR)/interfaceReservoir.ui
+        uic $(FORMDIR)/interfaceReservoir.ui -o $@
+
+############################################################################## Qt moc files
+
+$(MOCDIR)/moc_Interface.cpp: ./include/Interface.h
+         moc  ./include/Interface.h -o $@
 
 

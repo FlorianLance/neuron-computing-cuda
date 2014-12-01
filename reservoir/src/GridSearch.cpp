@@ -87,14 +87,18 @@ void GridSearch::launchTrainWithAllParameters(const std::string resultsFilePath,
 //        l_flowResFileRawData << m_corpusList[ii] << " " << ii << "\n";
     }
 
-    l_flowResFileReadableData << "\nRES 1 : average for all sentences of : correct position and word percentage (between 0% and 100%)\n";
-    l_flowResFileReadableData << "RES 2 : average for all sentences of : sentence right and absolute position (0% or 100%) \n";
-    l_flowResFileReadableData << "RES 3 : average for all sentences of : correct position and word percentage \n";
-    l_flowResFileReadableData << "RES 4 : average for all sentences of : correct position and word percentage (between 0% and 100%), CCW only \n";
-    l_flowResFileReadableData << "RES 5 : average for all sentences of : sentence right and absolute position (0% or 100%) CCW only \n\n";
+//    l_flowResFileReadableData << "\nRES 1 : average for all sentences of : correct position and word percentage (between 0% and 100%)\n";
+//    l_flowResFileReadableData << "RES 2 : average for all sentences of : sentence right and absolute position (0% or 100%) \n";
+//    l_flowResFileReadableData << "RES 3 : average for all sentences of : correct position and word percentage \n";
+//    l_flowResFileReadableData << "RES 4 : average for all sentences of : correct position and word percentage (between 0% and 100%), CCW only \n";
+//    l_flowResFileReadableData << "RES 5 : average for all sentences of : sentence right and absolute position (0% or 100%) CCW only \n\n";
 
-    l_flowResFileReadableData << "\n CORPUS ID | NEURONS | LEAK RATE | SPARCITY | INPUT SCALING |  RIDGE  | SPECTRAL RADIUS |   TIME   |   RES 1   |   RES 2   |   RES 3   |   RES 4   |   RES 5   |\n";
-    int l_nbCharParams[] = {11,9,11,10,15,9,17,10,11,11,11,11,11};
+    l_flowResFileReadableData << "\nRES 1 : CCW correct position and word ABSOLUTE (0% or 100%)\n";
+    l_flowResFileReadableData << "RES 2 : CCW correct position and word (between 0% and 100%) \n";
+    l_flowResFileReadableData << "RES 3 : OCW diff size \n\n";
+
+    l_flowResFileReadableData << "\n CORPUS ID | NEURONS | LEAK RATE | SPARCITY | INPUT SCALING |  RIDGE  | SPECTRAL RADIUS |   TIME   |   RES 1   |   RES 2   |   RES 3   |\n";//   RES 4   |   RES 5   |\n";
+    int l_nbCharParams[] = {11,9,11,10,15,9,17,10,11,11,11};//,11,11};
 
     int l_currentTrain = 1;
 
@@ -134,11 +138,12 @@ void GridSearch::launchTrainWithAllParameters(const std::string resultsFilePath,
                                 l_currentParameters.m_useCudaInv        = m_useCudaInv;
                                 l_currentParameters.m_useCudaMult       = m_useCudaMult;
 
-                                std::cout << "######## Start the training number : " << l_currentTrain++ << " / " << l_nbTrain << std::endl;
+                                std::cout << "############################################################## " << std::endl;
+                                std::cout << "########## Start the training number : " << l_currentTrain++ << " / " << l_nbTrain << std::endl << std::endl;
 //                                l_currentParameters.display();
 
 //                                m_model->resetModel(l_currentParameters, true);
-                                m_model->resetModelF(l_currentParameters, true);
+                                m_model->resetModelF(l_currentParameters, false);
                                 clock_t l_timeTraining = clock();
 
 //                                m_model->launchTraining();
@@ -149,46 +154,56 @@ void GridSearch::launchTrainWithAllParameters(const std::string resultsFilePath,
 //                                m_model->launchTestsF();
 //                                m_model->retrieveTestsSentences();
 
-                                m_model->displayResults(false,true);
+                                m_model->displayResults(true,true);
 
-                                std::vector<double> l_sizeDifferencePercentage, l_sentenceRightAbsolutePercentage, l_correctPositionAndWordPercentage;
-                                std::vector<double> l_correctPositionAndWordPercentageCCW, l_sentenceRightAbsolutePercentageCCW;
+//                                std::vector<double> l_sizeDifferencePercentage, l_sentenceRightAbsolutePercentage, l_correctPositionAndWordPercentage;
+//                                std::vector<double> l_correctPositionAndWordPercentageCCW, l_sentenceRightAbsolutePercentageCCW;
 
-                                int l_nbTotalWords, l_nbTotalCorrectWords;
-                                m_model->compareResults(true, l_sizeDifferencePercentage, l_sentenceRightAbsolutePercentage, l_correctPositionAndWordPercentage, l_nbTotalWords, l_nbTotalCorrectWords);
-                                m_model->computeCCWResult(true, l_correctPositionAndWordPercentageCCW, l_sentenceRightAbsolutePercentageCCW);
+//                                int l_nbTotalWords, l_nbTotalCorrectWords;
+//                                m_model->compareResults(true, l_sizeDifferencePercentage, l_sentenceRightAbsolutePercentage, l_correctPositionAndWordPercentage, l_nbTotalWords, l_nbTotalCorrectWords);
+//                                m_model->computeCCWResult(true, l_correctPositionAndWordPercentageCCW, l_sentenceRightAbsolutePercentageCCW);
 
-                                double l_res1 = 0, l_res2 = 0, l_res3 = 0, l_res4 = 0, l_res5 = 0;
-                                for(int bb = 0; bb < l_sizeDifferencePercentage.size(); ++bb)
-                                {
-                                    l_res1 += l_sizeDifferencePercentage[bb];
-                                    l_res2 += l_sentenceRightAbsolutePercentage[bb];
+//                                double l_res1 = 0, l_res2 = 0, l_res3 = 0, l_res4 = 0, l_res5 = 0;
+//                                for(int bb = 0; bb < l_sizeDifferencePercentage.size(); ++bb)
+//                                {
+//                                    l_res1 += l_sizeDifferencePercentage[bb];
+//                                    l_res2 += l_sentenceRightAbsolutePercentage[bb];
 
-                                    l_res4 += l_correctPositionAndWordPercentageCCW[bb];
-                                    l_res5 += l_sentenceRightAbsolutePercentageCCW[bb];
-                                }
+//                                    l_res4 += l_correctPositionAndWordPercentageCCW[bb];
+//                                    l_res5 += l_sentenceRightAbsolutePercentageCCW[bb];
+//                                }
 
-                                l_res1 /= l_sizeDifferencePercentage.size();
-                                l_res2 /= l_sizeDifferencePercentage.size();
+//                                l_res1 /= l_sizeDifferencePercentage.size();
+//                                l_res2 /= l_sizeDifferencePercentage.size();
 
-                                l_res3 = 100.0*l_nbTotalCorrectWords / l_nbTotalWords;
+//                                l_res3 = 100.0*l_nbTotalCorrectWords / l_nbTotalWords;
 
-                                l_res4 /= l_correctPositionAndWordPercentageCCW.size();
-                                l_res5 /= l_sentenceRightAbsolutePercentageCCW.size();
+//                                l_res4 /= l_correctPositionAndWordPercentageCCW.size();
+//                                l_res5 /= l_sentenceRightAbsolutePercentageCCW.size();
+
+
+                                std::vector<double> l_diffSizeOCW, l_absoluteCorrectPositionAndWordCCW, l_correctPositionAndWordCCW;
+                                double l_meanDiffSizeOCW, l_meanCorrectPositionAndWordCCW, l_meanAbsoluteCorrectPositionAndWordCCW;
+                                m_model->computeResultsData(true,"../data/Results/test.txt", l_diffSizeOCW, l_absoluteCorrectPositionAndWordCCW, l_correctPositionAndWordCCW,
+                                                            l_meanDiffSizeOCW, l_meanAbsoluteCorrectPositionAndWordCCW, l_meanCorrectPositionAndWordCCW);
+
+                                double l_res1 = l_meanAbsoluteCorrectPositionAndWordCCW, l_res2 = l_meanCorrectPositionAndWordCCW, l_res3 = l_meanDiffSizeOCW;
+
+
 
                                 // retrieve string values from parameters
-                                    std::ostringstream l_os1,l_os2,l_os3,l_os4,l_os5,l_os6,l_os7,l_os8,l_os9,l_os10,l_os11, l_os12, l_os13;
-                                    l_os4.precision(4);l_os8.precision(6),l_os9.precision(3); l_os10.precision(3); l_os11.precision(3); l_os12.precision(3); l_os13.precision(3);
+                                    std::ostringstream l_os1,l_os2,l_os3,l_os4,l_os5,l_os6,l_os7,l_os8,l_os9,l_os10,l_os11;//, l_os12, l_os13;
+                                    l_os4.precision(4);l_os8.precision(6),l_os9.precision(3); l_os10.precision(3); l_os11.precision(3); //l_os12.precision(3); l_os13.precision(3);
                                     l_os1 << aa; l_os2 << l_currentParameters.m_nbNeurons; l_os3 <<  l_currentParameters.m_leakRate;
                                     l_os4 << l_currentParameters.m_sparcity; l_os5 << l_currentParameters.m_inputScaling; l_os6 << l_currentParameters.m_ridge;
                                     l_os7 << l_currentParameters.m_spectralRadius; l_os8 << l_time; l_os9 << l_res1; l_os10 << l_res2; l_os11 << l_res3;
-                                    l_os12 << l_res4; l_os13 << l_res5;
+//                                    l_os12 << l_res4; l_os13 << l_res5;
 
                                     std::vector<std::string> l_parameters;
                                     l_parameters.push_back(l_os1.str()); l_parameters.push_back(l_os2.str()); l_parameters.push_back(l_os3.str()); l_parameters.push_back(l_os4.str());
                                     l_parameters.push_back(l_os5.str()); l_parameters.push_back(l_os6.str()); l_parameters.push_back(l_os7.str()); l_parameters.push_back(l_os8.str());
-                                    l_parameters.push_back(l_os9.str()); l_parameters.push_back(l_os10.str()); l_parameters.push_back(l_os11.str()); l_parameters.push_back(l_os12.str());
-                                    l_parameters.push_back(l_os13.str());
+                                    l_parameters.push_back(l_os9.str()); l_parameters.push_back(l_os10.str()); l_parameters.push_back(l_os11.str());
+                                    //l_parameters.push_back(l_os12.str()); l_parameters.push_back(l_os13.str());
 
                                 // read raw data
                                     for(int oo = 0; oo < l_parameters.size(); ++oo)
@@ -214,6 +229,9 @@ void GridSearch::launchTrainWithAllParameters(const std::string resultsFilePath,
                                     }
 
                                     l_flowResFileReadableData << std::endl;
+
+
+                                    std::cout << "############################################################## " << std::endl << std::endl;
                             }
                         }
                     }

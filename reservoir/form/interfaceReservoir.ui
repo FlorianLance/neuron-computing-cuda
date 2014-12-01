@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>UI_Reservoir</class>
+ <widget class="QMainWindow" name="UI_Reservoir">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>724</width>
-    <height>591</height>
+    <width>1208</width>
+    <height>677</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,22 +31,22 @@
               <string>Corpus list</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_5">
-              <item row="0" column="0" rowspan="3">
-               <widget class="QListView" name="listView"/>
-              </item>
               <item row="0" column="1">
-               <widget class="QPushButton" name="pushButton">
+               <widget class="QPushButton" name="pbAddCorpus">
                 <property name="text">
                  <string>Add corpus</string>
                 </property>
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QPushButton" name="pushButton_2">
+               <widget class="QPushButton" name="pbRemoveCorpus">
                 <property name="text">
                  <string>Remove corpus</string>
                 </property>
                </widget>
+              </item>
+              <item row="0" column="0" rowspan="2">
+               <widget class="QListWidget" name="lwCorpus"/>
               </item>
              </layout>
             </widget>
@@ -56,14 +56,28 @@
          <item row="1" column="0">
           <widget class="QGroupBox" name="groupBox_5">
            <property name="title">
-            <string>Grid of reservoir parameters</string>
+            <string>Reservoir parameters</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_6">
             <item row="4" column="2">
-             <widget class="QDoubleSpinBox" name="sbStartIS"/>
+             <widget class="QDoubleSpinBox" name="sbStartIS">
+              <property name="singleStep">
+               <double>0.010000000000000</double>
+              </property>
+              <property name="value">
+               <double>0.200000000000000</double>
+              </property>
+             </widget>
             </item>
             <item row="4" column="4">
-             <widget class="QDoubleSpinBox" name="sbEndIS"/>
+             <widget class="QDoubleSpinBox" name="sbEndIS">
+              <property name="singleStep">
+               <double>0.010000000000000</double>
+              </property>
+              <property name="value">
+               <double>0.200000000000000</double>
+              </property>
+             </widget>
             </item>
             <item row="4" column="0">
              <widget class="QLabel" name="label_7">
@@ -101,10 +115,21 @@
              </widget>
             </item>
             <item row="3" column="2">
-             <widget class="QDoubleSpinBox" name="sbStartLeakRate"/>
+             <widget class="QDoubleSpinBox" name="sbStartLeakRate">
+              <property name="singleStep">
+               <double>0.010000000000000</double>
+              </property>
+              <property name="value">
+               <double>0.250000000000000</double>
+              </property>
+             </widget>
             </item>
             <item row="3" column="4">
-             <widget class="QDoubleSpinBox" name="sbEndLeakRate"/>
+             <widget class="QDoubleSpinBox" name="sbEndLeakRate">
+              <property name="value">
+               <double>0.250000000000000</double>
+              </property>
+             </widget>
             </item>
             <item row="0" column="1" rowspan="8">
              <widget class="Line" name="line">
@@ -170,17 +195,37 @@
              </widget>
             </item>
             <item row="2" column="2">
-             <widget class="QSpinBox" name="sbStartNeurons"/>
+             <widget class="QSpinBox" name="sbStartNeurons">
+              <property name="minimum">
+               <number>10</number>
+              </property>
+              <property name="maximum">
+               <number>100000</number>
+              </property>
+              <property name="singleStep">
+               <number>100</number>
+              </property>
+              <property name="value">
+               <number>1000</number>
+              </property>
+             </widget>
             </item>
             <item row="2" column="6">
-             <widget class="QLineEdit" name="leNeuonsOperation">
+             <widget class="QLineEdit" name="leNeuronsOperation">
               <property name="text">
                <string>+500</string>
               </property>
              </widget>
             </item>
             <item row="2" column="4">
-             <widget class="QSpinBox" name="sbEndNeurons"/>
+             <widget class="QSpinBox" name="sbEndNeurons">
+              <property name="maximum">
+               <number>100000</number>
+              </property>
+              <property name="value">
+               <number>1000</number>
+              </property>
+             </widget>
             </item>
             <item row="3" column="6">
              <widget class="QLineEdit" name="leLeakRateOperation">
@@ -371,11 +416,14 @@
             </item>
             <item row="6" column="10" alignment="Qt::AlignHCenter">
              <widget class="QCheckBox" name="cbRidge">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
               <property name="text">
                <string/>
               </property>
               <property name="checked">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
              </widget>
             </item>
@@ -387,16 +435,44 @@
              </widget>
             </item>
             <item row="5" column="2" alignment="Qt::AlignHCenter">
-             <widget class="QDoubleSpinBox" name="sbStartSpectralRadius"/>
+             <widget class="QDoubleSpinBox" name="sbStartSpectralRadius">
+              <property name="value">
+               <double>4.000000000000000</double>
+              </property>
+             </widget>
             </item>
             <item row="5" column="4">
-             <widget class="QDoubleSpinBox" name="sbEndSpectralRadius"/>
+             <widget class="QDoubleSpinBox" name="sbEndSpectralRadius">
+              <property name="value">
+               <double>4.000000000000000</double>
+              </property>
+             </widget>
             </item>
             <item row="6" column="2" alignment="Qt::AlignVCenter">
-             <widget class="QDoubleSpinBox" name="sbStartRidge"/>
+             <widget class="QDoubleSpinBox" name="sbStartRidge">
+              <property name="decimals">
+               <number>5</number>
+              </property>
+              <property name="singleStep">
+               <double>0.000010000000000</double>
+              </property>
+              <property name="value">
+               <double>0.000010000000000</double>
+              </property>
+             </widget>
             </item>
             <item row="6" column="4">
-             <widget class="QDoubleSpinBox" name="sbEndRidge"/>
+             <widget class="QDoubleSpinBox" name="sbEndRidge">
+              <property name="decimals">
+               <number>5</number>
+              </property>
+              <property name="singleStep">
+               <double>0.000010000000000</double>
+              </property>
+              <property name="value">
+               <double>0.000010000000000</double>
+              </property>
+             </widget>
             </item>
             <item row="7" column="2">
              <widget class="QDoubleSpinBox" name="sbStartSparcity"/>
@@ -407,10 +483,69 @@
            </layout>
           </widget>
          </item>
+         <item row="2" column="0">
+          <widget class="QGroupBox" name="groupBox_6">
+           <property name="title">
+            <string>Grammar/Structure</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_10">
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_14">
+              <property name="text">
+               <string>Structure to be used :</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_13">
+              <property name="text">
+               <string>Grammar to be used :</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="2">
+             <widget class="Line" name="line_13">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="comboBox"/>
+            </item>
+            <item row="2" column="1">
+             <widget class="QComboBox" name="comboBox_2"/>
+            </item>
+           </layout>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
      </layout>
+    </item>
+    <item row="0" column="1">
+     <widget class="QGroupBox" name="groupBox_4">
+      <property name="title">
+       <string>Commands</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_9">
+       <item row="0" column="1">
+        <widget class="QPushButton" name="pushButton_3">
+         <property name="text">
+          <string>Start</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QPushButton" name="pushButton_4">
+         <property name="text">
+          <string>Stop</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -419,36 +554,30 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>724</width>
+     <width>1208</width>
      <height>21</height>
     </rect>
    </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QDockWidget" name="dockWidget_2">
+  <widget class="QDockWidget" name="dockWidget">
+   <property name="features">
+    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+   </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_2">
-    <layout class="QGridLayout" name="gridLayout_7">
-     <item row="1" column="0">
-      <widget class="QTextBrowser" name="textBrowser"/>
-     </item>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QGridLayout" name="gridLayout_8">
      <item row="0" column="0">
-      <widget class="QLabel" name="label_12">
-       <property name="text">
-        <string>Results :</string>
+      <widget class="QGroupBox" name="groupBox_2">
+       <property name="title">
+        <string>Display</string>
        </property>
       </widget>
      </item>
     </layout>
    </widget>
-  </widget>
-  <widget class="QDockWidget" name="dockWidget_3">
-   <attribute name="dockWidgetArea">
-    <number>2</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents_3"/>
   </widget>
  </widget>
  <resources/>
