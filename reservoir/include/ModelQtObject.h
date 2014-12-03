@@ -1,14 +1,13 @@
-
 /**
- * \file Model.h
+ * \file ModelQtObject.h
  * \brief defines Model
  * \author Florian Lance
- * \date 01/10/14
+ * \date 02/12/14
  */
 
+#ifndef MODELQTOBJECT_H
+#define MODELQTOBJECT_H
 
-#ifndef MODEL_H
-#define MODEL_H
 
 #include "Reservoir.h"
 #include "CorpusProcessing.h"
@@ -96,20 +95,20 @@ struct ModelParameters
 /**
  * @brief The Model class
  */
-class Model
+class ModelObject : public QObject
 {
     public :
 
         /**
          * @brief Model default constructor.
          */
-        Model();
+        ModelObject();
 
         /**
          * @brief Model constructor.
          * @param [in] parameters : parameters used for initializeing the reservoirs and the pathes
          */
-        Model(const ModelParameters &parameters);                       
+        ModelObject(const ModelParameters &parameters);
 
         /**
          * @brief return the parameters of the model.
@@ -117,12 +116,6 @@ class Model
          */
         ModelParameters parameters() const;
 
-        /**
-         * @brief Reset the reservoir by appliying new parameters
-         * @param [in] newParameters : new parameters
-         * @param [in] verbose       : display infos
-         */
-        void resetModel(const ModelParameters &newParameters, cbool verbose = true);
         /**
          * @brief resetModelF
          * @param newParameters
@@ -138,18 +131,10 @@ class Model
         void setGrammar(const Sentence &grammar, const Sentence &structure);
 
         /**
-         * @brief launchTraining
-         */
-        void launchTraining();
-        /**
          * @brief launchTrainingF
          */
         void launchTrainingF();
 
-        /**
-         * @brief launchTests
-         */
-        void launchTests(const std::string &corpusTestFilePath = "");
         /**
          * @brief launchTestsF
          * @param corpusTestFilePath
@@ -186,7 +171,7 @@ class Model
          * @param CCWrightAbsolutePercentage
          * @param CCWcorrectPositionAndWordPercentage
          */
-//        void computeCCWResult(cbool trainResults, std::vector<double> &CCWrightAbsolutePercentage, std::vector<double> &CCWcorrectPositionAndWordPercentage);
+        void computeCCWResult(cbool trainResults, std::vector<double> &CCWrightAbsolutePercentage, std::vector<double> &CCWcorrectPositionAndWordPercentage);
 
         /**
          * @brief compareResults
@@ -197,10 +182,10 @@ class Model
          * @param totalWordNumber
          * @param totalWordCorrectNumber
          */
-//        void compareResults(cbool trainResults, std::vector<double> &correctPositionAndWordPercentage,
-//                                                std::vector<double> &sentenceRightAbsolutePercentage,
-//                                                std::vector<double> &sizeDifferencePercentage,
-//                                                int &totalWordNumber, int &totalWordCorrectNumber);
+        void compareResults(cbool trainResults, std::vector<double> &correctPositionAndWordPercentage,
+                                                std::vector<double> &sentenceRightAbsolutePercentage,
+                                                std::vector<double> &sizeDifferencePercentage,
+                                                int &totalWordNumber, int &totalWordCorrectNumber);
 
 
         /**
@@ -210,22 +195,13 @@ class Model
          * @param diffSizeOCW
          * @param absoluteCorrectPositionAndWordCCW
          * @param correctPositionAndWordCCW
-         * @param absoluteCorrectPositionAndWordAll
-         * @param correctPositionAndWordAll
          * @param meanDiffSizeOCW
          * @param meanAbsoluteCorrectPositionAndWordCCW
          * @param meanCorrectPositionAndWordCCW
-         * @param meanAbsoluteCorrectPositionAndWordAll
-         * @param meanCorrectPositionAndWordAll
          */
         void computeResultsData(cbool trainResults, const std::string &pathSaveAllSentenceRest,
-                                std::vector<double> diffSizeOCW,
-                                std::vector<double> absoluteCorrectPositionAndWordCCW, std::vector<double> correctPositionAndWordCCW,
-                                std::vector<double> absoluteCorrectPositionAndWordAll, std::vector<double> correctPositionAndWordAll,
-                                double &meanDiffSizeOCW,
-                                double &meanAbsoluteCorrectPositionAndWordCCW, double &meanCorrectPositionAndWordCCW,
-                                double &meanAbsoluteCorrectPositionAndWordAll, double &meanCorrectPositionAndWordAll
-                                );
+                                std::vector<double> diffSizeOCW, std::vector<double> absoluteCorrectPositionAndWordCCW, std::vector<double> correctPositionAndWordCCW,
+                                double &meanDiffSizeOCW, double &meanAbsoluteCorrectPositionAndWordCCW, double &meanCorrectPositionAndWordCCW);
 
 
 
@@ -275,3 +251,4 @@ class Model
 };
 
 #endif
+

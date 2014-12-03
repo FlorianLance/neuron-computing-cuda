@@ -41,15 +41,36 @@ void Generalization::retrieveRandomSentenceList(cint sizeCorpus, cint nbSentence
 
 void Generalization::retrieveSubSentenceCorpusRandomized(std::vector<int> &randomSentenceList, QVector<QStringList> &subMeaning, QVector<QStringList> &subInfo, QVector<QStringList>& subSentence)
 {
-    for(int ii = 0; ii < randomSentenceList.size(); ++ii)
-    {
-        QStringList l_randomSubSentence = m_trainSentence[randomSentenceList[ii]];
-        std::random_shuffle(l_randomSubSentence.begin(), l_randomSubSentence.end());
+//    for(int ii = 0; ii < randomSentenceList.size(); ++ii)
+//    {
+//        QStringList l_randomSubSentence = m_trainSentence[randomSentenceList[ii]];
+//        std::random_shuffle(l_randomSubSentence.begin(), l_randomSubSentence.end());
 
-        subMeaning.push_back(m_trainMeaning[randomSentenceList[ii]]);
-        subInfo.push_back(m_trainInfo[randomSentenceList[ii]]);
-        subSentence.push_back(l_randomSubSentence);
-    }
+//        subMeaning.push_back(m_trainMeaning[randomSentenceList[ii]]);
+//        subInfo.push_back(m_trainInfo[randomSentenceList[ii]]);
+//        subSentence.push_back(l_randomSubSentence);
+//    }
+
+//    for(int ii = 0; ii < m_trainSentence.size(); ++ii)
+//    {
+//        bool l_addSentence = true;
+
+//        for(int jj = 0; jj < randomSentenceList.size(); ++jj)
+//        {
+//            if(randomSentenceList[jj] == ii)
+//            {
+//                l_addSentence = false;
+//                break;
+//            }
+//        }
+
+//        if(l_addSentence)
+//        {
+//            subMeaning.push_back(m_trainMeaning[ii]);
+//            subInfo.push_back(m_trainInfo[ii]);
+//            subSentence.push_back(m_trainSentence[ii]);
+//        }
+//    }
 
     for(int ii = 0; ii < m_trainSentence.size(); ++ii)
     {
@@ -60,9 +81,17 @@ void Generalization::retrieveSubSentenceCorpusRandomized(std::vector<int> &rando
             if(randomSentenceList[jj] == ii)
             {
                 l_addSentence = false;
+
+                QStringList l_randomSubSentence = m_trainSentence[randomSentenceList[jj]];
+                std::random_shuffle(l_randomSubSentence.begin(), l_randomSubSentence.end());
+                subMeaning.push_back(m_trainMeaning[randomSentenceList[jj]]);
+                subInfo.push_back(m_trainInfo[randomSentenceList[jj]]);
+                subSentence.push_back(l_randomSubSentence);
+
                 break;
             }
         }
+
 
         if(l_addSentence)
         {
@@ -71,6 +100,7 @@ void Generalization::retrieveSubSentenceCorpusRandomized(std::vector<int> &rando
             subSentence.push_back(m_trainSentence[ii]);
         }
     }
+
 }
 
 void Generalization::retrieveSubMeaningCorpusRandomized(std::vector<int> &randomSentenceList, QVector<QStringList> &subMeaning, QVector<QStringList> &subInfo, QVector<QStringList>& subSentence)
@@ -185,13 +215,21 @@ void Generalization::startXVerification(const std::string &xCheckTrainPath, cons
     std::ofstream l_flowXCheckTest(xCheckTestPath);
     std::ofstream l_flowXCheckTestSentences(xCheckTestSentencesPath);
 
-    l_flowXCheckTrain << "\nRES 1 : average for all sentences of : correct position and word percentage (between 0% and 100%)\n";
-    l_flowXCheckTrain << "RES 2 : average for all sentences of : sentence right and absolute position (0% or 100%) \n";
-    l_flowXCheckTrain << "RES 3 : average for all sentences of : correct position and word percentage \n\n";
+    l_flowXCheckTrain << "\nRES 1 : CCW correct position and word ABSOLUTE (0% or 100%) -> ex : goal : the , the  that -s -ed it | res : that, the the -s -ed it\n";
+    l_flowXCheckTrain << "RES 2 : CCW correct position and word (between 0% and 100%) \n";
+    l_flowXCheckTrain << "RES 3 : ALL correct position and word ABSOLUTE (0% or 100%) -> ex : goal : the X , the X that X -s X -ed it | res : the X X X, the the that X -s X X -ed it \n";
+    l_flowXCheckTrain << "RES 4 : ALL correct position and word (between 0% and 100%) \n";
 
-    l_flowXCheckTrain << "\n CORPUS ID | NEURONS | LEAK RATE | SPARCITY | INPUT SCALING |  RIDGE  | SPECTRAL RADIUS |   TIME   |   RES 1   |   RES 2   |   RES 3   |\n";
-    l_flowXCheckTest  << "\n CORPUS ID | NEURONS | LEAK RATE | SPARCITY | INPUT SCALING |  RIDGE  | SPECTRAL RADIUS |   TIME   |   RES 1   |   RES 2   |   RES 3   |\n";
-    int l_nbCharParams[] = {11,9,11,10,15,9,17,10,11,11,11};
+    l_flowXCheckTest << "\nRES 1 : CCW correct position and word ABSOLUTE (0% or 100%) -> ex : goal : the , the  that -s -ed it | res : that, the the -s -ed it\n";
+    l_flowXCheckTest << "RES 2 : CCW correct position and word (between 0% and 100%) \n";
+    l_flowXCheckTest << "RES 3 : ALL correct position and word ABSOLUTE (0% or 100%) -> ex : goal : the X , the X that X -s X -ed it | res : the X X X, the the that X -s X X -ed it \n";
+    l_flowXCheckTest << "RES 4 : ALL correct position and word (between 0% and 100%) \n";
+
+    l_flowXCheckTrain << "\n CORPUS ID | NEURONS | LEAK RATE | SPARCITY | INPUT SCALING |  RIDGE  | SPECTRAL RADIUS |   TIME   |   RES 1   |   RES 2   |   RES 3   |   RES 4   |\n";
+    l_flowXCheckTest  << "\n CORPUS ID | NEURONS | LEAK RATE | SPARCITY | INPUT SCALING |  RIDGE  | SPECTRAL RADIUS |   TIME   |   RES 1   |   RES 2   |   RES 3   |   RES 4   |\n";
+    int l_nbCharParams[] = {11,9,11,10,15,9,17,10,11,11,11,11};
+
+    int aa = 0; // corpus number
 
     for(int ii = 0; ii < m_trainMeaning.size(); ++ii)
     {
@@ -233,35 +271,66 @@ void Generalization::startXVerification(const std::string &xCheckTrainPath, cons
             m_model->retrieveTrainSentences();
 
 
-            std::vector<double> l_sizeDifferencePercentage, l_sentenceRightAbsolutePercentage, l_correctPositionAndWordPercentage;
-            int l_nbTotalWords, l_nbTotalCorrectWords;
-            m_model->compareResults(true, l_sizeDifferencePercentage, l_sentenceRightAbsolutePercentage, l_correctPositionAndWordPercentage, l_nbTotalWords, l_nbTotalCorrectWords);
+            std::vector<double> l_diffSizeOCW, l_absoluteCorrectPositionAndWordCCW, l_correctPositionAndWordCCW, l_absoluteCorrectPositionAndWordAll, l_correctPositionAndWordAll;
+            double l_meanDiffSizeOCW, l_meanCorrectPositionAndWordCCW, l_meanAbsoluteCorrectPositionAndWordCCW, l_meanCorrectPositionAndWordAll, l_meanAbsoluteCorrectPositionAndWordAll;
 
-            double l_res1 = 0, l_res2 = 0, l_res3 = 0;
-            for(int bb = 0; bb < l_sizeDifferencePercentage.size(); ++bb)
-            {
-                l_res1 += l_sizeDifferencePercentage[bb];
-                l_res2 += l_sentenceRightAbsolutePercentage[bb];
-            }
+            m_model->computeResultsData(true,"../data/Results/generalization_train.txt", l_diffSizeOCW,
+                                        l_absoluteCorrectPositionAndWordCCW, l_correctPositionAndWordCCW,
+                                        l_absoluteCorrectPositionAndWordAll, l_correctPositionAndWordAll,
+                                        l_meanDiffSizeOCW,
+                                        l_meanAbsoluteCorrectPositionAndWordCCW, l_meanCorrectPositionAndWordCCW,
+                                        l_meanAbsoluteCorrectPositionAndWordAll, l_meanCorrectPositionAndWordAll
+                                        );
 
-            l_res1 /= l_sizeDifferencePercentage.size();
-            l_res2 /= l_sizeDifferencePercentage.size();
-            l_res3 = 100.0*l_nbTotalCorrectWords / l_nbTotalWords;
-
-            std::vector<std::string> l_parameters;
+            double l_res1 = l_meanAbsoluteCorrectPositionAndWordCCW, l_res2 = l_meanCorrectPositionAndWordCCW;
+            double l_res3 = l_meanAbsoluteCorrectPositionAndWordAll, l_res4 = l_meanCorrectPositionAndWordAll;
 
             // retrieve string values from parameters
+            std::vector<std::string> l_parameters;
             {
-                std::ostringstream l_os1,l_os2,l_os3,l_os4,l_os5,l_os6,l_os7,l_os8,l_os9,l_os10,l_os11;
-                l_os4.precision(4);l_os8.precision(6),l_os9.precision(3); l_os10.precision(3); l_os11.precision(3);
-                l_os1 << ii; l_os2 << l_currentParameters.m_nbNeurons; l_os3 <<  l_currentParameters.m_leakRate;
+                std::ostringstream l_os1,l_os2,l_os3,l_os4,l_os5,l_os6,l_os7,l_os8,l_os9,l_os10,l_os11, l_os12;//, l_os13;
+                l_os4.precision(4);l_os8.precision(6),l_os9.precision(3); l_os10.precision(3); l_os11.precision(3),l_os12.precision(3); // l_os13.precision(3);
+                l_os1 << aa; l_os2 << l_currentParameters.m_nbNeurons; l_os3 <<  l_currentParameters.m_leakRate;
                 l_os4 << l_currentParameters.m_sparcity; l_os5 << l_currentParameters.m_inputScaling; l_os6 << l_currentParameters.m_ridge;
                 l_os7 << l_currentParameters.m_spectralRadius; l_os8 << l_time; l_os9 << l_res1; l_os10 << l_res2; l_os11 << l_res3;
+                l_os12 << l_res4;// l_os13 << l_res5;
+
 
                 l_parameters.push_back(l_os1.str()); l_parameters.push_back(l_os2.str()); l_parameters.push_back(l_os3.str()); l_parameters.push_back(l_os4.str());
                 l_parameters.push_back(l_os5.str()); l_parameters.push_back(l_os6.str()); l_parameters.push_back(l_os7.str()); l_parameters.push_back(l_os8.str());
-                l_parameters.push_back(l_os9.str()); l_parameters.push_back(l_os10.str());  l_parameters.push_back(l_os11.str());
+                l_parameters.push_back(l_os9.str()); l_parameters.push_back(l_os10.str()); l_parameters.push_back(l_os11.str());
+                l_parameters.push_back(l_os12.str()); //l_parameters.push_back(l_os13.str());
             }
+
+//            std::vector<double> l_sizeDifferencePercentage, l_sentenceRightAbsolutePercentage, l_correctPositionAndWordPercentage;
+//            int l_nbTotalWords, l_nbTotalCorrectWords;
+//            m_model->compareResults(true, l_sizeDifferencePercentage, l_sentenceRightAbsolutePercentage, l_correctPositionAndWordPercentage, l_nbTotalWords, l_nbTotalCorrectWords);
+
+//            double l_res1 = 0, l_res2 = 0, l_res3 = 0;
+//            for(int bb = 0; bb < l_sizeDifferencePercentage.size(); ++bb)
+//            {
+//                l_res1 += l_sizeDifferencePercentage[bb];
+//                l_res2 += l_sentenceRightAbsolutePercentage[bb];
+//            }
+
+//            l_res1 /= l_sizeDifferencePercentage.size();
+//            l_res2 /= l_sizeDifferencePercentage.size();
+//            l_res3 = 100.0*l_nbTotalCorrectWords / l_nbTotalWords;
+
+//            std::vector<std::string> l_parameters;
+
+//            // retrieve string values from parameters
+//            {
+//                std::ostringstream l_os1,l_os2,l_os3,l_os4,l_os5,l_os6,l_os7,l_os8,l_os9,l_os10,l_os11;
+//                l_os4.precision(4);l_os8.precision(6),l_os9.precision(3); l_os10.precision(3); l_os11.precision(3);
+//                l_os1 << ii; l_os2 << l_currentParameters.m_nbNeurons; l_os3 <<  l_currentParameters.m_leakRate;
+//                l_os4 << l_currentParameters.m_sparcity; l_os5 << l_currentParameters.m_inputScaling; l_os6 << l_currentParameters.m_ridge;
+//                l_os7 << l_currentParameters.m_spectralRadius; l_os8 << l_time; l_os9 << l_res1; l_os10 << l_res2; l_os11 << l_res3;
+
+//                l_parameters.push_back(l_os1.str()); l_parameters.push_back(l_os2.str()); l_parameters.push_back(l_os3.str()); l_parameters.push_back(l_os4.str());
+//                l_parameters.push_back(l_os5.str()); l_parameters.push_back(l_os6.str()); l_parameters.push_back(l_os7.str()); l_parameters.push_back(l_os8.str());
+//                l_parameters.push_back(l_os9.str()); l_parameters.push_back(l_os10.str());  l_parameters.push_back(l_os11.str());
+//            }
 
 
             // read readable data
@@ -285,32 +354,61 @@ void Generalization::startXVerification(const std::string &xCheckTrainPath, cons
             // create test stats
                 m_model->launchTestsF();
                 m_model->retrieveTestsSentences();
-                m_model->compareResults(false, l_sizeDifferencePercentage, l_sentenceRightAbsolutePercentage, l_correctPositionAndWordPercentage, l_nbTotalWords, l_nbTotalCorrectWords);
+//                m_model->compareResults(false, l_sizeDifferencePercentage, l_sentenceRightAbsolutePercentage, l_correctPositionAndWordPercentage, l_nbTotalWords, l_nbTotalCorrectWords);
 
-                l_res1 = 0; l_res2 = 0; l_res3 = 0;
-                for(int bb = 0; bb < l_sizeDifferencePercentage.size(); ++bb)
-                {
-                    l_res1 += l_sizeDifferencePercentage[bb];
-                    l_res2 += l_sentenceRightAbsolutePercentage[bb];
-                }
+//                l_res1 = 0; l_res2 = 0; l_res3 = 0;
+//                for(int bb = 0; bb < l_sizeDifferencePercentage.size(); ++bb)
+//                {
+//                    l_res1 += l_sizeDifferencePercentage[bb];
+//                    l_res2 += l_sentenceRightAbsolutePercentage[bb];
+//                }
 
-                l_res1 /= l_sizeDifferencePercentage.size();
-                l_res2 /= l_sizeDifferencePercentage.size();
-                l_res3 = 100.0*l_nbTotalCorrectWords / l_nbTotalWords;
+//                l_res1 /= l_sizeDifferencePercentage.size();
+//                l_res2 /= l_sizeDifferencePercentage.size();
+//                l_res3 = 100.0*l_nbTotalCorrectWords / l_nbTotalWords;
+
+
+//                // retrieve string values from parameters
+//                {
+//                    std::ostringstream l_os1,l_os2,l_os3,l_os4,l_os5,l_os6,l_os7,l_os8,l_os9,l_os10,l_os11;
+//                    l_os4.precision(4);l_os8.precision(6),l_os9.precision(3); l_os10.precision(3); l_os11.precision(3);
+//                    l_os1 << ii; l_os2 << l_currentParameters.m_nbNeurons; l_os3 <<  l_currentParameters.m_leakRate;
+//                    l_os4 << l_currentParameters.m_sparcity; l_os5 << l_currentParameters.m_inputScaling; l_os6 << l_currentParameters.m_ridge;
+//                    l_os7 << l_currentParameters.m_spectralRadius; l_os8 << l_time; l_os9 << l_res1; l_os10 << l_res2; l_os11 << l_res3;
+
+//                    l_parameters.push_back(l_os1.str()); l_parameters.push_back(l_os2.str()); l_parameters.push_back(l_os3.str()); l_parameters.push_back(l_os4.str());
+//                    l_parameters.push_back(l_os5.str()); l_parameters.push_back(l_os6.str()); l_parameters.push_back(l_os7.str()); l_parameters.push_back(l_os8.str());
+//                    l_parameters.push_back(l_os9.str()); l_parameters.push_back(l_os10.str());  l_parameters.push_back(l_os11.str());
+//                }
+
+                m_model->computeResultsData(false,"../data/Results/generalization_test.txt", l_diffSizeOCW,
+                                            l_absoluteCorrectPositionAndWordCCW, l_correctPositionAndWordCCW,
+                                            l_absoluteCorrectPositionAndWordAll, l_correctPositionAndWordAll,
+                                            l_meanDiffSizeOCW,
+                                            l_meanAbsoluteCorrectPositionAndWordCCW, l_meanCorrectPositionAndWordCCW,
+                                            l_meanAbsoluteCorrectPositionAndWordAll, l_meanCorrectPositionAndWordAll
+                                            );
+
+                l_res1 = l_meanAbsoluteCorrectPositionAndWordCCW; l_res2 = l_meanCorrectPositionAndWordCCW;
+                l_res3 = l_meanAbsoluteCorrectPositionAndWordAll; l_res4 = l_meanCorrectPositionAndWordAll;
 
                 l_parameters.clear();
                 // retrieve string values from parameters
                 {
-                    std::ostringstream l_os1,l_os2,l_os3,l_os4,l_os5,l_os6,l_os7,l_os8,l_os9,l_os10,l_os11;
-                    l_os4.precision(4);l_os8.precision(6),l_os9.precision(3); l_os10.precision(3); l_os11.precision(3);
-                    l_os1 << ii; l_os2 << l_currentParameters.m_nbNeurons; l_os3 <<  l_currentParameters.m_leakRate;
+                    std::ostringstream l_os1,l_os2,l_os3,l_os4,l_os5,l_os6,l_os7,l_os8,l_os9,l_os10,l_os11, l_os12;//, l_os13;
+                    l_os4.precision(4);l_os8.precision(6),l_os9.precision(3); l_os10.precision(3); l_os11.precision(3),l_os12.precision(3); // l_os13.precision(3);
+                    l_os1 << aa; l_os2 << l_currentParameters.m_nbNeurons; l_os3 <<  l_currentParameters.m_leakRate;
                     l_os4 << l_currentParameters.m_sparcity; l_os5 << l_currentParameters.m_inputScaling; l_os6 << l_currentParameters.m_ridge;
                     l_os7 << l_currentParameters.m_spectralRadius; l_os8 << l_time; l_os9 << l_res1; l_os10 << l_res2; l_os11 << l_res3;
+                    l_os12 << l_res4;// l_os13 << l_res5;
 
                     l_parameters.push_back(l_os1.str()); l_parameters.push_back(l_os2.str()); l_parameters.push_back(l_os3.str()); l_parameters.push_back(l_os4.str());
                     l_parameters.push_back(l_os5.str()); l_parameters.push_back(l_os6.str()); l_parameters.push_back(l_os7.str()); l_parameters.push_back(l_os8.str());
-                    l_parameters.push_back(l_os9.str()); l_parameters.push_back(l_os10.str());  l_parameters.push_back(l_os11.str());
+                    l_parameters.push_back(l_os9.str()); l_parameters.push_back(l_os10.str()); l_parameters.push_back(l_os11.str());
+                    l_parameters.push_back(l_os12.str()); //l_parameters.push_back(l_os13.str());
                 }
+
+
 
                 for(int oo = 0; oo < l_parameters.size(); ++oo)
                 {

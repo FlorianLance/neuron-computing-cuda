@@ -18,6 +18,8 @@
 
 #include "../genUI/UI_Interface.h"
 
+
+#include "GridSearch.h"
 //#include "interface/QtWidgets/SWGLMultiObjectWidget.h"
 
 //#include "animation/SWAnimation.h"
@@ -31,7 +33,13 @@ namespace Ui {
 
 class InterfaceWorker;
 
-struct ReservoirParameter
+struct LanguageParameters
+{
+    QString m_structure;
+    QString m_grammar;
+};
+
+struct ReservoirParameters
 {
     int m_neuronsStart;
     double m_leakRateStart;
@@ -114,14 +122,34 @@ class Interface : public QMainWindow
          */
         void updateReservoirParameters();
 
-
         void updateReservoirParameters(int value);
 
         void updateReservoirParameters(double value);
 
         void updateReservoirParameters(QString value);
 
-        void updateReservoirParameters(bool value);
+        /**
+         * @brief updateLanguageParameters
+         */
+        void updateLanguageParameters();
+
+        void updateLanguageParameters(int value);
+
+        void updateLanguageParameters(QString value);
+
+        /**
+         * @brief lockInterface
+         * @param lock
+         */
+        void lockInterface(bool lock);
+
+        /**
+         * @brief displayValidityOperation
+         * @param operationValid
+         * @param indexParameter
+         */
+        void displayValidityOperation(bool operationValid, int indexParameter);
+
 
     signals:
 
@@ -138,7 +166,12 @@ class Interface : public QMainWindow
         /**
          * @brief sendReservoirParametersSignal
          */
-        void sendReservoirParametersSignal(ReservoirParameter);
+        void sendReservoirParametersSignal(ReservoirParameters);
+
+        /**
+         * @brief sendLanguageParametersSignal
+         */
+        void sendLanguageParametersSignal(LanguageParameters);
 
 
     private :
@@ -174,14 +207,63 @@ class InterfaceWorker : public QObject
 
     public slots:
 
+        /**
+         * @brief updateCorpus
+         * @param corpusPath
+         */
+        void addCorpus(QString corpusPath);
+
+        /**
+         * @brief removeCorpus
+         * @param index
+         */
+        void removeCorpus(int index);
+
+        /**
+         * @brief updateReservoirParameters
+         */
+        void updateReservoirParameters(ReservoirParameters newParams);
+
+        /**
+         * @brief updateLanguageParameters
+         * @param newParams
+         */
+        void updateLanguageParameters(LanguageParameters newParams);
+
+        /**
+         * @brief start
+         */
+        void start();
+
+        /**
+         * @brief stop
+         */
+        void stop();
 
     signals:
+
+        /**
+         * @brief lockInterfaceSignal
+         */
+        void lockInterfaceSignal(bool);
+
+        /**
+         * @brief displayValidityOperation
+         */
+        void displayValidityOperationSignal(bool, int);
 
 
     private :
 
+        int m_nbOfCorpus;
 
-//        QReadWriteLock m_oMutex;                /**< ... */
+        ReservoirParameters m_reservoirParameters;
+        LanguageParameters m_languageParameters;
+
+        Model m_model;
+        GridSearch m_gridSearch;
+
+        QStringList m_corpusList;
 };
 
 

@@ -67,7 +67,12 @@ class GridSearch
          * @param [in] endValue     : the ending value of the parameter
          * @param [in] operation    : operator to apply to the value for defining the range : ex "+2" "*5.1" -"2.3"
          */
-        void setParameterValues(const ReservoirParameter parameterId, cdouble startValue, cdouble endValue, const std::string operation = "*2");
+        bool setParameterValues(const ReservoirParameter parameterId, cdouble startValue, cdouble endValue, const std::string operation = "*2");
+
+        /**
+         * @brief deleteParameterValues
+         */
+        void deleteParameterValues();
 
         /**
          * @brief Define the corpus file to be used.

@@ -20,7 +20,7 @@ Model::Model(const ModelParameters &parameters) : m_parameters(parameters), m_tr
      m_reservoir = Reservoir(m_parameters.m_nbNeurons, m_parameters.m_spectralRadius, m_parameters.m_inputScaling, m_parameters.m_leakRate, m_parameters.m_sparcity, m_parameters.m_ridge, m_verbose);
 
 
-     cvNamedWindow("reservoir_display", CV_WINDOW_AUTOSIZE | CV_GUI_NORMAL);
+//     cvNamedWindow("reservoir_display", CV_WINDOW_AUTOSIZE | CV_GUI_NORMAL);
 //     cvMoveWindow("reservoir_display",200,200);
 }
 
@@ -231,7 +231,7 @@ void Model::retrieveTestsSentences()
 
     // convert signal
         Sentences l_recoveredConstructionTest;
-        convertLOutputActivityInConstruction(m_3DMatSentencesOutputTest, m_closedClassWords, l_recoveredConstructionTest, 2);                
+        convertLOutputActivityInConstruction(m_3DMatSentencesOutputTest, m_closedClassWords, l_recoveredConstructionTest, 2);
         attributeOcwToConstructions(l_recoveredConstructionTest, l_testOCW, m_recoveredSentencesTest, "X");
 }
 
@@ -318,159 +318,166 @@ void Model::setResultsTestToCompare(const std::string &resultsTestFilePath)
 }
 
 
-void Model::computeCCWResult(cbool trainResults, std::vector<double> &CCWrightAbsolutePercentage, std::vector<double> &CCWcorrectPositionAndWordPercentage)
-{
-    if(m_verbose)
-    {
-        std::cout << "Start analysing results. " << std::endl;
-    }
+//void Model::computeCCWResult(cbool trainResults, std::vector<double> &CCWrightAbsolutePercentage, std::vector<double> &CCWcorrectPositionAndWordPercentage)
+//{
+//    if(m_verbose)
+//    {
+//        std::cout << "Start analysing results. " << std::endl;
+//    }
 
-    Sentences l_goal, l_results;
-    Sentences l_goalCCWOnly, l_resultsCCWOnly;
+//    Sentences l_goal, l_results;
+//    Sentences l_goalCCWOnly, l_resultsCCWOnly;
 
-    if(!trainResults)
-    {
-        l_results = m_recoveredSentencesTest;
+//    if(!trainResults)
+//    {
+//        l_results = m_recoveredSentencesTest;
 
-        if(m_desiredSentencesTest.size() == 0)
-        {
-            l_goal = m_testSentence;
-        }
-        else
-        {
-            l_goal = m_desiredSentencesTest;
-        }
+//        if(m_desiredSentencesTest.size() == 0)
+//        {
+//            l_goal = m_testSentence;
+//        }
+//        else
+//        {
+//            l_goal = m_desiredSentencesTest;
+//        }
 
-        if(l_goal.size() != m_recoveredSentencesTest.size())
-        {
-            std::cerr << "Error compare results : not the same number of sentences. " << std::endl;
-        }
-    }
-    else
-    {
-        l_goal = m_trainSentence;
-        l_results = m_recoveredSentencesTrain;
-    }
+//        if(l_goal.size() != m_recoveredSentencesTest.size())
+//        {
+//            std::cerr << "Error compare results : not the same number of sentences. " << std::endl;
+//        }
+//    }
+//    else
+//    {
+//        l_goal = m_trainSentence;
+//        l_results = m_recoveredSentencesTrain;
+//    }
 
-    // suppress OCW from the sentences
-    for(int aa = 0; aa < l_goal.size(); ++aa)
-    {
-        Sentence l_currentGoal = l_goal[aa];
-        Sentence l_currentRes  = l_results[aa];
-        Sentence l_currentGoalCCWOnly, l_currentResCCWOnly;
+//    // suppress OCW from the sentences
+//    for(int aa = 0; aa < l_goal.size(); ++aa)
+//    {
+//        Sentence l_currentGoal = l_goal[aa];
+//        Sentence l_currentRes  = l_results[aa];
+//        Sentence l_currentGoalCCWOnly, l_currentResCCWOnly;
 
-        // goal
-            for(int ii = 0; ii < l_currentGoal.size(); ++ii)
-            {
-                bool l_addWord = false;
-
-
-
-                for(int jj = 0; jj < m_grammar.size(); ++jj)
-                {
-                    if(l_currentGoal[ii] == m_grammar[jj])
-                    {
-                        l_addWord = true;
-                        break;
-                    }
-                }
-
-                if(l_addWord)
-                {
-                    l_currentGoalCCWOnly.push_back(l_currentGoal[ii]);
-                }
-            }
+//        // goal
+//            for(int ii = 0; ii < l_currentGoal.size(); ++ii)
+//            {
+//                bool l_addWord = false;
 
 
-        // result
-            for(int ii = 0; ii < l_currentRes.size(); ++ii)
-            {
-                bool l_addWord = false;
 
-                for(int jj = 0; jj < m_grammar.size(); ++jj)
-                {
-                    if(l_currentRes[ii] == m_grammar[jj])
-                    {
-                        l_addWord = true;
-                        break;
-                    }
-                }
+//                for(int jj = 0; jj < m_grammar.size(); ++jj)
+//                {
+//                    if(l_currentGoal[ii] == m_grammar[jj])
+//                    {
+//                        l_addWord = true;
+//                        break;
+//                    }
+//                }
 
-                if(l_addWord)
-                {
-
-                    l_currentResCCWOnly.push_back(l_currentRes[ii]);
-                }
-            }
-
-        l_goalCCWOnly.push_back(l_currentGoalCCWOnly);
-        l_resultsCCWOnly.push_back(l_currentResCCWOnly);
-    }
+//                if(l_addWord)
+//                {
+//                    l_currentGoalCCWOnly.push_back(l_currentGoal[ii]);
+//                }
+//            }
 
 
-    // compute the percentages
-    for(int ii = 0; ii < l_goalCCWOnly.size(); ++ii)
-    {
-        Sentence l_currenGoalCCWOnly = l_goalCCWOnly[ii];
-        Sentence l_currenResCCWOnly  = l_resultsCCWOnly[ii];
+//        // result
+//            for(int ii = 0; ii < l_currentRes.size(); ++ii)
+//            {
+//                bool l_addWord = false;
 
-        int l_correctPositionAndWord = 0;
-        int l_nbWordsGoal   = static_cast<int>(l_currenGoalCCWOnly.size());
-        int l_nbWordsResult = static_cast<int>(l_currenResCCWOnly.size());
+//                for(int jj = 0; jj < m_grammar.size(); ++jj)
+//                {
+//                    if(l_currentRes[ii] == m_grammar[jj])
+//                    {
+//                        l_addWord = true;
+//                        break;
+//                    }
+//                }
 
-        for(int jj = 0; jj < std::min(l_nbWordsGoal, l_nbWordsResult); ++jj)
-        {
-            if(l_currenGoalCCWOnly[jj] == l_currenResCCWOnly[jj])
-            {
-                ++l_correctPositionAndWord;
-            }
-        }
+//                if(l_addWord)
+//                {
 
-        double l_percentCorrectPositionAndWord = 100.0 * l_correctPositionAndWord / l_nbWordsGoal;
+//                    l_currentResCCWOnly.push_back(l_currentRes[ii]);
+//                }
+//            }
 
-        double l_percentAbsolute = 0.0;
-        if(l_percentCorrectPositionAndWord == 100)
-        {
-            l_percentAbsolute = 100.0;
-        }
+//        l_goalCCWOnly.push_back(l_currentGoalCCWOnly);
+//        l_resultsCCWOnly.push_back(l_currentResCCWOnly);
+//    }
 
-        std::cout.precision(5);
-        if(m_verbose)
-        {
 
-            std::cout << "|CPW : " << l_percentCorrectPositionAndWord << "% | Abs : " << l_percentAbsolute << "% |  -> ";
+//    // compute the percentages
+//    for(int ii = 0; ii < l_goalCCWOnly.size(); ++ii)
+//    {
+//        Sentence l_currenGoalCCWOnly = l_goalCCWOnly[ii];
+//        Sentence l_currenResCCWOnly  = l_resultsCCWOnly[ii];
 
-            if(trainResults)
-            {
-                for(int jj = 0; jj < m_recoveredSentencesTrain[ii].size(); ++jj)
-                {
-                    std::cout << m_recoveredSentencesTrain[ii][jj] << " ";
-                }
-            }
-            else
-            {
-                for(int jj = 0; jj < m_recoveredSentencesTest[ii].size(); ++jj)
-                {
-                    std::cout << m_recoveredSentencesTest[ii][jj] << " ";
-                }
-            }
-            std::cout << std::endl;
-        }
+//        int l_correctPositionAndWord = 0;
+//        int l_nbWordsGoal   = static_cast<int>(l_currenGoalCCWOnly.size());
+//        int l_nbWordsResult = static_cast<int>(l_currenResCCWOnly.size());
 
-        CCWrightAbsolutePercentage.push_back(l_percentCorrectPositionAndWord);
-        CCWcorrectPositionAndWordPercentage.push_back(l_percentAbsolute);
-    }
+//        for(int jj = 0; jj < std::min(l_nbWordsGoal, l_nbWordsResult); ++jj)
+//        {
+//            if(l_currenGoalCCWOnly[jj] == l_currenResCCWOnly[jj])
+//            {
+//                ++l_correctPositionAndWord;
+//            }
+//        }
 
-    if(m_verbose)
-    {
-        std::cout << "End analysing CCW results. " << std::endl;
-    }
-}
+//        double l_percentCorrectPositionAndWord = 100.0 * l_correctPositionAndWord / l_nbWordsGoal;
 
+//        double l_percentAbsolute = 0.0;
+//        if(l_percentCorrectPositionAndWord == 100)
+//        {
+//            l_percentAbsolute = 100.0;
+//        }
+
+//        std::cout.precision(5);
+//        if(m_verbose)
+//        {
+
+//            std::cout << "|CPW : " << l_percentCorrectPositionAndWord << "% | Abs : " << l_percentAbsolute << "% |  -> ";
+
+//            if(trainResults)
+//            {
+//                for(int jj = 0; jj < m_recoveredSentencesTrain[ii].size(); ++jj)
+//                {
+//                    std::cout << m_recoveredSentencesTrain[ii][jj] << " ";
+//                }
+//            }
+//            else
+//            {
+//                for(int jj = 0; jj < m_recoveredSentencesTest[ii].size(); ++jj)
+//                {
+//                    std::cout << m_recoveredSentencesTest[ii][jj] << " ";
+//                }
+//            }
+//            std::cout << std::endl;
+//        }
+
+//        CCWrightAbsolutePercentage.push_back(l_percentCorrectPositionAndWord);
+//        CCWcorrectPositionAndWordPercentage.push_back(l_percentAbsolute);
+//    }
+
+//    if(m_verbose)
+//    {
+//        std::cout << "End analysing CCW results. " << std::endl;
+//    }
+//}
 
 void Model::computeResultsData(cbool trainResults, const std::string &pathSaveAllSentenceRest,
-                               std::vector<double> diffSizeOCW, std::vector<double> absoluteCorrectPositionAndWordCCW, std::vector<double> correctPositionAndWordCCW,
-                               double &meanDiffSizeOCW, double &meanAbsoluteCorrectPositionAndWordCCW, double &meanCorrectPositionAndWordCCW)
+                        std::vector<double> diffSizeOCW,
+                        std::vector<double> absoluteCorrectPositionAndWordCCW, std::vector<double> correctPositionAndWordCCW,
+                        std::vector<double> absoluteCorrectPositionAndWordAll, std::vector<double> correctPositionAndWordAll,
+                        double &meanDiffSizeOCW,
+                        double &meanAbsoluteCorrectPositionAndWordCCW, double &meanCorrectPositionAndWordCCW,
+                        double &meanAbsoluteCorrectPositionAndWordAll, double &meanCorrectPositionAndWordAll
+                        )
+//void Model::computeResultsData(cbool trainResults, const std::string &pathSaveAllSentenceRest,
+//                               std::vector<double> diffSizeOCW, std::vector<double> absoluteCorrectPositionAndWordCCW, std::vector<double> correctPositionAndWordCCW,
+//                               double &meanDiffSizeOCW, double &meanAbsoluteCorrectPositionAndWordCCW, double &meanCorrectPositionAndWordCCW)
 {
     if(m_verbose)
     {
@@ -504,8 +511,11 @@ void Model::computeResultsData(cbool trainResults, const std::string &pathSaveAl
         l_results = m_recoveredSentencesTrain;
     }
 
+
+
     Sentences l_goalCCWOnly, l_resultsCCWOnly;
-    Sentences l_goalOCWOnly, l_resultsOCWOnly;
+//    Sentences l_goalOCWOnly, l_resultsOCWOnly;
+    Sentences l_goalAll, l_resultAll;
 
     std::vector<int> l_diffSizesOCW;
 
@@ -515,6 +525,7 @@ void Model::computeResultsData(cbool trainResults, const std::string &pathSaveAl
         Sentence l_currentGoal = l_goal[aa];
         Sentence l_currentRes  = l_results[aa];
         Sentence l_currentGoalCCWOnly, l_currentResCCWOnly, l_currentGoalOCWOnly, l_currentResultsOCWOnly;
+        Sentence l_currentGoalAll, l_currenResultAll;
 
         // goal
             for(int ii = 0; ii < l_currentGoal.size(); ++ii)
@@ -533,10 +544,12 @@ void Model::computeResultsData(cbool trainResults, const std::string &pathSaveAl
                 if(l_addWord)
                 {
                     l_currentGoalCCWOnly.push_back(l_currentGoal[ii]);
+                    l_currentGoalAll.push_back(l_currentGoal[ii]);
                 }
                 else
                 {
                     l_currentGoalOCWOnly.push_back(l_currentGoal[ii]);
+                    l_currentGoalAll.push_back("X");
                 }
             }
 
@@ -559,30 +572,44 @@ void Model::computeResultsData(cbool trainResults, const std::string &pathSaveAl
                 {
 
                     l_currentResCCWOnly.push_back(l_currentRes[ii]);
+                    l_currenResultAll.push_back(l_currentRes[ii]);
                 }
                 else
                 {
                     l_currentResultsOCWOnly.push_back(l_currentRes[ii]);
+                    l_currenResultAll.push_back("X");
                 }
             }
 
         l_goalCCWOnly.push_back(l_currentGoalCCWOnly);
         l_resultsCCWOnly.push_back(l_currentResCCWOnly);
-        l_goalOCWOnly.push_back(l_currentGoalOCWOnly);
-        l_resultsOCWOnly.push_back(l_currentResultsOCWOnly);
+        l_goalAll.push_back(l_currentGoalAll);
+        l_resultAll.push_back(l_currenResultAll);
 
         l_diffSizesOCW.push_back(static_cast<int>(l_currentResultsOCWOnly.size() - l_currentGoalOCWOnly.size()));
     }
 
 
-    // mean results
-    meanDiffSizeOCW = 0.0;
-    meanAbsoluteCorrectPositionAndWordCCW = 0.0;
-    meanCorrectPositionAndWordCCW = 0.0;
 
-    diffSizeOCW.clear();
-    absoluteCorrectPositionAndWordCCW.clear();
-    correctPositionAndWordCCW.clear();
+    // reset mean results
+        // OCW
+        meanDiffSizeOCW = 0.0;
+        // CCW
+        meanAbsoluteCorrectPositionAndWordCCW = 0.0;
+        meanCorrectPositionAndWordCCW = 0.0;
+        // all
+        meanAbsoluteCorrectPositionAndWordAll = 0.0;
+        meanCorrectPositionAndWordAll = 0.0;
+
+    // reset results arrays
+        // OCW
+        diffSizeOCW.clear();
+        // CCW
+        absoluteCorrectPositionAndWordCCW.clear();
+        correctPositionAndWordCCW.clear();
+        // all
+        absoluteCorrectPositionAndWordAll.clear();
+        correctPositionAndWordAll.clear();
 
     std::ofstream l_flowResFile(pathSaveAllSentenceRest);
 
@@ -591,181 +618,227 @@ void Model::computeResultsData(cbool trainResults, const std::string &pathSaveAl
         std::cerr << "Error log file. " << std::endl;
     }
 
-    // compute the percentages
+    // compute the stats
     for(int ii = 0; ii < l_goalCCWOnly.size(); ++ii)
     {
-        Sentence l_currenGoalCCWOnly = l_goalCCWOnly[ii];
-        Sentence l_currenResCCWOnly  = l_resultsCCWOnly[ii];
+        Sentence l_currentGoalCCWOnly = l_goalCCWOnly[ii];
+        Sentence l_currentResCCWOnly  = l_resultsCCWOnly[ii];
+        Sentence l_currentGoalAll     = l_goalAll[ii];
+        Sentence l_currentResAll      = l_resultAll[ii];
 
-        int l_correctPositionAndWord = 0;
-        int l_nbWordsGoal   = static_cast<int>(l_currenGoalCCWOnly.size());
-        int l_nbWordsResult = static_cast<int>(l_currenResCCWOnly.size());
+        int l_correctPositionAndWordCCWOnly = 0;
+        int l_correctPositionAndWordAll = 0;
+        // sizes
+            // CCW
+            int l_nbWordsGoalCCWOnly   = static_cast<int>(l_currentGoalCCWOnly.size());
+            int l_nbWordsResultCCWOnly = static_cast<int>(l_currentResCCWOnly.size());
+            // all
+            int l_nbWordsGoalAll = static_cast<int>(l_currentGoalAll.size());
+            int l_nbWordsResAll = static_cast<int>(l_currentResAll.size());
 
-        for(int jj = 0; jj < std::min(l_nbWordsGoal, l_nbWordsResult); ++jj)
+        // CCW
+        for(int jj = 0; jj < std::min(l_nbWordsGoalCCWOnly, l_nbWordsResultCCWOnly); ++jj)
         {
-            if(l_currenGoalCCWOnly[jj] == l_currenResCCWOnly[jj])
+            if(l_currentGoalCCWOnly[jj] == l_currentResCCWOnly[jj])
             {
-                ++l_correctPositionAndWord;
+                ++l_correctPositionAndWordCCWOnly;
+            }
+        }        
+        // all
+        for(int jj = 0; jj < std::min(l_nbWordsGoalAll, l_nbWordsResAll); ++jj)
+        {
+            if(l_currentGoalAll[jj] == l_currentResAll[jj])
+            {
+                ++l_correctPositionAndWordAll;
             }
         }
 
-        double l_percentCorrectPositionAndWord = 100.0 * l_correctPositionAndWord / std::max(l_nbWordsGoal,l_nbWordsResult);
+        // percent
+            // CCW
+            double l_percentCorrectPositionAndWordAll     = 100.0 * l_correctPositionAndWordAll     / std::max(l_nbWordsGoalAll,l_nbWordsResAll);
+            // all
+            double l_percentCorrectPositionAndWordCCWOnly = 100.0 * l_correctPositionAndWordCCWOnly / std::max(l_nbWordsGoalCCWOnly,l_nbWordsResultCCWOnly);
 
-        double l_percentAbsolute = 0.0;
-        if(l_percentCorrectPositionAndWord == 100)
-        {
-            l_percentAbsolute = 100.0;
-        }
+        // absolute
+            double l_percentAbsoluteCCWOnly = 0.0;
+            double l_percentAbsoluteAll = 0.0;
+            // CCW
+            if(l_percentCorrectPositionAndWordCCWOnly == 100)
+            {
+                l_percentAbsoluteCCWOnly = 100.0;
+            }
+            // all
+            if(l_percentCorrectPositionAndWordAll == 100)
+            {
+                l_percentAbsoluteAll = 100.0;
+            }
 
-        meanAbsoluteCorrectPositionAndWordCCW += l_percentAbsolute;
-        meanCorrectPositionAndWordCCW         += l_percentCorrectPositionAndWord;
-        meanDiffSizeOCW                       += sqrt(static_cast<double>(l_diffSizesOCW[ii]*l_diffSizesOCW[ii]));
+        // mean
+            // CCW
+            meanAbsoluteCorrectPositionAndWordCCW += l_percentAbsoluteCCWOnly;
+            meanCorrectPositionAndWordCCW         += l_percentCorrectPositionAndWordCCWOnly;
+            // OCW
+            meanDiffSizeOCW                       += sqrt(static_cast<double>(l_diffSizesOCW[ii]*l_diffSizesOCW[ii]));
+            // all
+            meanAbsoluteCorrectPositionAndWordAll += l_percentAbsoluteAll;
+            meanCorrectPositionAndWordAll         += l_percentCorrectPositionAndWordAll;
 
+        // display
+            std::ostringstream l_os1,l_os2,l_os3, l_os4, l_os5;
+            l_os1 << l_percentCorrectPositionAndWordCCWOnly;
+            l_os2 << l_percentAbsoluteCCWOnly;
+            l_os3 << l_diffSizesOCW[ii];
+            l_os4 << l_percentCorrectPositionAndWordCCWOnly;
+            l_os5 << l_percentAbsoluteAll;
+            l_flowResFile << l_os1.str() << " " << l_os2.str() << " " << l_os3.str() << " " << l_os4.str() << " " << l_os5.str() << std::endl;
 
-        std::ostringstream l_os1,l_os2,l_os3;
-        l_os1 << l_percentCorrectPositionAndWord;
-        l_os2 << l_percentAbsolute;
-        l_os3 << l_diffSizesOCW[ii];
-        l_flowResFile << l_os1.str() << " " << l_os2.str() << " " << l_os3.str() << std::endl;
-
-
-        diffSizeOCW.push_back(l_percentCorrectPositionAndWord);
-        absoluteCorrectPositionAndWordCCW.push_back(l_percentAbsolute);
-        correctPositionAndWordCCW.push_back(l_diffSizesOCW[ii]);
+        // add results to array
+            // OCW
+            diffSizeOCW.push_back(l_diffSizesOCW[ii]);
+            // CCW
+            absoluteCorrectPositionAndWordCCW.push_back(l_percentAbsoluteCCWOnly);
+            correctPositionAndWordCCW.push_back(l_percentCorrectPositionAndWordCCWOnly);
+            // all
+            absoluteCorrectPositionAndWordAll.push_back(l_percentAbsoluteAll);
+            correctPositionAndWordAll.push_back(l_percentCorrectPositionAndWordAll);
 
         std::cout.precision(5);
         if(m_verbose)
         {
-            std::cout << "|CCW absolute: " << l_percentAbsolute << "% | CCW : " << l_percentCorrectPositionAndWord << "% | OCW diff size : " << l_diffSizesOCW[ii] << std::endl;
+            std::cout << "|CCW absolute: " << l_percentAbsoluteCCWOnly << "% | CCW : " << l_percentCorrectPositionAndWordCCWOnly << "% | OCW diff size : " << l_diffSizesOCW[ii] << std::endl;
         }
     }
-
 
     // update mean res values
+        // OCW
         meanDiffSizeOCW /= l_goalCCWOnly.size();
+        // CCW
         meanCorrectPositionAndWordCCW /= l_goalCCWOnly.size();
         meanAbsoluteCorrectPositionAndWordCCW /= l_goalCCWOnly.size();
+        // all
+        meanCorrectPositionAndWordAll /= l_goalAll.size();
+        meanAbsoluteCorrectPositionAndWordAll /= l_goalAll.size();
 }
 
 
 
-void Model::compareResults(cbool trainResults,std::vector<double> &correctPositionAndWordPercentage,
-                                              std::vector<double> &sentenceRightAbsolutePercentage,
-                                              std::vector<double> &sizeDifferencePercentage,
-                                              int &totalWordNumber, int &totalWordCorrectNumber)
-{
-    if(m_verbose)
-    {
-        std::cout << "Start analysing results. " << std::endl;
-    }
+//void Model::compareResults(cbool trainResults,std::vector<double> &correctPositionAndWordPercentage,
+//                                              std::vector<double> &sentenceRightAbsolutePercentage,
+//                                              std::vector<double> &sizeDifferencePercentage,
+//                                              int &totalWordNumber, int &totalWordCorrectNumber)
+//{
+//    if(m_verbose)
+//    {
+//        std::cout << "Start analysing results. " << std::endl;
+//    }
 
-    Sentences l_goal;
-    Sentences l_results;
+//    Sentences l_goal;
+//    Sentences l_results;
 
-    if(!trainResults)
-    {
-        l_results = m_recoveredSentencesTest;
+//    if(!trainResults)
+//    {
+//        l_results = m_recoveredSentencesTest;
 
-        if(m_desiredSentencesTest.size() == 0)
-        {
-            l_goal = m_testSentence;
-        }
-        else
-        {
-            l_goal = m_desiredSentencesTest;
-        }
+//        if(m_desiredSentencesTest.size() == 0)
+//        {
+//            l_goal = m_testSentence;
+//        }
+//        else
+//        {
+//            l_goal = m_desiredSentencesTest;
+//        }
 
-        if(l_goal.size() != m_recoveredSentencesTest.size())
-        {
-            std::cerr << "Error compare results : not the same number of sentences. " << std::endl;
-        }
-    }
-    else
-    {
-        l_goal = m_trainSentence;
-        l_results = m_recoveredSentencesTrain;
-    }
+//        if(l_goal.size() != m_recoveredSentencesTest.size())
+//        {
+//            std::cerr << "Error compare results : not the same number of sentences. " << std::endl;
+//        }
+//    }
+//    else
+//    {
+//        l_goal = m_trainSentence;
+//        l_results = m_recoveredSentencesTrain;
+//    }
 
-    correctPositionAndWordPercentage.clear();
-    sentenceRightAbsolutePercentage.clear();
-    sizeDifferencePercentage.clear();
-    totalWordNumber        = 0;
-    totalWordCorrectNumber = 0;
+//    correctPositionAndWordPercentage.clear();
+//    sentenceRightAbsolutePercentage.clear();
+//    sizeDifferencePercentage.clear();
+//    totalWordNumber        = 0;
+//    totalWordCorrectNumber = 0;
 
-    for(int ii = 0; ii < l_goal.size(); ++ii)
-    {
-        int l_nbWordsGoal   = static_cast<int>(l_goal[ii].size());
-        int l_nbWordsResult = static_cast<int>(l_results[ii].size());
-        totalWordNumber += l_nbWordsGoal;
+//    for(int ii = 0; ii < l_goal.size(); ++ii)
+//    {
+//        int l_nbWordsGoal   = static_cast<int>(l_goal[ii].size());
+//        int l_nbWordsResult = static_cast<int>(l_results[ii].size());
+//        totalWordNumber += l_nbWordsGoal;
 
-        int l_correctPositionAndWord = 0;
-        int l_wordsNotAllocated = 0;
-        int l_sizeDifference = (l_nbWordsGoal - l_nbWordsResult);
-        if(l_sizeDifference < 0)
-        {
-            l_sizeDifference *= -1;
-        }
+//        int l_correctPositionAndWord = 0;
+//        int l_wordsNotAllocated = 0;
+//        int l_sizeDifference = (l_nbWordsGoal - l_nbWordsResult);
+//        if(l_sizeDifference < 0)
+//        {
+//            l_sizeDifference *= -1;
+//        }
 
-        for(int jj = 0; jj < std::min(l_goal[ii].size(), l_results[ii].size()); ++jj)
-        {
-            if(l_goal[ii][jj] == l_results[ii][jj])
-            {
-                ++l_correctPositionAndWord;
-            }
-        }
-        totalWordCorrectNumber += l_correctPositionAndWord;
+//        for(int jj = 0; jj < std::min(l_goal[ii].size(), l_results[ii].size()); ++jj)
+//        {
+//            if(l_goal[ii][jj] == l_results[ii][jj])
+//            {
+//                ++l_correctPositionAndWord;
+//            }
+//        }
+//        totalWordCorrectNumber += l_correctPositionAndWord;
 
-        for(int jj = 0; jj < l_results[ii].size(); ++jj)
-        {
-            if( l_results[ii][jj] == "X")
-            {
-                ++l_wordsNotAllocated;
-            }
-        }
+//        for(int jj = 0; jj < l_results[ii].size(); ++jj)
+//        {
+//            if( l_results[ii][jj] == "X")
+//            {
+//                ++l_wordsNotAllocated;
+//            }
+//        }
 
-        double l_percentCorrectPositionAndWord = 100.0 * l_correctPositionAndWord / l_nbWordsGoal;
-        double l_percentNotAllocated = 100.0 * l_wordsNotAllocated / l_nbWordsGoal;
-        double l_percentSizeDifference = 100.0 * l_sizeDifference / l_nbWordsGoal;
-        double l_percentAbsolute = 0.0;
-        if(l_percentCorrectPositionAndWord == 100)
-        {
-            l_percentAbsolute = 100.0;
-        }
+//        double l_percentCorrectPositionAndWord = 100.0 * l_correctPositionAndWord / l_nbWordsGoal;
+//        double l_percentNotAllocated = 100.0 * l_wordsNotAllocated / l_nbWordsGoal;
+//        double l_percentSizeDifference = 100.0 * l_sizeDifference / l_nbWordsGoal;
+//        double l_percentAbsolute = 0.0;
+//        if(l_percentCorrectPositionAndWord == 100)
+//        {
+//            l_percentAbsolute = 100.0;
+//        }
 
-        std::cout.precision(5);
-        if(m_verbose)
-        {
+//        std::cout.precision(5);
+//        if(m_verbose)
+//        {
 
-            std::cout << "|CPW : " << l_percentCorrectPositionAndWord << "% | Abs : " << l_percentAbsolute << "% | SD : " << l_percentSizeDifference << "% | -> ";
+//            std::cout << "|CPW : " << l_percentCorrectPositionAndWord << "% | Abs : " << l_percentAbsolute << "% | SD : " << l_percentSizeDifference << "% | -> ";
 
-            if(trainResults)
-            {
-                for(int jj = 0; jj < m_recoveredSentencesTrain[ii].size(); ++jj)
-                {
-                    std::cout << m_recoveredSentencesTrain[ii][jj] << " ";
-                }
-            }
-            else
-            {
-                for(int jj = 0; jj < m_recoveredSentencesTest[ii].size(); ++jj)
-                {
-                    std::cout << m_recoveredSentencesTest[ii][jj] << " ";
-                }
-            }
-            std::cout << std::endl;
-        }
+//            if(trainResults)
+//            {
+//                for(int jj = 0; jj < m_recoveredSentencesTrain[ii].size(); ++jj)
+//                {
+//                    std::cout << m_recoveredSentencesTrain[ii][jj] << " ";
+//                }
+//            }
+//            else
+//            {
+//                for(int jj = 0; jj < m_recoveredSentencesTest[ii].size(); ++jj)
+//                {
+//                    std::cout << m_recoveredSentencesTest[ii][jj] << " ";
+//                }
+//            }
+//            std::cout << std::endl;
+//        }
 
-        correctPositionAndWordPercentage.push_back(l_percentCorrectPositionAndWord);
-        sentenceRightAbsolutePercentage.push_back(l_percentAbsolute);
-        sizeDifferencePercentage.push_back(l_percentSizeDifference);
+//        correctPositionAndWordPercentage.push_back(l_percentCorrectPositionAndWord);
+//        sentenceRightAbsolutePercentage.push_back(l_percentAbsolute);
+//        sizeDifferencePercentage.push_back(l_percentSizeDifference);
 
-    }    
+//    }
 
-    if(m_verbose)
-    {
-        std::cout << "End analysing results. " << std::endl;
-    }
-}
+//    if(m_verbose)
+//    {
+//        std::cout << "End analysing results. " << std::endl;
+//    }
+//}
 
 
 
@@ -848,8 +921,6 @@ void Model::launchTrainingF()
                 {
                     for(int kk = 0; kk < m_3DMatSentencesOutputTrain.size[2]; ++kk)
                     {
-
-
                         cv::Vec3f l_value;
 
                         if(ii % 3 == 0)
@@ -913,20 +984,27 @@ void Model::launchTrainingF()
 
     // save data for creating curves
 
-        cv::Mat l_curve(m_3DMatSentencesOutputTrain.size[1], m_3DMatSentencesOutputTrain.size[2], CV_32FC1);
+        cv::Mat l_curve(m_3DMatSentencesOutputTrain.size[0]*m_3DMatSentencesOutputTrain.size[1], m_3DMatSentencesOutputTrain.size[2]+2, CV_32FC1);
 
         for(int ii = 0; ii < m_3DMatSentencesOutputTrain.size[0]; ++ii)
         {
             for(int jj = 0; jj < m_3DMatSentencesOutputTrain.size[1]; ++jj)
             {
+                l_curve.at<float>(ii*m_3DMatSentencesOutputTrain.size[1] + jj, 1) = jj;
+
                 for(int kk = 0; kk < m_3DMatSentencesOutputTrain.size[2]; ++kk)
                 {
-                    l_curve.at<float>(jj,kk) = m_3DMatSentencesOutputTrain.at<float>(0,jj,kk);
+                    l_curve.at<float>(ii*m_3DMatSentencesOutputTrain.size[1] + jj,kk+2) = m_3DMatSentencesOutputTrain.at<float>(ii,jj,kk);
                 }
             }
         }
 
-        save2DMatrixToTextStd("../data/Results/mat_out/curve.txt", l_curve);
+        for(int ii = 0; ii < l_curve.rows; ++ii)
+        {
+            l_curve.at<float>(ii,0) = ii / m_3DMatSentencesOutputTrain.size[1];
+        }
+
+        save2DMatrixToTextStd("../data/Results/mat_out/curve_" +  l_os1.str() + ".txt", l_curve);
 
 
 //        cv::imshow("reservoir_display",l_subRes);

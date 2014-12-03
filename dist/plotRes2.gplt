@@ -2,15 +2,15 @@
 set macros
 
 # define styles
-set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 70 ps 1.1   # --- blue
+set style line 1 lc rgb '#ffff00' lt 1 lw 2 pt 70 ps 1.1   # --- blue
 set style line 2 lc rgb '#FF0000' lt 1 lw 2 pt 71 ps 1.1   # --- red
 set style line 3 lc rgb '#00FF00' lt 1 lw 2 pt 72 ps 1.1   # --- green
 set style line 4 lc rgb '#B33ECD' lt 1 lw 2 pt 73 ps 1.1   # --- violet
 set style line 5 lc rgb '#c8cc29' lt 1 lw 2 pt 74 ps 1.1   #
 set style line 6 lc rgb '#b6fcd5' lt 1 lw 2 pt 75 ps 1.1   #
 set style line 7 lc rgb '#cbc4dc' lt 1 lw 2 pt 76 ps 1.1   #
-set style line 8 lc rgb '#dd4563' lt 1 lw 2 pt 77 ps 1.1   #
-set style line 9 lc rgb '#66092f' lt 1 lw 2 pt 78 ps 1.1   #
+set style line 8 lc rgb '#0060ad' lt 1 lw 2 pt 77 ps 1.1   #
+set style line 9 lc rgb '#ffff00' lt 1 lw 2 pt 78 ps 1.1   #
 
 # define display macros
 display1 = 'set pm3d; set view map; unset contour; unset grid; set dgrid3d;set key outside; unset surface'
@@ -83,6 +83,7 @@ file28  = "../dist/data/Results/random_res/26_11_c8.txt"
 
 
 file29  = "../dist/data/Results/mat_out/curve.txt"
+file30  = "../dist/data/Results/mat_out/curve_0.txt"
 
 
 
@@ -578,6 +579,71 @@ plot file20 u @corpus_id:@res2_id:(0.1) t title1 w boxplot, \
 
 
 
+
+
+#        l_corpusList.push_back("../data/input/Corpus/japan.txt");
+#        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_24_5.txt");
+#        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_24_10.txt");
+#        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_24_15.txt");
+#        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_24_20.txt");
+#        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_24_24.txt");
+
+
+############################################################################################ boxplot res1 res2 res3 res4
+
+file = "../dist/data/Results/random_res/grid_search_raw.txt"
+
+unset multiplot
+set output "../dist/data/Results/boxplot.png"
+set terminal png size 2000,2000
+set multiplot layout 2, 2 title "Analyse random sentence influence"
+
+set xrange [-1:6]
+set xtics 0,1,5;
+
+title1 = "Corpus 0 -> jap : 24-0r"
+title2 = "Corpus 1 -> jap : 24-5r"
+title3 = "Corpus 2 -> jap : 24-10r"
+title4 = "Corpus 3 -> jap : 24-15r"
+title5 = "Corpus 4 -> jap : 24-20r"
+title6 = "Corpus 5 -> jap : 24-24r"
+
+set xlabel "corpus id"
+set ylabel "grammar absolute correct position %"
+
+plot file u ($1==0?$1:1/0):@res1_id:(0.1) t title1 w boxplot, \
+     file u ($1==1?$1:1/0):@res1_id:(0.1) t title2 w boxplot, \
+     file u ($1==2?$1:1/0):@res1_id:(0.1) t title3 w boxplot, \
+     file u ($1==3?$1:1/0):@res1_id:(0.1) t title4 w boxplot, \
+     file u ($1==4?$1:1/0):@res1_id:(0.1) t title5 w boxplot, \
+     file u ($1==5?$1:1/0):@res1_id:(0.1) t title6 w boxplot
+
+set ylabel "grammar correct position %"
+plot file u ($1==0?$1:1/0):@res2_id:(0.1) t title1 w boxplot, \
+     file u ($1==1?$1:1/0):@res2_id:(0.1) t title2 w boxplot, \
+     file u ($1==2?$1:1/0):@res2_id:(0.1) t title3 w boxplot, \
+     file u ($1==3?$1:1/0):@res2_id:(0.1) t title4 w boxplot, \
+     file u ($1==4?$1:1/0):@res2_id:(0.1) t title5 w boxplot, \
+     file u ($1==5?$1:1/0):@res2_id:(0.1) t title6 w boxplot
+
+set ylabel "all words absolute correct position %"
+plot file u ($1==0?$1:1/0):@res3_id:(0.1) t title1 w boxplot, \
+     file u ($1==1?$1:1/0):@res3_id:(0.1) t title2 w boxplot, \
+     file u ($1==2?$1:1/0):@res3_id:(0.1) t title3 w boxplot, \
+     file u ($1==3?$1:1/0):@res3_id:(0.1) t title4 w boxplot, \
+     file u ($1==4?$1:1/0):@res3_id:(0.1) t title5 w boxplot, \
+     file u ($1==5?$1:1/0):@res3_id:(0.1) t title6 w boxplot
+
+set ylabel "all words correct position %"
+plot file u ($1==0?$1:1/0):@res4_id:(0.1) t title1 w boxplot, \
+     file u ($1==1?$1:1/0):@res4_id:(0.1) t title2 w boxplot, \
+     file u ($1==2?$1:1/0):@res4_id:(0.1) t title3 w boxplot, \
+     file u ($1==3?$1:1/0):@res4_id:(0.1) t title4 w boxplot, \
+     file u ($1==4?$1:1/0):@res4_id:(0.1) t title5 w boxplot, \
+     file u ($1==5?$1:1/0):@res4_id:(0.1) t title6 w boxplot
+
+############################################################################################ plot grammar
+
 unset label
 unset xlabel
 unset ylabel
@@ -595,18 +661,139 @@ set ytics -0.2,0.1,1.5
 set key right top
 
 
-set output "../dist/data/Results/mat_out.png"
-set terminal png size 1500,2000
-set multiplot layout 2, 1 title "Gramar / time"
 
-plot file29 u 0:1 t "-ga" w linespoint ls 1, \
-     file29 u 0:2 t "-ni" w linespoint ls 2, \
-     file29 u 0:3 t "-wo" w linespoint ls 3, \
-     file29 u 0:4 t "-yotte" w linespoint ls 4, \
-     file29 u 0:5 t "-o" w linespoint ls 5, \
-     file29 u 0:6 t "-to" w linespoint ls 6, \
-     file29 u 0:7 t "sore" w linespoint ls 7, \
-     file29 u 0:8 t "X" w linespoint ls 8
+#set output "../dist/data/Results/mat_out_jap_24_0.png"
+#set terminal png size 4000,4000
+#set multiplot layout 5, 5 title "Corpus japan 24s_0randS : Gramar / time"
+
+
+#file = "../dist/data/Results/mat_out/curve_0.txt"
+
+#do for [ii=0:23] {
+#    titleS = sprintf("Sentence %d",ii)
+#    set title titleS
+#    plot file u 2:($1==ii?$3:1/0) t "-ga" w linespoint ls 1, \
+#         file u 2:($1==ii?$4:1/0) t "-ni" w linespoint ls 2, \
+#         file u 2:($1==ii?$5:1/0) t "-wo" w linespoint ls 3, \
+#         file u 2:($1==ii?$6:1/0) t "-yotte" w linespoint ls 4, \
+#         file u 2:($1==ii?$7:1/0) t "-o" w linespoint ls 5, \
+#         file u 2:($1==ii?$8:1/0) t "-to" w linespoint ls 6, \
+#         file u 2:($1==ii?$9:1/0) t "sore" w linespoint ls 7, \
+#         file u 2:($1==ii?$10:1/0) t "X" w linespoint ls 8
+#}
+
+#unset multiplot
+#set output "../dist/data/Results/mat_out_jap_24_5.png"
+#set terminal png size 4000,4000
+#set multiplot layout 5, 5 title "Corpus japan 24s_5randS: Gramar / time"
+
+#file = "../dist/data/Results/mat_out/curve_1.txt"
+
+#do for [ii=0:23] {
+#    titleS = sprintf("Sentence %d",ii)
+#    set title titleS
+#    plot file u 2:($1==ii?$3:1/0) t "-ga" w linespoint ls 1, \
+#         file u 2:($1==ii?$4:1/0) t "-ni" w linespoint ls 2, \
+#         file u 2:($1==ii?$5:1/0) t "-wo" w linespoint ls 3, \
+#         file u 2:($1==ii?$6:1/0) t "-yotte" w linespoint ls 4, \
+#         file u 2:($1==ii?$7:1/0) t "-o" w linespoint ls 5, \
+#         file u 2:($1==ii?$8:1/0) t "-to" w linespoint ls 6, \
+#         file u 2:($1==ii?$9:1/0) t "sore" w linespoint ls 7, \
+#         file u 2:($1==ii?$10:1/0) t "X" w linespoint ls 8
+#}
+
+
+#unset multiplot
+#set output "../dist/data/Results/mat_out_jap_24_10.png"
+#set terminal png size 4000,4000
+#set multiplot layout 5, 5 title "Corpus japan 24s_10randS: Gramar / time"
+
+#file = "../dist/data/Results/mat_out/curve_2.txt"
+
+#do for [ii=0:23] {
+#    titleS = sprintf("Sentence %d",ii)
+#    set title titleS
+#    plot file u 2:($1==ii?$3:1/0) t "-ga" w linespoint ls 1, \
+#         file u 2:($1==ii?$4:1/0) t "-ni" w linespoint ls 2, \
+#         file u 2:($1==ii?$5:1/0) t "-wo" w linespoint ls 3, \
+#         file u 2:($1==ii?$6:1/0) t "-yotte" w linespoint ls 4, \
+#         file u 2:($1==ii?$7:1/0) t "-o" w linespoint ls 5, \
+#         file u 2:($1==ii?$8:1/0) t "-to" w linespoint ls 6, \
+#         file u 2:($1==ii?$9:1/0) t "sore" w linespoint ls 7, \
+#         file u 2:($1==ii?$10:1/0) t "X" w linespoint ls 8
+#}
+
+
+#unset multiplot
+#set output "../dist/data/Results/mat_out_jap_24_15.png"
+#set terminal png size 4000,4000
+#set multiplot layout 5, 5 title "Corpus japan 24s_15randS: Gramar / time"
+
+#file = "../dist/data/Results/mat_out/curve_3.txt"
+
+#do for [ii=0:23] {
+#    titleS = sprintf("Sentence %d",ii)
+#    set title titleS
+#    plot file u 2:($1==ii?$3:1/0) t "-ga" w linespoint ls 1, \
+#         file u 2:($1==ii?$4:1/0) t "-ni" w linespoint ls 2, \
+#         file u 2:($1==ii?$5:1/0) t "-wo" w linespoint ls 3, \
+#         file u 2:($1==ii?$6:1/0) t "-yotte" w linespoint ls 4, \
+#         file u 2:($1==ii?$7:1/0) t "-o" w linespoint ls 5, \
+#         file u 2:($1==ii?$8:1/0) t "-to" w linespoint ls 6, \
+#         file u 2:($1==ii?$9:1/0) t "sore" w linespoint ls 7, \
+#         file u 2:($1==ii?$10:1/0) t "X" w linespoint ls 8
+#}
+
+
+#unset multiplot
+#set output "../dist/data/Results/mat_out_jap_24_20.png"
+#set terminal png size 4000,4000
+#set multiplot layout 5, 5 title "Corpus japan 24s_20randS: Gramar / time"
+
+#file = "../dist/data/Results/mat_out/curve_4.txt"
+
+#do for [ii=0:23] {
+#    titleS = sprintf("Sentence %d",ii)
+#    set title titleS
+#    plot file u 2:($1==ii?$3:1/0) t "-ga" w linespoint ls 1, \
+#         file u 2:($1==ii?$4:1/0) t "-ni" w linespoint ls 2, \
+#         file u 2:($1==ii?$5:1/0) t "-wo" w linespoint ls 3, \
+#         file u 2:($1==ii?$6:1/0) t "-yotte" w linespoint ls 4, \
+#         file u 2:($1==ii?$7:1/0) t "-o" w linespoint ls 5, \
+#         file u 2:($1==ii?$8:1/0) t "-to" w linespoint ls 6, \
+#         file u 2:($1==ii?$9:1/0) t "sore" w linespoint ls 7, \
+#         file u 2:($1==ii?$10:1/0) t "X" w linespoint ls 8
+#}
+
+#unset multiplot
+#set output "../dist/data/Results/mat_out_jap_24_24.png"
+#set terminal png size 4000,4000
+#set multiplot layout 5, 5 title "Corpus japan 24s_24randS: Gramar / time"
+
+#file = "../dist/data/Results/mat_out/curve_5.txt"
+
+#do for [ii=0:23] {
+#    titleS = sprintf("Sentence %d",ii)
+#    set title titleS
+#    plot file u 2:($1==ii?$3:1/0) t "-ga" w linespoint ls 1, \
+#         file u 2:($1==ii?$4:1/0) t "-ni" w linespoint ls 2, \
+#         file u 2:($1==ii?$5:1/0) t "-wo" w linespoint ls 3, \
+#         file u 2:($1==ii?$6:1/0) t "-yotte" w linespoint ls 4, \
+#         file u 2:($1==ii?$7:1/0) t "-o" w linespoint ls 5, \
+#         file u 2:($1==ii?$8:1/0) t "-to" w linespoint ls 6, \
+#         file u 2:($1==ii?$9:1/0) t "sore" w linespoint ls 7, \
+#         file u 2:($1==ii?$10:1/0) t "X" w linespoint ls 8
+#}
+
+############################################################################################
+
+
+
+
+
+
+
+
 
 
 
