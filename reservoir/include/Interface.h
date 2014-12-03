@@ -118,6 +118,11 @@ class Interface : public QMainWindow
         void removeCorpus();
 
         /**
+         * @brief saveTraining
+         */
+        void saveTraining();
+
+        /**
          * @brief updateParamters
          */
         void updateReservoirParameters();
@@ -162,6 +167,11 @@ class Interface : public QMainWindow
          * @brief removeCorpusSignal
          */
         void removeCorpusSignal(int);
+
+        /**
+         * @brief saveTrainingSignal
+         */
+        void saveTrainingSignal(QString);
 
         /**
          * @brief sendReservoirParametersSignal

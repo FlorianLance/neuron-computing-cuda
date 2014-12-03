@@ -41,6 +41,7 @@ Interface::Interface() : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(m_uiInterface->pbStop,         SIGNAL(clicked()), m_pWInterface, SLOT(stop()));
         QObject::connect(m_uiInterface->pbAddCorpus,    SIGNAL(clicked()), this, SLOT(addCorpus()));
         QObject::connect(m_uiInterface->pbRemoveCorpus, SIGNAL(clicked()), this, SLOT(removeCorpus()));
+        QObject::connect(m_uiInterface->pbSaveLastTrainingFile, SIGNAL(clicked()), this, SLOT(saveTraining()));
 
         // spinbox
         QObject::connect(m_uiInterface->sbStartNeurons,         SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
@@ -87,7 +88,6 @@ Interface::Interface() : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(this, SIGNAL(sendReservoirParametersSignal(ReservoirParameters)), m_pWInterface, SLOT(updateReservoirParameters(ReservoirParameters)));
         QObject::connect(this, SIGNAL(sendLanguageParametersSignal(LanguageParameters)), m_pWInterface, SLOT(updateLanguageParameters(LanguageParameters)));
         QObject::connect(m_pWInterface, SIGNAL(displayValidityOperationSignal(bool, int)), this, SLOT(displayValidityOperation(bool, int)));
-
 
 //            QObject::connect(this,  SIGNAL(stopLoop()), m_pWViewer, SLOT(stopLoop()));
 //            QObject::connect(this, SIGNAL(setModFilePath(bool,int,QString)), m_pWViewer, SLOT(setModFile(bool,int,QString)));
@@ -154,6 +154,14 @@ void Interface::removeCorpus()
 
     // remove item
     emit removeCorpusSignal(l_currentIndex);
+}
+
+void Interface::saveTraining()
+{
+    QString l_sPathTrainingFile = QFileDialog::getExistingDirectory(this, "Select directory", "../data/training");
+
+    // send directory path
+    emit saveTrainingSignal(l_sPathTrainingFile);
 }
 
 
@@ -327,6 +335,11 @@ void InterfaceWorker::addCorpus(QString corpusPath)
 
 void InterfaceWorker::removeCorpus(int index)
 {
+    if(index == -1)
+    {
+        return;
+    }
+
     m_corpusList.removeAt(index);
 
     std::vector<std::string> l_stringListCorpus;

@@ -52,17 +52,6 @@ class Reservoir
          * @param ridge
          * @param verbose
          */
-        Reservoir(cuint nbNeurons, cdouble spectralRadius, cdouble inputScaling, cdouble leakRate, cdouble sparcity = -1.0, cdouble ridge = 1e-5, cbool verbose = true);
-        /**
-         * @brief Reservoir
-         * @param nbNeurons
-         * @param spectralRadius
-         * @param inputScaling
-         * @param leakRate
-         * @param sparcity
-         * @param ridge
-         * @param verbose
-         */
         Reservoir(cuint nbNeurons, cfloat spectralRadius, cfloat inputScaling, cfloat leakRate, cfloat sparcity = -1.f, cfloat ridge = 1e-5f, cbool verbose = true);
 
         /**
@@ -73,32 +62,16 @@ class Reservoir
         void setCudaProperties(cbool cudaInv, cbool cudaMult);
 
         /**
-         * @brief generateMatrixW : generate the main matrix of the reservoir
-         */
-        void generateMatrixW();
-        /**
          * @brief generateMatrixWF
          */
         void generateMatrixWF();
 
-        /**
-         * @brief generateWIn : generate the input matrix of the reservoir
-         * @param dimInput
-         */
-        void generateWIn(cuint dimInput);
         /**
          * @brief generateWInF
          * @param dimInput
          */
         void generateWInF(cuint dimInput);
 
-        /**
-         * @brief tikhonovRegularization : computation of the weight of w_out
-         * @param xTot
-         * @param yTeacher
-         * @param dimInput
-         */
-        void tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTeacher, cuint dimInput);
         /**
          * @brief tikhonovRegularizationF
          * @param xTot
@@ -107,14 +80,6 @@ class Reservoir
          */
         void tikhonovRegularizationF(const cv::Mat &xTot, const cv::Mat &yTeacher, cuint dimInput);
 
-        /**
-         * @brief train : training of the reseroir
-         * @param meaningInputTrain
-         * @param teacher
-         * @param sentencesOutputTrain
-         * @param xTot
-         */
-        void train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher, cv::Mat &sentencesOutputTrain, cv::Mat &xTot);
         /**
          * @brief trainF
          * @param meaningInputTrain
@@ -125,20 +90,24 @@ class Reservoir
         void trainF(const cv::Mat &meaningInputTrain, const cv::Mat &teacher, cv::Mat &sentencesOutputTrain, cv::Mat &xTot);
 
         /**
-         * @brief testing of the reservoir, this function works exactly like the training function except w_out is already known
-         * so there is no Thikhonov regularization
-         * @param meaningInputTest
-         * @param sentencesOutputTest
-         * @param xTot
-         */
-        void test(const cv::Mat &meaningInputTest, cv::Mat &sentencesOutputTest, cv::Mat &xTot);
-        /**
          * @brief testF
          * @param meaningInputTest
          * @param sentencesOutputTest
          * @param xTot
          */
         void testF(const cv::Mat &meaningInputTest, cv::Mat &sentencesOutputTest, cv::Mat &xTot);
+
+        /**
+         * @brief Save the current state of internal matrices m_wF m_wInF, m_wOutF
+         * @param [in] path : path of the directory where the files m_w.txt, m_wIn.txt, m_wOut.txt will be saved
+         */
+        void saveTraining(const std::string &path);
+
+        /**
+         * @brief loadTraining
+         * @param [in] path : path of directory containg the files m_w.txt, m_wIn.txt, m_wOut.txt
+         */
+        void loadTraining(const std::string &path);
 
     private :
 
@@ -149,19 +118,8 @@ class Reservoir
         bool m_verbose;                 /**< ... */
         int m_nbNeurons;                /**< ... */
 
-        double m_sparcity;              /**< ... */
-        double m_spectralRadius;        /**< ... */
-        double m_inputScaling;          /**< ... */
-        double m_leakRate;              /**< ... */
-        double m_ridge;                 /**< ... */
-
-        cv::Mat m_w;                    /**< ... */
-        cv::Mat m_wIn;                  /**< ... */
-        cv::Mat m_wOut;                 /**< ... */
-
         clock_t m_oTime;                /**< ... */
 
-        // FLOAT TEST
         float m_sparcityF;              /**< ... */
         float m_spectralRadiusF;        /**< ... */
         float m_inputScalingF;          /**< ... */
@@ -268,6 +226,40 @@ class Reservoir2
         clock_t m_oTime;                /**< ... */
 };
 
+
+template<class T>
+Reservoir2<T>::Reservoir2()
+{
+    m_initialized = false;
+    m_verbose = true;
+
+    m_useCudaInversion      = true;
+    m_useCudaMultiplication = false;
+}
+
+template<class T>
+Reservoir2<T>::Reservoir2(cuint nbNeurons, const T spectralRadius, const T inputScaling, const T leakRate, const T sparcity, const T ridge, cbool verbose)
+    : m_nbNeurons(nbNeurons), m_spectralRadius(spectralRadius), m_inputScaling(inputScaling), m_leakRate(leakRate), m_ridge(ridge), m_verbose(verbose)
+{
+    if(sparcity > 0)
+    {
+        m_sparcity = sparcity;
+    }
+    else
+    {
+        m_sparcity = static_cast<T>(10)/m_nbNeurons;
+    }
+    m_initialized = true;
+}
+
+template<class T>
+void Reservoir2<T>::setCudaProperties(cbool cudaInv, cbool cudaMult)
+{
+    m_useCudaInversion = cudaInv;
+    m_useCudaMultiplication = cudaMult;
+}
+
+
 template<class T>
 void Reservoir2<T>::generateMatrixW()
 {
@@ -281,7 +273,7 @@ void Reservoir2<T>::generateMatrixW()
     {
         if(static_cast <T> (rand()) / static_cast <T> (RAND_MAX) < m_sparcity)
         {
-            double r = static_cast <T> (rand()) / static_cast <T> (RAND_MAX);
+            T r = static_cast <T> (rand()) / static_cast <T> (RAND_MAX);
             m_w.at<T>(ii) = (r - static_cast<T>(0.5)) * m_spectralRadius;
         }
     }
@@ -296,7 +288,7 @@ void Reservoir2<T>::generateWIn(cuint dimInput)
     displayTime("START : generate WIn ", m_oTime, false, m_verbose);
 
     // init wIn
-    initMatrix<T>(m_w, m_nbNeurons, dimInput + 1, false);
+    initMatrix<T>(m_wIn, m_nbNeurons, dimInput + 1, false);
 
     // fill wIn matrix with random values [0, 1]
         cv::MatIterator_<T> it = m_wIn.begin<T>(), it_end = m_wIn.end<T>();
@@ -380,11 +372,11 @@ void Reservoir2<T>::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &y
         {
             if(matCudaS.at<T>(ii,ii) > static_cast<T>(1e-6))
             {
-                matCudaS.at<T>(ii,ii) = static_cast<T>(1)/matCudaS.at<T>(ii,ii);
+                matCudaS.at<T>(ii,ii) = 1/matCudaS.at<T>(ii,ii);
             }
             else
             {
-                matCudaS.at<T>(ii,ii) = static_cast<T>(0);
+                matCudaS.at<T>(ii,ii) = 0;
             }
         }
 
@@ -497,30 +489,47 @@ void Reservoir2<T>::train(const cv::Mat &meaningInputTrain, const cv::Mat &teach
 
     displayTime("START : sub train ", m_oTime, false, m_verbose);
 
-        int l_sizeTot[3] = {meaningInputTrain.size[0], 1 + meaningInputTrain.size[2] + m_nbNeurons,  meaningInputTrain.size[1]};
-        xTot = cv::Mat (3,l_sizeTot, CV_64FC1, cv::Scalar(0.0)); //  will contain the internal states of the reservoir for all sentences and all timesteps
-
-        cv::Mat l_X2Copy = cv::Mat::zeros(1 + meaningInputTrain.size[2] + m_nbNeurons, meaningInputTrain.size[1], CV_64FC1); // OPTI
-
+        int l_sizeTot[3] = {meaningInputTrain.size[0], 1 + meaningInputTrain.size[2] + m_nbNeurons,  meaningInputTrain.size[1]};        
         int l_size[1] = {m_w.rows}; // OPTI
-        cv::Mat l_xPrev2Copy(1,l_size, CV_64FC1, cv::Scalar(0.0)); // OPTI
 
-        double l_invLeakRate = 1.0 - m_leakRate;
+        cv::Mat l_X2Copy, l_xPrev2Copy;
+        if(typeid(T) == typeid(float))
+        {
+            xTot = cv::Mat (3,l_sizeTot, CV_32FC1, cv::Scalar(0.f)); //  will contain the internal states of the reservoir for all sentences and all timesteps
+            l_X2Copy = cv::Mat::zeros(1 + meaningInputTrain.size[2] + m_nbNeurons, meaningInputTrain.size[1], CV_32FC1); // OPTI
+            l_xPrev2Copy = cv::Mat(1,l_size, CV_32FC1, cv::Scalar(0.f)); // OPTI
+        }
+        else
+        {
+            xTot = cv::Mat (3,l_sizeTot, CV_64FC1, cv::Scalar(0.0)); //  will contain the internal states of the reservoir for all sentences and all timesteps
+            l_X2Copy = cv::Mat::zeros(1 + meaningInputTrain.size[2] + m_nbNeurons, meaningInputTrain.size[1], CV_64FC1); // OPTI
+            l_xPrev2Copy = cv::Mat(1,l_size, CV_64FC1, cv::Scalar(0.0)); // OPTI
+        }
+
+        T l_invLeakRate = 1 - m_leakRate;
 
 //        fillRandomMat_(xTot);
-
 //        #pragma omp parallel for num_threads(7)
         #pragma omp parallel for
             for(int ii = 0; ii < meaningInputTrain.size[0]; ++ii)
             {
                 if(m_verbose)
                 {
-                    printf("input train : %d / %d\n", ii,meaningInputTrain.size[0]);
+                    printf("input train : %d / %d\n", ii+1,meaningInputTrain.size[0]);
                 }
 
                 cv::Mat l_X = l_X2Copy.clone();
                 cv::Mat l_xPrev, l_x;
-                cv::Mat l_subMean(meaningInputTrain.size[1], meaningInputTrain.size[2], CV_64FC1, meaningInputTrain.data + meaningInputTrain.step[0] *ii);
+                cv::Mat l_subMean;
+
+                if(typeid(T) == typeid(float))
+                {
+                    l_subMean = cv::Mat(meaningInputTrain.size[1], meaningInputTrain.size[2], CV_32FC1, meaningInputTrain.data + meaningInputTrain.step[0] *ii);
+                }
+                else
+                {
+                    l_subMean = cv::Mat(meaningInputTrain.size[1], meaningInputTrain.size[2], CV_64FC1, meaningInputTrain.data + meaningInputTrain.step[0] *ii);
+                }
 
                 for(int jj = 0; jj < meaningInputTrain.size[1]; ++jj)
                 {
@@ -535,35 +544,37 @@ void Reservoir2<T>::train(const cv::Mat &meaningInputTrain, const cv::Mat &teach
                     }
 
                     cv::Mat l_u = l_subMean.row(jj);
-                    cv::Mat l_temp(l_subMean.cols+1, 1, CV_64FC1);
-                    l_temp.at<double>(0) = 1.0;
+                    cv::Mat l_temp;
+                    initMatrix<T>(l_temp, l_subMean.cols+1, 1, false);
+                    l_temp.at<T>(0) = 1;
 
                     for(int kk = 0; kk < l_subMean.cols; ++kk)
                     {
-                        l_temp.at<double>(kk+1) = l_u.at<double>(kk);
+                        l_temp.at<T>(kk+1) = l_u.at<T>(kk);
                     }
 
                     cv::Mat l_xTemp = (m_wIn * l_temp)+ (m_w * l_xPrev);
 
-                    cv::MatIterator_<double> it = l_xTemp.begin<double>(), it_end = l_xTemp.end<double>();
+                    cv::MatIterator_<T> it = l_xTemp.begin<T>(), it_end = l_xTemp.end<T>();
                     for(;it != it_end; ++it)
                     {
-                        (*it) = tanh(*it);
+                        (*it) = static_cast<T>(tanh(*it));
                     }
 
                     l_x = (l_xPrev * l_invLeakRate) + (l_xTemp * m_leakRate);
 
-                    cv::Mat l_temp2(l_temp.rows + l_x.rows, 1, CV_64FC1);
+                    cv::Mat l_temp2;
+                    initMatrix<T>(l_temp2, l_temp.rows + l_x.rows, 1, false);
 
                     for(int kk = 0; kk < l_temp.rows + l_x.rows; ++kk)
                     {
                         if(kk < l_temp.rows)
                         {
-                            l_temp2.at<double>(kk) = l_temp.at<double>(kk);
+                            l_temp2.at<T>(kk) = l_temp.at<T>(kk);
                         }
                         else
                         {
-                            l_temp2.at<double>(kk) = l_x.at<double>(kk - l_temp.rows);
+                            l_temp2.at<T>(kk) = l_x.at<T>(kk - l_temp.rows);
                         }
                     }
 
@@ -574,9 +585,10 @@ void Reservoir2<T>::train(const cv::Mat &meaningInputTrain, const cv::Mat &teach
                 {
                     for(int kk = 0; kk < l_X.cols; ++kk)
                     {
-                        xTot.at<double>(ii,jj,kk) = l_X.at<double>(jj,kk);
+                        xTot.at<T>(ii,jj,kk) = l_X.at<T>(jj,kk);
                     }
                 }
+
             }
         // end pragma
 
@@ -593,13 +605,14 @@ void Reservoir2<T>::train(const cv::Mat &meaningInputTrain, const cv::Mat &teach
         #pragma omp parallel for
             for(int ii = 0; ii < xTot.size[0]; ++ii)
             {
-                cv::Mat l_X = cv::Mat::zeros(xTot.size[1], xTot.size[2], CV_64FC1);
+                cv::Mat l_X;
+                initMatrix<T>(l_X, xTot.size[1], xTot.size[2], true);
 
                 for(int jj = 0; jj < l_X.rows; ++jj)
                 {
                     for(int kk = 0; kk < l_X.cols; ++kk)
                     {
-                        l_X.at<double>(jj,kk) = xTot.at<double>(ii,jj,kk);
+                        l_X.at<T>(jj,kk) = xTot.at<T>(ii,jj,kk);
                     }
                 }
 
@@ -611,7 +624,7 @@ void Reservoir2<T>::train(const cv::Mat &meaningInputTrain, const cv::Mat &teach
                 {
                     for(int kk = 0; kk < sentencesOutputTrain.size[2]; ++kk)
                     {
-                        sentencesOutputTrain.at<double>(ii,jj,kk) = res.at<double>(jj,kk);
+                        sentencesOutputTrain.at<T>(ii,jj,kk) = res.at<T>(jj,kk);
                     }
                 }
             }
@@ -620,5 +633,142 @@ void Reservoir2<T>::train(const cv::Mat &meaningInputTrain, const cv::Mat &teach
     displayTime("END : train ", m_oTime, false, m_verbose);
 
 }
+
+
+template<class T>
+void Reservoir2<T>::test(const cv::Mat &meaningInputTest, cv::Mat &sentencesOutputTest, cv::Mat &xTot)
+{
+    m_oTime = clock();
+
+    displayTime("START : test", m_oTime, false, m_verbose);
+
+    int l_sizeTot[3] = {meaningInputTest.size[0], 1 + meaningInputTest.size[2] + m_nbNeurons,  meaningInputTest.size[1]};
+    int l_sizeOut[3] = {l_sizeTot[0], l_sizeTot[2], m_wOut.rows};
+
+
+    if(typeid(T) == typeid(float))
+    {
+        xTot = cv::Mat (3,l_sizeTot, CV_32FC1); //  will contain the internal states of the reservoir for all sentences and all timesteps
+        sentencesOutputTest = cv::Mat(3, l_sizeOut, CV_32FC1);
+
+    }
+    else
+    {
+        xTot = cv::Mat (3,l_sizeTot, CV_64FC1); //  will contain the internal states of the reservoir for all sentences and all timesteps
+        sentencesOutputTest = cv::Mat(3, l_sizeOut, CV_64FC1);
+
+    }
+
+    T l_invLeakRate = 1 - m_leakRate;
+
+    #pragma omp parallel for
+        for(int ii = 0; ii < meaningInputTest.size[0]; ++ii)
+        {
+            cv::Mat l_X;
+            initMatrix<T>(l_X, 1 + meaningInputTest.size[2] + m_nbNeurons,meaningInputTest.size[1], true);
+
+            cv::Mat l_xPrev, l_x;
+            cv::Mat l_subMean;
+
+            if(typeid(T) == typeid(float))
+            {
+                l_subMean = cv::Mat(meaningInputTest.size[1], meaningInputTest.size[2], CV_32FC1, meaningInputTest.data + meaningInputTest.step[0] *ii);
+            }
+            else
+            {
+                l_subMean = cv::Mat(meaningInputTest.size[1], meaningInputTest.size[2], CV_64FC1, meaningInputTest.data + meaningInputTest.step[0] *ii);
+            }
+
+            for(int jj = 0; jj < meaningInputTest.size[1]; ++jj)
+            {
+                // X will contain all the internal states of the reservoir for all timesteps
+                if(jj == 0)
+                {
+                    int l_size[1] = {m_w.rows};
+
+                    if(typeid(T) == typeid(float))
+                    {
+                        l_xPrev = cv::Mat(1,l_size, CV_32FC1, cv::Scalar(0.f));
+                    }
+                    else
+                    {
+                        l_xPrev = cv::Mat(1,l_size, CV_64FC1, cv::Scalar(0.0));
+                    }
+                }
+                else
+                {
+                    l_xPrev = l_x;
+                }
+
+                cv::Mat l_u = l_subMean.row(jj);
+                cv::Mat l_temp;
+                initMatrix<T>(l_temp,l_subMean.cols+1, 1);
+
+                l_temp.at<T>(0) = 1;
+                for(int kk = 0; kk < l_subMean.cols; ++kk)
+                {
+                    l_temp.at<T>(kk+1) = l_u.at<T>(kk);
+                }
+
+                cv::Mat l_xTemp = (m_wIn * l_temp) + (m_w * l_xPrev);
+
+                cv::MatIterator_<T> it = l_xTemp.begin<T>(), it_end = l_xTemp.end<T>();
+                for(;it != it_end; ++it)
+                {
+                    (*it) = tanh(*it);
+                }
+
+                l_x = (l_xPrev * l_invLeakRate) + (l_xTemp * m_leakRate);
+
+                cv::Mat l_temp2;
+                initMatrix<T>(l_temp,l_temp.rows + l_x.rows, 1, false);
+
+                for(int kk = 0; kk < l_temp.rows + l_x.rows; ++kk)
+                {
+                    if(kk < l_temp.rows)
+                    {
+                        l_temp2.at<T>(kk) = l_temp.at<T>(kk);
+                    }
+                    else
+                    {
+                        l_temp2.at<T>(kk) = l_x.at<T>(kk - l_temp.rows);
+                    }
+                }
+
+                l_temp2.copyTo( l_X.col(jj));
+
+                cv::Mat l_temp3;
+                initMatrix<T>(l_temp3,l_x.rows + l_subMean.cols+1, 1, false);
+
+
+                l_temp3.at<T>(0) = 1;
+                for(int kk = 0; kk < l_subMean.cols; ++kk)
+                {
+                    l_temp3.at<T>(kk+1) = l_u.at<T>(kk);
+                }
+                for(int kk = 0; kk < l_x.rows; ++kk)
+                {
+                    l_temp3.at<T>(kk+l_subMean.cols+1) = l_x.at<T>(kk);
+                }
+
+                cv::Mat l_y = m_wOut * l_temp3;
+                for(int kk = 0; kk < sentencesOutputTest.size[2]; ++kk)
+                {
+                    sentencesOutputTest.at<T>(ii,jj,kk) = l_y.at<T>(kk);
+                }
+            }
+            for(int jj = 0; jj < l_X.rows; ++jj)
+            {
+                for(int kk = 0; kk < l_X.cols; ++kk)
+                {
+                    xTot.at<T>(ii,jj,kk) = l_X.at<T>(jj,kk);
+                }
+            }
+        }
+    // end omp parallel
+
+     displayTime("END : test", m_oTime, false, m_verbose);
+}
+
 
 #endif

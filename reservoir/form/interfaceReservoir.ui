@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>753</width>
-    <height>677</height>
+    <height>694</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <item row="0" column="2">
      <widget class="QGroupBox" name="groupBox_4">
       <property name="title">
-       <string>Commands</string>
+       <string>COMMANDS</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_9">
        <item row="0" column="1">
@@ -30,6 +30,9 @@
        </item>
        <item row="1" column="1">
         <widget class="QPushButton" name="pbStop">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
          <property name="text">
           <string>Stop</string>
          </property>
@@ -49,31 +52,121 @@
          </size>
         </property>
         <property name="title">
-         <string>Parameters</string>
+         <string>SETTINGS</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_4">
+         <item row="3" column="0">
+          <widget class="QGroupBox" name="groupBox_7">
+           <property name="title">
+            <string>TRAIN / TEST</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_7">
+            <item row="0" column="1">
+             <widget class="QRadioButton" name="rbTrain">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Train</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QCheckBox" name="cbTrainingFile">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Uses training file :</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QPushButton" name="pbLoadTrainingFile">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Load training file</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1" colspan="4">
+             <widget class="QLineEdit" name="leCurrentTrainingFile">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="5">
+             <widget class="Line" name="line_14">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="4">
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_12">
+              <property name="text">
+               <string>To do:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QRadioButton" name="rbTest">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Test</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="3">
+             <widget class="QRadioButton" name="rbBoth">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Both</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="0">
+             <widget class="QPushButton" name="pbSaveLastTrainingFile">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>Save last training</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
          <item row="0" column="0">
           <layout class="QGridLayout" name="gridLayout_3">
            <item row="0" column="0">
             <widget class="QGroupBox" name="groupBox_3">
              <property name="title">
-              <string>Corpus list</string>
+              <string>CORPUS LIST</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_5">
-              <item row="1" column="0">
-               <widget class="QPushButton" name="pbAddCorpus">
-                <property name="maximumSize">
-                 <size>
-                  <width>150</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Add corpus</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0" colspan="3">
+              <item row="0" column="0" rowspan="2" colspan="2">
                <widget class="QListWidget" name="lwCorpus">
                 <property name="maximumSize">
                  <size>
@@ -83,7 +176,7 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="1">
+              <item row="1" column="2">
                <widget class="QPushButton" name="pbRemoveCorpus">
                 <property name="maximumSize">
                  <size>
@@ -96,6 +189,19 @@
                 </property>
                </widget>
               </item>
+              <item row="0" column="2">
+               <widget class="QPushButton" name="pbAddCorpus">
+                <property name="maximumSize">
+                 <size>
+                  <width>150</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Add corpus</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
            </item>
@@ -104,10 +210,17 @@
          <item row="1" column="0">
           <widget class="QGroupBox" name="groupBox_5">
            <property name="title">
-            <string>Reservoir parameters</string>
+            <string>RESERVOIR PARAMETERS</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_6">
-            <item row="4" column="2">
+            <item row="2" column="2">
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Start value</string>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="2">
              <widget class="QDoubleSpinBox" name="sbStartIS">
               <property name="singleStep">
                <double>0.010000000000000</double>
@@ -117,7 +230,7 @@
               </property>
              </widget>
             </item>
-            <item row="4" column="4">
+            <item row="6" column="4">
              <widget class="QDoubleSpinBox" name="sbEndIS">
               <property name="singleStep">
                <double>0.010000000000000</double>
@@ -127,42 +240,35 @@
               </property>
              </widget>
             </item>
-            <item row="4" column="0">
+            <item row="6" column="0">
              <widget class="QLabel" name="label_7">
               <property name="text">
                <string>Input scaling</string>
               </property>
              </widget>
             </item>
-            <item row="3" column="0">
+            <item row="5" column="0">
              <widget class="QLabel" name="label_2">
               <property name="text">
                <string>Leak rate</string>
               </property>
              </widget>
             </item>
-            <item row="2" column="0">
+            <item row="4" column="0">
              <widget class="QLabel" name="label">
               <property name="text">
                <string>Neurons number</string>
               </property>
              </widget>
             </item>
-            <item row="0" column="2">
-             <widget class="QLabel" name="label_3">
-              <property name="text">
-               <string>Start value</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="3" rowspan="8">
+            <item row="2" column="3" rowspan="8">
              <widget class="Line" name="line_2">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
               </property>
              </widget>
             </item>
-            <item row="3" column="2">
+            <item row="5" column="2">
              <widget class="QDoubleSpinBox" name="sbStartLeakRate">
               <property name="singleStep">
                <double>0.010000000000000</double>
@@ -172,70 +278,70 @@
               </property>
              </widget>
             </item>
-            <item row="3" column="4">
+            <item row="5" column="4">
              <widget class="QDoubleSpinBox" name="sbEndLeakRate">
               <property name="value">
                <double>0.250000000000000</double>
               </property>
              </widget>
             </item>
-            <item row="0" column="1" rowspan="8">
+            <item row="2" column="1" rowspan="8">
              <widget class="Line" name="line">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
               </property>
              </widget>
             </item>
-            <item row="1" column="4">
+            <item row="3" column="4">
              <widget class="Line" name="line_3">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
              </widget>
             </item>
-            <item row="0" column="4">
+            <item row="2" column="4">
              <widget class="QLabel" name="label_4">
               <property name="text">
                <string>End value</string>
               </property>
              </widget>
             </item>
-            <item row="0" column="0">
+            <item row="2" column="0">
              <widget class="QLabel" name="label_5">
               <property name="text">
                <string>Name parameter</string>
               </property>
              </widget>
             </item>
-            <item row="1" column="2">
+            <item row="3" column="2">
              <widget class="Line" name="line_4">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
              </widget>
             </item>
-            <item row="0" column="6">
+            <item row="2" column="6">
              <widget class="QLabel" name="label_6">
               <property name="text">
                <string>Operation on the values</string>
               </property>
              </widget>
             </item>
-            <item row="1" column="0">
+            <item row="3" column="0">
              <widget class="Line" name="line_5">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
              </widget>
             </item>
-            <item row="0" column="5" rowspan="8">
+            <item row="2" column="5" rowspan="8">
              <widget class="Line" name="line_6">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
               </property>
              </widget>
             </item>
-            <item row="1" column="6">
+            <item row="3" column="6">
              <widget class="Line" name="line_7">
               <property name="maximumSize">
                <size>
@@ -248,7 +354,7 @@
               </property>
              </widget>
             </item>
-            <item row="2" column="2">
+            <item row="4" column="2">
              <widget class="QSpinBox" name="sbStartNeurons">
               <property name="minimum">
                <number>10</number>
@@ -264,7 +370,7 @@
               </property>
              </widget>
             </item>
-            <item row="2" column="6">
+            <item row="4" column="6">
              <widget class="QLineEdit" name="leNeuronsOperation">
               <property name="maximumSize">
                <size>
@@ -277,7 +383,7 @@
               </property>
              </widget>
             </item>
-            <item row="2" column="4">
+            <item row="4" column="4">
              <widget class="QSpinBox" name="sbEndNeurons">
               <property name="maximum">
                <number>100000</number>
@@ -287,7 +393,7 @@
               </property>
              </widget>
             </item>
-            <item row="3" column="6">
+            <item row="5" column="6">
              <widget class="QLineEdit" name="leLeakRateOperation">
               <property name="maximumSize">
                <size>
@@ -300,7 +406,7 @@
               </property>
              </widget>
             </item>
-            <item row="4" column="6">
+            <item row="6" column="6">
              <widget class="QLineEdit" name="leISOperation">
               <property name="maximumSize">
                <size>
@@ -313,28 +419,28 @@
               </property>
              </widget>
             </item>
-            <item row="5" column="0">
+            <item row="7" column="0">
              <widget class="QLabel" name="label_8">
               <property name="text">
                <string>Spectral radius</string>
               </property>
              </widget>
             </item>
-            <item row="6" column="0">
+            <item row="8" column="0">
              <widget class="QLabel" name="label_9">
               <property name="text">
                <string>Ridge</string>
               </property>
              </widget>
             </item>
-            <item row="7" column="0">
+            <item row="9" column="0">
              <widget class="QLabel" name="label_10">
               <property name="text">
                <string>Sparcity</string>
               </property>
              </widget>
             </item>
-            <item row="5" column="6">
+            <item row="7" column="6">
              <widget class="QLineEdit" name="leSpectralRadiusOperation">
               <property name="maximumSize">
                <size>
@@ -347,7 +453,7 @@
               </property>
              </widget>
             </item>
-            <item row="6" column="6">
+            <item row="8" column="6">
              <widget class="QLineEdit" name="leRidgeOperation">
               <property name="maximumSize">
                <size>
@@ -360,7 +466,7 @@
               </property>
              </widget>
             </item>
-            <item row="7" column="6">
+            <item row="9" column="6">
              <widget class="QLineEdit" name="leSparcityOperation">
               <property name="maximumSize">
                <size>
@@ -373,98 +479,98 @@
               </property>
              </widget>
             </item>
-            <item row="0" column="7" rowspan="8">
+            <item row="2" column="7" rowspan="8">
              <widget class="Line" name="line_8">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
               </property>
              </widget>
             </item>
-            <item row="0" column="8">
+            <item row="2" column="8">
              <widget class="QLabel" name="label_11">
               <property name="text">
                <string>Current value</string>
               </property>
              </widget>
             </item>
-            <item row="7" column="8" alignment="Qt::AlignHCenter">
+            <item row="9" column="8" alignment="Qt::AlignHCenter">
              <widget class="QLabel" name="laSparcityValue">
               <property name="text">
                <string>0</string>
               </property>
              </widget>
             </item>
-            <item row="6" column="8" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+            <item row="8" column="8" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
              <widget class="QLabel" name="laRidgeValue">
               <property name="text">
                <string>0</string>
               </property>
              </widget>
             </item>
-            <item row="5" column="8" alignment="Qt::AlignHCenter">
+            <item row="7" column="8" alignment="Qt::AlignHCenter">
              <widget class="QLabel" name="laSpectralRadiusValue">
               <property name="text">
                <string>0</string>
               </property>
              </widget>
             </item>
-            <item row="4" column="8" alignment="Qt::AlignHCenter">
+            <item row="6" column="8" alignment="Qt::AlignHCenter">
              <widget class="QLabel" name="laISValue">
               <property name="text">
                <string>0</string>
               </property>
              </widget>
             </item>
-            <item row="3" column="8" alignment="Qt::AlignHCenter">
+            <item row="5" column="8" alignment="Qt::AlignHCenter">
              <widget class="QLabel" name="laLeakRateValue">
               <property name="text">
                <string>0</string>
               </property>
              </widget>
             </item>
-            <item row="2" column="8" alignment="Qt::AlignHCenter">
+            <item row="4" column="8" alignment="Qt::AlignHCenter">
              <widget class="QLabel" name="laNeuronsValue">
               <property name="text">
                <string>0</string>
               </property>
              </widget>
             </item>
-            <item row="1" column="8">
+            <item row="3" column="8">
              <widget class="Line" name="line_9">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
              </widget>
             </item>
-            <item row="0" column="10">
+            <item row="2" column="10">
              <widget class="QLabel" name="label_18">
               <property name="text">
                <string>Enabled</string>
               </property>
              </widget>
             </item>
-            <item row="0" column="9">
+            <item row="2" column="9">
              <widget class="Line" name="line_10">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
               </property>
              </widget>
             </item>
-            <item row="2" column="9" rowspan="6">
+            <item row="4" column="9" rowspan="6">
              <widget class="Line" name="line_11">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
               </property>
              </widget>
             </item>
-            <item row="1" column="10">
+            <item row="3" column="10">
              <widget class="Line" name="line_12">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
              </widget>
             </item>
-            <item row="2" column="10" alignment="Qt::AlignHCenter">
+            <item row="4" column="10" alignment="Qt::AlignHCenter">
              <widget class="QCheckBox" name="cbNeurons">
               <property name="text">
                <string/>
@@ -474,7 +580,7 @@
               </property>
              </widget>
             </item>
-            <item row="3" column="10" alignment="Qt::AlignHCenter">
+            <item row="5" column="10" alignment="Qt::AlignHCenter">
              <widget class="QCheckBox" name="cbLeakRate">
               <property name="text">
                <string/>
@@ -484,7 +590,7 @@
               </property>
              </widget>
             </item>
-            <item row="4" column="10" alignment="Qt::AlignHCenter">
+            <item row="6" column="10" alignment="Qt::AlignHCenter">
              <widget class="QCheckBox" name="cbIS">
               <property name="text">
                <string/>
@@ -494,7 +600,7 @@
               </property>
              </widget>
             </item>
-            <item row="5" column="10" alignment="Qt::AlignHCenter">
+            <item row="7" column="10" alignment="Qt::AlignHCenter">
              <widget class="QCheckBox" name="cbSpectralRadius">
               <property name="text">
                <string/>
@@ -504,7 +610,7 @@
               </property>
              </widget>
             </item>
-            <item row="6" column="10" alignment="Qt::AlignHCenter">
+            <item row="8" column="10" alignment="Qt::AlignHCenter">
              <widget class="QCheckBox" name="cbRidge">
               <property name="enabled">
                <bool>true</bool>
@@ -517,28 +623,28 @@
               </property>
              </widget>
             </item>
-            <item row="7" column="10" alignment="Qt::AlignHCenter">
+            <item row="9" column="10" alignment="Qt::AlignHCenter">
              <widget class="QCheckBox" name="cbSparcity">
               <property name="text">
                <string/>
               </property>
              </widget>
             </item>
-            <item row="5" column="2" alignment="Qt::AlignHCenter">
+            <item row="7" column="2" alignment="Qt::AlignHCenter">
              <widget class="QDoubleSpinBox" name="sbStartSpectralRadius">
               <property name="value">
                <double>4.000000000000000</double>
               </property>
              </widget>
             </item>
-            <item row="5" column="4">
+            <item row="7" column="4">
              <widget class="QDoubleSpinBox" name="sbEndSpectralRadius">
               <property name="value">
                <double>4.000000000000000</double>
               </property>
              </widget>
             </item>
-            <item row="6" column="2" alignment="Qt::AlignVCenter">
+            <item row="8" column="2" alignment="Qt::AlignVCenter">
              <widget class="QDoubleSpinBox" name="sbStartRidge">
               <property name="decimals">
                <number>5</number>
@@ -551,7 +657,7 @@
               </property>
              </widget>
             </item>
-            <item row="6" column="4">
+            <item row="8" column="4">
              <widget class="QDoubleSpinBox" name="sbEndRidge">
               <property name="decimals">
                <number>5</number>
@@ -564,11 +670,28 @@
               </property>
              </widget>
             </item>
-            <item row="7" column="2">
+            <item row="9" column="2">
              <widget class="QDoubleSpinBox" name="sbStartSparcity"/>
             </item>
-            <item row="7" column="4">
+            <item row="9" column="4">
              <widget class="QDoubleSpinBox" name="sbEndSparcity"/>
+            </item>
+            <item row="0" column="0" colspan="3">
+             <widget class="QCheckBox" name="checkBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Uses only the start value</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="11">
+             <widget class="Line" name="line_15">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -576,7 +699,7 @@
          <item row="2" column="0">
           <widget class="QGroupBox" name="groupBox_6">
            <property name="title">
-            <string>Grammar/Structure</string>
+            <string>GRAMMAR / STRUCTURE</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_10">
             <item row="2" column="0">
@@ -653,7 +776,7 @@
      <item row="0" column="0">
       <widget class="QGroupBox" name="groupBox_2">
        <property name="title">
-        <string>Display</string>
+        <string>DISPLAY</string>
        </property>
       </widget>
      </item>

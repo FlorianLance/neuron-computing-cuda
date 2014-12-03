@@ -118,12 +118,6 @@ class Model
         ModelParameters parameters() const;
 
         /**
-         * @brief Reset the reservoir by appliying new parameters
-         * @param [in] newParameters : new parameters
-         * @param [in] verbose       : display infos
-         */
-        void resetModel(const ModelParameters &newParameters, cbool verbose = true);
-        /**
          * @brief resetModelF
          * @param newParameters
          * @param verbose
@@ -138,18 +132,10 @@ class Model
         void setGrammar(const Sentence &grammar, const Sentence &structure);
 
         /**
-         * @brief launchTraining
-         */
-        void launchTraining();
-        /**
          * @brief launchTrainingF
          */
         void launchTrainingF();
 
-        /**
-         * @brief launchTests
-         */
-        void launchTests(const std::string &corpusTestFilePath = "");
         /**
          * @brief launchTestsF
          * @param corpusTestFilePath
@@ -179,30 +165,6 @@ class Model
          */
         void setResultsTestToCompare(const std::string &resultsTestFilePath);
 
-
-        /**
-         * @brief computeCCWResult
-         * @param trainResults
-         * @param CCWrightAbsolutePercentage
-         * @param CCWcorrectPositionAndWordPercentage
-         */
-//        void computeCCWResult(cbool trainResults, std::vector<double> &CCWrightAbsolutePercentage, std::vector<double> &CCWcorrectPositionAndWordPercentage);
-
-        /**
-         * @brief compareResults
-         * @param trainResults
-         * @param correctPositionAndWordPercentage
-         * @param sentenceRightAbsolutePercentage
-         * @param sizeDifferencePercentage
-         * @param totalWordNumber
-         * @param totalWordCorrectNumber
-         */
-//        void compareResults(cbool trainResults, std::vector<double> &correctPositionAndWordPercentage,
-//                                                std::vector<double> &sentenceRightAbsolutePercentage,
-//                                                std::vector<double> &sizeDifferencePercentage,
-//                                                int &totalWordNumber, int &totalWordCorrectNumber);
-
-
         /**
          * @brief computeResultsData
          * @param trainResults
@@ -228,11 +190,25 @@ class Model
                                 );
 
 
-
         /**
          * @brief saveResults
          */
         void saveResults();
+
+
+        /**
+         * @brief saveTraining
+         * @param pathDirectory
+         */
+        void saveTraining(const std::string &pathDirectory);
+
+        /**
+         * @brief loadTraining
+         * @param pathDirectory
+         */
+        void loadTraining(const std::string &pathDirectory);
+
+
 
         Sentences m_recoveredSentencesTrain;    /**< ... */
         Sentences m_recoveredSentencesTest;     /**< ... */
@@ -272,6 +248,8 @@ class Model
 
         // reservoir
         Reservoir m_reservoir;                  /**< reservoir structure */
+        Reservoir2<float> m_res1;
+        Reservoir2<double> m_res2;
 };
 
 #endif
