@@ -1,6 +1,6 @@
 
 
-#include "GridSearch.h"
+//#include "GridSearch.h"
 #include "Generalization.h"
 
 #include "gpuMat/cudaMultiplications.h"
@@ -149,7 +149,6 @@ int main(int argc, char* argv[])
 
     QApplication l_oApp(argc, argv);
     Interface l_oViewerInterface;
-//    l_oViewerInterface.resize(1800, 900);
     l_oViewerInterface.move(50,50);
     l_oViewerInterface.show();
 
@@ -345,4 +344,48 @@ int main(int argc, char* argv[])
 
 //    culaStop();
 //    return 0;
+
+//     ############################################## MODEL - TEST SAVE LOAD TRAINING
+    ModelParameters l_parameters;
+
+    l_parameters.m_nbNeurons = 400;
+    l_parameters.m_leakRate  = 0.25;
+    l_parameters.m_inputScaling = 0.2;
+    l_parameters.m_spectralRadius = 7.0;
+    l_parameters.m_ridge = 1e-5;
+    l_parameters.m_corpusFilePath = "../data/input/Corpus/japan_test.txt";
+
+    l_parameters.m_sparcity = 10.0 / l_parameters.m_nbNeurons;
+    l_parameters.m_useCudaInv= true;
+    l_parameters.m_useCudaMult = true;
+    l_parameters.m_useLoadedTraining = false;
+
+    Model l_model(l_parameters);
+
+    std::string l_grammarStd[] ={"-ga","-ni","-wo","-yotte","-o","-to","sore"};
+    std::string l_structureStd[] = {"P0","A1","O2","R3", "Q0"};
+
+    Sentence l_grammar = Sentence(l_grammarStd, l_grammarStd + sizeof(l_grammarStd) / sizeof(std::string));
+    Sentence l_structure = Sentence(l_structureStd, l_structureStd + sizeof(l_structureStd) / sizeof(std::string));
+    l_model.setGrammar(l_grammar, l_structure);
+
+    l_model.resetModelParameters(l_parameters,true);
+    l_model.launchTraining();
+    l_model.retrieveTrainSentences();
+    l_model.saveTraining("../data/training/last");
+
+    std::cout << "load training : " << std::endl;
+    l_model.loadTraining("../data/training/last");
+    l_parameters.m_useLoadedTraining = true;
+
+    std::cout << "resetModelParameters : " << std::endl;
+    l_model.resetModelParameters(l_parameters,true);
+
+    std::cout << "launchTests : " << std::endl;
+    l_model.launchTests();
+    l_model.retrieveTestsSentences();
+
+    culaStop();
+    return 0;
+
 }

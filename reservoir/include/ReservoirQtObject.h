@@ -26,6 +26,8 @@
  */
 class ReservoirObject : public QObject
 {
+    Q_OBJECT
+
     public :
 
         /**

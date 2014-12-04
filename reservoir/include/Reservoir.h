@@ -55,6 +55,18 @@ class Reservoir
         Reservoir(cuint nbNeurons, cfloat spectralRadius, cfloat inputScaling, cfloat leakRate, cfloat sparcity = -1.f, cfloat ridge = 1e-5f, cbool verbose = true);
 
         /**
+         * @brief setParameters
+         * @param nbNeurons
+         * @param spectralRadius
+         * @param inputScaling
+         * @param leakRate
+         * @param sparcity
+         * @param ridge
+         * @param verbose
+         */
+        void setParameters(cuint nbNeurons, cfloat spectralRadius, cfloat inputScaling, cfloat leakRate, cfloat sparcity, cfloat ridge, cbool verbose);
+
+        /**
          * @brief setCudaProperties
          * @param cudaInv
          * @param cudaMult
@@ -62,40 +74,40 @@ class Reservoir
         void setCudaProperties(cbool cudaInv, cbool cudaMult);
 
         /**
-         * @brief generateMatrixWF
+         * @brief generateMatrixW
          */
-        void generateMatrixWF();
+        void generateMatrixW();
 
         /**
-         * @brief generateWInF
+         * @brief generateWIn
          * @param dimInput
          */
-        void generateWInF(cuint dimInput);
+        void generateWIn(cuint dimInput);
 
         /**
-         * @brief tikhonovRegularizationF
+         * @brief tikhonovRegularization
          * @param xTot
          * @param yTeacher
          * @param dimInput
          */
-        void tikhonovRegularizationF(const cv::Mat &xTot, const cv::Mat &yTeacher, cuint dimInput);
+        void tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTeacher, cuint dimInput);
 
         /**
-         * @brief trainF
+         * @brief train
          * @param meaningInputTrain
          * @param teacher
          * @param sentencesOutputTrain
          * @param xTot
          */
-        void trainF(const cv::Mat &meaningInputTrain, const cv::Mat &teacher, cv::Mat &sentencesOutputTrain, cv::Mat &xTot);
+        void train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher, cv::Mat &sentencesOutputTrain, cv::Mat &xTot);
 
         /**
-         * @brief testF
+         * @brief test
          * @param meaningInputTest
          * @param sentencesOutputTest
          * @param xTot
          */
-        void testF(const cv::Mat &meaningInputTest, cv::Mat &sentencesOutputTest, cv::Mat &xTot);
+        void test(const cv::Mat &meaningInputTest, cv::Mat &sentencesOutputTest, cv::Mat &xTot);
 
         /**
          * @brief Save the current state of internal matrices m_wF m_wInF, m_wOutF
@@ -109,6 +121,11 @@ class Reservoir
          */
         void loadTraining(const std::string &path);
 
+        /**
+         * @brief updateMatricesWithLoadedTraining
+         */
+        void updateMatricesWithLoadedTraining();
+
     private :
 
         bool m_useCudaInversion;        /**< ... */
@@ -120,16 +137,19 @@ class Reservoir
 
         clock_t m_oTime;                /**< ... */
 
-        float m_sparcityF;              /**< ... */
-        float m_spectralRadiusF;        /**< ... */
-        float m_inputScalingF;          /**< ... */
-        float m_leakRateF;              /**< ... */
-        float m_ridgeF;                 /**< ... */
+        float m_sparcity;              /**< ... */
+        float m_spectralRadius;        /**< ... */
+        float m_inputScaling;          /**< ... */
+        float m_leakRate;              /**< ... */
+        float m_ridge;                 /**< ... */
 
-        cv::Mat m_wF;                   /**< ... */
-        cv::Mat m_wInF;                 /**< ... */
-        cv::Mat m_wOutF;                /**< ... */
+        cv::Mat m_w;                   /**< ... */
+        cv::Mat m_wIn;                 /**< ... */
+        cv::Mat m_wOut;                /**< ... */
 
+        cv::Mat m_wLoaded;              /**< ... */
+        cv::Mat m_wInLoaded;            /**< ... */
+        cv::Mat m_wOutLoaded;           /**< ... */
 };
 
 

@@ -261,11 +261,11 @@ void Generalization::startXVerification(const std::string &xCheckTrainPath, cons
 
             generateCorpus(l_currentParameters.m_corpusFilePath.c_str(), l_trainDataM, l_trainInfoM, l_trainMeaningM, l_testData, l_testInfo);
 
-            m_model->resetModelF(l_currentParameters, false);
+            m_model->resetModelParameters(l_currentParameters, false);
 
             clock_t l_timeTraining = clock();
 
-            m_model->launchTrainingF();
+            m_model->launchTraining();
 
             double l_time = static_cast<double>((clock() - l_timeTraining)) / CLOCKS_PER_SEC;
             m_model->retrieveTrainSentences();
@@ -322,7 +322,7 @@ void Generalization::startXVerification(const std::string &xCheckTrainPath, cons
                 l_flowXCheckTrain << std::endl;
 
             // create test stats
-                m_model->launchTestsF();
+                m_model->launchTests();
                 m_model->retrieveTestsSentences();
 
                 m_model->computeResultsData(false,"../data/Results/generalization_test.txt", l_diffSizeOCW,

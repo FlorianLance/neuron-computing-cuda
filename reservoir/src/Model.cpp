@@ -18,8 +18,6 @@ Model::Model() : m_trainingSuccess(false), m_verbose(true) {}
 Model::Model(const ModelParameters &parameters) : m_parameters(parameters), m_trainingSuccess(false), m_verbose(true)
 {
      m_reservoir = Reservoir(m_parameters.m_nbNeurons, m_parameters.m_spectralRadius, m_parameters.m_inputScaling, m_parameters.m_leakRate, m_parameters.m_sparcity, m_parameters.m_ridge, m_verbose);
-//     m_res1 = Reservoir2<float>(m_parameters.m_nbNeurons, m_parameters.m_spectralRadius, m_parameters.m_inputScaling, m_parameters.m_leakRate, m_parameters.m_sparcity, m_parameters.m_ridge, m_verbose);
-//     m_res2 = Reservoir2<float>(m_parameters.m_nbNeurons, m_parameters.m_spectralRadius, m_parameters.m_inputScaling, m_parameters.m_leakRate, m_parameters.m_sparcity, m_parameters.m_ridge, m_verbose);
 }
 
 ModelParameters Model::parameters() const
@@ -28,23 +26,27 @@ ModelParameters Model::parameters() const
 }
 
 
-void Model::resetModelF(const ModelParameters &newParameters, cbool verbose)
+void Model::resetModelParameters(const ModelParameters &newParameters, cbool verbose)
 {
-    m_verbose = verbose;
-
-    m_trainingSuccess = false;
     m_parameters = newParameters;
-    m_reservoir = Reservoir(m_parameters.m_nbNeurons, static_cast<float>(m_parameters.m_spectralRadius), static_cast<float>(m_parameters.m_inputScaling)
-                            ,  static_cast<float>(m_parameters.m_leakRate), static_cast<float>(m_parameters.m_sparcity), static_cast<float>(m_parameters.m_ridge), m_verbose);
-    m_reservoir.setCudaProperties(m_parameters.m_useCudaInv, m_parameters.m_useCudaMult);
+    m_verbose    = verbose;
 
-//    m_res1 = Reservoir2<float>(m_parameters.m_nbNeurons, static_cast<float>(m_parameters.m_spectralRadius), static_cast<float>(m_parameters.m_inputScaling)
-//                            ,  static_cast<float>(m_parameters.m_leakRate), static_cast<float>(m_parameters.m_sparcity), static_cast<float>(m_parameters.m_ridge), m_verbose);
-//    m_res1.setCudaProperties(m_parameters.m_useCudaInv, m_parameters.m_useCudaMult);
+    // resert training state
+        m_trainingSuccess = false;
 
-//    m_res2 = Reservoir2<double>(m_parameters.m_nbNeurons, static_cast<double>(m_parameters.m_spectralRadius), static_cast<double>(m_parameters.m_inputScaling)
-//                            ,  static_cast<double>(m_parameters.m_leakRate), static_cast<double>(m_parameters.m_sparcity), static_cast<double>(m_parameters.m_ridge), m_verbose);
-//    m_res2.setCudaProperties(m_parameters.m_useCudaInv, m_parameters.m_useCudaMult);
+    // update the matrices with the training loaded
+        if(m_parameters.m_useLoadedTraining)
+        {
+            m_reservoir.updateMatricesWithLoadedTraining();
+            m_trainingSuccess = true;
+        }
+
+    // reservoir
+        m_reservoir.setParameters(m_parameters.m_nbNeurons, static_cast<float>(m_parameters.m_spectralRadius), static_cast<float>(m_parameters.m_inputScaling)
+                              ,static_cast<float>(m_parameters.m_leakRate), static_cast<float>(m_parameters.m_sparcity), static_cast<float>(m_parameters.m_ridge), m_verbose);
+
+    // CUDA
+        m_reservoir.setCudaProperties(m_parameters.m_useCudaInv, m_parameters.m_useCudaMult);
 }
 
 void Model::setGrammar(const Sentence &grammar, const Sentence &structure)
@@ -70,6 +72,10 @@ void Model::retrieveTestsSentences()
     // generate open class word arrays
         Sentences l_testOCW;
         generateOCWArray(m_testMeaning, m_testInfo, l_testOCW);
+
+        displaySentence(m_testMeaning);
+        displaySentence(m_testInfo);
+        displaySentence(l_testOCW);
 
     // convert signal
         Sentences l_recoveredConstructionTest;
@@ -108,11 +114,6 @@ void Model::displayResults(const bool trainResults, const bool testResults)
 
         for(int ii = 0; ii < m_recoveredSentencesTest.size(); ++ii)
         {
-            for(int jj = 0; jj < m_testSentence[ii].size(); ++jj)
-            {
-                std::cout << m_testSentence[ii][jj] << " ";
-            }
-            std::cout << " -> ";
             for(int jj = 0; jj < m_recoveredSentencesTest[ii].size(); ++jj)
             {
                 std::cout << m_recoveredSentencesTest[ii][jj] << " ";
@@ -414,7 +415,7 @@ void Model::loadTraining(const std::string &pathDirectory)
     m_reservoir.loadTraining(pathDirectory);
 }
 
-void Model::launchTrainingF()
+void Model::launchTraining()
 {
     // init time
         clock_t l_trainingTime = clock();
@@ -422,6 +423,7 @@ void Model::launchTrainingF()
         m_3DMatSentencesOutputTrain = cv::Mat();
 
     // generate close class word arrays
+        m_closedClassWords.clear();
         if(m_grammar.size() > 0)
         {
             m_closedClassWords = m_grammar;
@@ -477,9 +479,7 @@ void Model::launchTrainingF()
 
     // train reservoir
         displayTime("Start reservoir training ", l_trainingTime, false, m_verbose);
-            m_reservoir.trainF(l_3DMatStimMeanTrain, l_3DMatStimSentTrain, m_3DMatSentencesOutputTrain, l_internalStatesTrain);
-//            m_res1.train(l_3DMatStimMeanTrain, l_3DMatStimSentTrain, m_3DMatSentencesOutputTrain, l_internalStatesTrain);
-//            m_res2.train(l_3DMatStimMeanTrain, l_3DMatStimSentTrain, m_3DMatSentencesOutputTrain, l_internalStatesTrain);
+            m_reservoir.train(l_3DMatStimMeanTrain, l_3DMatStimSentTrain, m_3DMatSentencesOutputTrain, l_internalStatesTrain);
         displayTime("End reservoir training ", l_trainingTime, true, m_verbose);
 
     // save matrices
@@ -592,7 +592,7 @@ void Model::launchTrainingF()
 }
 
 
-void Model::launchTestsF(const std::string &corpusTestFilePath)
+void Model::launchTests(const std::string &corpusTestFilePath)
 {
     // init time
         clock_t l_testTime = clock();
@@ -610,6 +610,18 @@ void Model::launchTestsF(const std::string &corpusTestFilePath)
         if(corpusTestFilePath.size() > 0)
         {
             l_corpusFilePath = corpusTestFilePath;
+        }
+
+    // generate close class word arrays
+        m_closedClassWords.clear();
+        if(m_grammar.size() > 0)
+        {
+            m_closedClassWords = m_grammar;
+            m_closedClassWords.push_back("X");
+        }
+        else
+        {
+            closedClassWords(m_closedClassWords, "X");
         }
 
     // generate CCW python argument
@@ -653,9 +665,7 @@ void Model::launchTestsF(const std::string &corpusTestFilePath)
 
     // test reservoir
         displayTime("Start reservoir testing ", l_testTime, false, m_verbose);
-            m_reservoir.testF(l_3DMatStimMeanTest, m_3DMatSentencesOutputTest, l_internalStatesTest);
-//            m_res1.test(l_3DMatStimMeanTest, m_3DMatSentencesOutputTest, l_internalStatesTest);
-//            m_res2.test(l_3DMatStimMeanTest, m_3DMatSentencesOutputTest, l_internalStatesTest);
+            m_reservoir.test(l_3DMatStimMeanTest, m_3DMatSentencesOutputTest, l_internalStatesTest);
         displayTime("End reservoir testing ", l_testTime, true, m_verbose);
 
     // retrieve corpus test data

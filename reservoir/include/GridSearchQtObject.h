@@ -1,13 +1,13 @@
 
 /**
- * \file GridSearch.h
- * \brief defines Generalization
+ * \file GridSearchQtObject.h
+ * \brief defines GridSearchQtObject
  * \author Florian Lance
- * \date 01/10/14
+ * \date 04/12/14
  */
 
-#ifndef GRIDSEARCH_H
-#define GRIDSEARCH_H
+#ifndef GRIDSEARCHQT_H
+#define GRIDSEARCHQT_H
 
 #include <Model.h>
 
@@ -26,11 +26,13 @@ static void display(std::vector<T> vec)
 }
 
 /**
- * @brief The GridSearch class
+ * @brief The GridSearchQt class
  */
-class GridSearch
+class GridSearchQt : public QObject
 {
-    public :   
+    Q_OBJECT
+
+    public :
 
         /**
          * @brief Enum of the parameters used by the grid search.
@@ -41,10 +43,10 @@ class GridSearch
         };
 
         /**
-         * @brief GridSearch constructor.
+         * @brief GridSearchQt constructor.
          * @param [in] model : model to be used for the generation.
          */
-        GridSearch(Model &model);
+        GridSearchQt(Model &model);
 
         /**
          * @brief Set the cuda parameters.
@@ -84,6 +86,11 @@ class GridSearch
          * @param [in] corpusList : path of the corpus file
          */
         void setCorpusList(const std::vector<std::string> &corpusList);
+
+
+    signals :
+
+        void sendCurrentParametersSignal(ModelParameters);
 
     private :
 

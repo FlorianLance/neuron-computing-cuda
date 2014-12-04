@@ -76,6 +76,8 @@ struct ModelParameters
         m_sparcity       = m_nbNeurons / 10.0;
     }
 
+    bool m_useLoadedTraining;
+
     // cuda
     bool m_useCudaInv;              /**< uses the cuda inversion ? */
     bool m_useCudaMult;             /**< uses the cuda multiplication ? */
@@ -118,11 +120,11 @@ class Model
         ModelParameters parameters() const;
 
         /**
-         * @brief resetModelF
+         * @brief resetModel
          * @param newParameters
          * @param verbose
          */
-        void resetModelF(const ModelParameters &newParameters, cbool verbose);
+        void resetModelParameters(const ModelParameters &newParameters, cbool verbose);
 
         /**
          * @brief setGrammar
@@ -132,15 +134,15 @@ class Model
         void setGrammar(const Sentence &grammar, const Sentence &structure);
 
         /**
-         * @brief launchTrainingF
+         * @brief launchTraining
          */
-        void launchTrainingF();
+        void launchTraining();
 
         /**
-         * @brief launchTestsF
+         * @brief launchTests
          * @param corpusTestFilePath
          */
-        void launchTestsF(const std::string &corpusTestFilePath = "");
+        void launchTests(const std::string &corpusTestFilePath = "");
 
         /**
          * @brief retrieveTrainSentences

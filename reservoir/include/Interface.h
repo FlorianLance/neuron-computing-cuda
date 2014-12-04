@@ -19,10 +19,8 @@
 #include "../genUI/UI_Interface.h"
 
 
-#include "GridSearch.h"
-//#include "interface/QtWidgets/SWGLMultiObjectWidget.h"
-
-//#include "animation/SWAnimation.h"
+//#include "GridSearch.h"
+#include "GridSearchQtObject.h"
 
 
 
@@ -33,6 +31,12 @@ namespace Ui {
 
 class InterfaceWorker;
 
+
+enum ActionToDo
+{
+    TRAINING_RES,TEST_RES,BOTH_RES
+};
+
 struct LanguageParameters
 {
     QString m_structure;
@@ -41,6 +45,12 @@ struct LanguageParameters
 
 struct ReservoirParameters
 {
+
+    bool m_useLoadedTraining;
+    bool m_useOnlyStartValue;
+
+    ActionToDo m_action;
+
     int m_neuronsStart;
     double m_leakRateStart;
     double m_issStart;
@@ -123,6 +133,11 @@ class Interface : public QMainWindow
         void saveTraining();
 
         /**
+         * @brief loadTraining
+         */
+        void loadTraining();
+
+        /**
          * @brief updateParamters
          */
         void updateReservoirParameters();
@@ -156,6 +171,12 @@ class Interface : public QMainWindow
         void displayValidityOperation(bool operationValid, int indexParameter);
 
 
+        /**
+         * @brief displayCurrentParameters
+         */
+        void displayCurrentParameters(ModelParameters params);
+
+
     signals:
 
         /**
@@ -174,6 +195,11 @@ class Interface : public QMainWindow
         void saveTrainingSignal(QString);
 
         /**
+         * @brief loadTrainingSignal
+         */
+        void loadTrainingSignal(QString);
+
+        /**
          * @brief sendReservoirParametersSignal
          */
         void sendReservoirParametersSignal(ReservoirParameters);
@@ -182,7 +208,6 @@ class Interface : public QMainWindow
          * @brief sendLanguageParametersSignal
          */
         void sendLanguageParametersSignal(LanguageParameters);
-
 
     private :
 
@@ -214,6 +239,16 @@ class InterfaceWorker : public QObject
          */
         InterfaceWorker();
 
+        /**
+         * \brief destructor of InterfaceWorker
+         */
+        ~InterfaceWorker();
+
+        /**
+         * @brief gridSearch
+         * @return
+         */
+        GridSearchQt *gridSearch() const;
 
     public slots:
 
@@ -250,6 +285,16 @@ class InterfaceWorker : public QObject
          */
         void stop();
 
+        /**
+         * @brief saveLastTraining
+         */
+        void saveLastTraining(QString pathDirectory);
+
+        /**
+         * @brief loadTraining
+         */
+        void loadTraining(QString pathDirectory);
+
     signals:
 
         /**
@@ -263,6 +308,12 @@ class InterfaceWorker : public QObject
         void displayValidityOperationSignal(bool, int);
 
 
+        /**
+         * @brief endTrainingSignal
+         */
+        void endTrainingSignal(bool);
+
+
     private :
 
         int m_nbOfCorpus;
@@ -271,7 +322,7 @@ class InterfaceWorker : public QObject
         LanguageParameters m_languageParameters;
 
         Model m_model;
-        GridSearch m_gridSearch;
+        GridSearchQt *m_gridSearch;
 
         QStringList m_corpusList;
 };

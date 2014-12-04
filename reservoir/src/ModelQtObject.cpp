@@ -681,7 +681,7 @@ void ModelObject::launchTrainingF()
 
     // train reservoir
         displayTime("Start reservoir training ", l_trainingTime, false, m_verbose);
-            m_reservoir.trainF(l_3DMatStimMeanTrain, l_3DMatStimSentTrain, m_3DMatSentencesOutputTrain, l_internalStatesTrain);
+            m_reservoir.train(l_3DMatStimMeanTrain, l_3DMatStimSentTrain, m_3DMatSentencesOutputTrain, l_internalStatesTrain);
         displayTime("End reservoir training ", l_trainingTime, true, m_verbose);
 
     // save matrices
@@ -863,7 +863,7 @@ void ModelObject::launchTestsF(const std::string &corpusTestFilePath)
 
     // test reservoir
         displayTime("Start reservoir testing ", l_testTime, false, m_verbose);
-            m_reservoir.testF(l_3DMatStimMeanTest, m_3DMatSentencesOutputTest, l_internalStatesTest);
+            m_reservoir.test(l_3DMatStimMeanTest, m_3DMatSentencesOutputTest, l_internalStatesTest);
         displayTime("End reservoir testing ", l_testTime, true, m_verbose);
 
     // retrieve corpus test data

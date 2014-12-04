@@ -20,20 +20,20 @@ LINK=link
 
 RESERVOIR_OBJ=\
     $(LIBDIR)/Reservoir.obj $(LIBDIR)/Model.obj $(LIBDIR)/inversions.obj $(LIBDIR)/multiplications.obj $(LIBDIR)/GridSearch.obj $(LIBDIR)/Generalization.obj $(LIBDIR)/main.obj $(LIBDIR)/Interface.obj\
-    $(LIBDIR)/ReservoirQtObject.obj $(LIBDIR)/ModelQtObject.obj\
+    $(LIBDIR)/ReservoirQtObject.obj $(LIBDIR)/ModelQtObject.obj $(LIBDIR)/GridSearchQtObject.obj\
 
 RESERVOIR_OBJ_S=\
     $(LIBDIR)/Reservoir-s.obj $(LIBDIR)/Model-s.obj $(LIBDIR)/inversions.obj $(LIBDIR)/multiplications.obj $(LIBDIR)/GridSearch-s.obj $(LIBDIR)/Generalization-s.obj $(LIBDIR)/main-s.obj $(LIBDIR)/Interface-s.obj\
-    $(LIBDIR)/ReservoirQtObject-s.obj $(LIBDIR)/ModelQtObject-s.obj\
+    $(LIBDIR)/ReservoirQtObject-s.obj $(LIBDIR)/ModelQtObject-s.obj $(LIBDIR)/GridSearchQtObject-s.obj\
 
 ############################################################################## Makefile commands
 
 !if "$(ARCH)" == "x86"
-all: $(QTGENW)/UI_Interface.h $(MOCDIR)/moc_Interface.cpp $(MOCDIR)/moc_ReservoirQtObject.cpp $(MOCDIR)/moc_ModelQtObject.cpp $(BINDIR)/reservoir-test.exe
+all: $(QTGENW)/UI_Interface.h $(MOCDIR)/moc_Interface.cpp $(MOCDIR)/moc_ReservoirQtObject.cpp $(MOCDIR)/moc_ModelQtObject.cpp $(MOCDIR)/moc_GridSearchQtObject.cpp $(BINDIR)/reservoir-test.exe
 !endif
 
 !if "$(ARCH)" == "amd64"
-all: $(QTGENW)/UI_Interface.h $(MOCDIR)/moc_Interface.cpp $(MOCDIR)/moc_ReservoirQtObject.cpp $(MOCDIR)/moc_ModelQtObject.cpp $(BINDIR)/reservoir-test-x64.exe
+all: $(QTGENW)/UI_Interface.h $(MOCDIR)/moc_Interface.cpp $(MOCDIR)/moc_ReservoirQtObject.cpp $(MOCDIR)/moc_ModelQtObject.cpp $(MOCDIR)/moc_GridSearchQtObject.cpp $(BINDIR)/reservoir-test-x64.exe
 !endif
 
 ############################################################################## exe files
@@ -79,6 +79,12 @@ $(LIBDIR)/GridSearch.obj: ./src/GridSearch.cpp
 $(LIBDIR)/GridSearch-s.obj: ./src/GridSearch.cpp
         $(CC) -c ./src/GridSearch.cpp $(CFLAGS_STA) $(RESERVOIR_INC) -Fo"$(LIBDIR)/GridSearch-s.obj"
 
+$(LIBDIR)/GridSearchQtObject.obj: ./src/GridSearchQtObject.cpp
+        $(CC) -c ./src/GridSearchQtObject.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/GridSearchQtObject.obj"
+
+$(LIBDIR)/GridSearchQtObject-s.obj: ./src/GridSearchQtObject.cpp
+        $(CC) -c ./src/GridSearchQtObject.cpp $(CFLAGS_STA) $(RESERVOIR_INC) -Fo"$(LIBDIR)/GridSearchQtObject-s.obj"
+
 
 $(LIBDIR)/Generalization.obj: ./src/Generalization.cpp
         $(CC) -c ./src/Generalization.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/Generalization.obj"
@@ -115,3 +121,6 @@ $(MOCDIR)/moc_ReservoirQtObject.cpp: ./include/ReservoirQtObject.h
 
 $(MOCDIR)/moc_ModelQtObject.cpp: ./include/ModelQtObject.h
          moc  ./include/ModelQtObject.h -o $@
+
+$(MOCDIR)/moc_GridSearchQtObject.cpp: ./include/GridSearchQtObject.h
+         moc  ./include/GridSearchQtObject.h -o $@

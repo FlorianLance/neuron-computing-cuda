@@ -1,23 +1,27 @@
 
+
 /**
- * \file GridSearch.cpp
- * \brief defines Generalization
+ * \file GridSearchQtObject.cpp
+ * \brief defines GridSearchQtObject
  * \author Florian Lance
- * \date 01/10/14
+ * \date 04/12/14
  */
 
-#include "GridSearch.h"
+#include "GridSearchQtObject.h"
 
-GridSearch::GridSearch(Model &model) : m_model(&model), m_useCudaInv(true), m_useCudaMult(false)
+
+#include "../moc/moc_GridSearchQtObject.cpp"
+
+GridSearchQt::GridSearchQt(Model &model) : m_model(&model), m_useCudaInv(true), m_useCudaMult(false)
 {}
 
-void GridSearch::setCudaParameters(cbool useCudaInversion, cbool useCudaMultiplication)
+void GridSearchQt::setCudaParameters(cbool useCudaInversion, cbool useCudaMultiplication)
 {
     m_useCudaInv    = useCudaInversion;
     m_useCudaMult   = useCudaMultiplication;
 }
 
-void GridSearch::launchTrainWithAllParameters(const std::string resultsFilePath, const std::string resultsRawFilePath, cbool doTraining, cbool doTest, cbool loadTraining)
+void GridSearchQt::launchTrainWithAllParameters(const std::string resultsFilePath, const std::string resultsRawFilePath, cbool doTraining, cbool doTest, cbool loadTraining)
 {
     if(m_corpusList.size() == 0)
     {
@@ -134,11 +138,13 @@ void GridSearch::launchTrainWithAllParameters(const std::string resultsFilePath,
 
                                 l_currentParameters.m_useLoadedTraining = loadTraining;
 
+                                emit sendCurrentParametersSignal(l_currentParameters);
+
                                 std::cout << "############################################################## " << std::endl;
 
                                 m_model->resetModelParameters(l_currentParameters, false);
 
-                                clock_t l_timeTraining = clock();                               
+                                clock_t l_timeTraining = clock();
                                 std::vector<double> l_diffSizeOCW, l_absoluteCorrectPositionAndWordCCW, l_correctPositionAndWordCCW, l_absoluteCorrectPositionAndWordAll, l_correctPositionAndWordAll;
                                 double l_meanDiffSizeOCW, l_meanCorrectPositionAndWordCCW, l_meanAbsoluteCorrectPositionAndWordCCW, l_meanCorrectPositionAndWordAll, l_meanAbsoluteCorrectPositionAndWordAll;
 
@@ -206,7 +212,7 @@ void GridSearch::launchTrainWithAllParameters(const std::string resultsFilePath,
     }
 }
 
-void GridSearch::deleteParameterValues()
+void GridSearchQt::deleteParameterValues()
 {
     m_nbNeuronsValues.clear();
     m_leakRateValues.clear();
@@ -216,7 +222,7 @@ void GridSearch::deleteParameterValues()
     m_spectralRadiusValues.clear();
 }
 
-bool GridSearch::setParameterValues(const GridSearch::ReservoirParameter parameterId, cdouble startValue, cdouble endValue, const std::string operation, cbool useOnlyStartValue)
+bool GridSearchQt::setParameterValues(const GridSearchQt::ReservoirParameter parameterId, cdouble startValue, cdouble endValue, const std::string operation, cbool useOnlyStartValue)
 {
     bool l_operationValid = true;
 
@@ -249,7 +255,7 @@ bool GridSearch::setParameterValues(const GridSearch::ReservoirParameter paramet
 
     int l_loopStop = 0;
     if(startValue <= endValue && !useOnlyStartValue)
-    {        
+    {
         while(l_value <= endValue)
         {
             if(parameterId != NEURONS_NB)
@@ -331,13 +337,13 @@ bool GridSearch::setParameterValues(const GridSearch::ReservoirParameter paramet
     return l_operationValid;
 }
 
-void GridSearch::setCorpusList(const std::vector<std::string> &corpusList)
+void GridSearchQt::setCorpusList(const std::vector<std::string> &corpusList)
 {
     m_corpusList = corpusList;
 }
 
 
-void GridSearch::addResultsInStream(std::ofstream *streamReadableData, std::ofstream *streamRawData, const std::vector<double> &results, cint numCorpus, const double time, const ModelParameters parameters, int *nbCharParams)
+void GridSearchQt::addResultsInStream(std::ofstream *streamReadableData, std::ofstream *streamRawData, const std::vector<double> &results, cint numCorpus, const double time, const ModelParameters parameters, int *nbCharParams)
 {
     // retrieve string values from parameters
         std::ostringstream l_os1,l_os2,l_os3,l_os4,l_os5,l_os6,l_os7,l_os8,l_os9,l_os10,l_os11, l_os12;

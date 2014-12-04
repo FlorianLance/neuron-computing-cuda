@@ -19,6 +19,8 @@
  */
 struct ModelParameters
 {
+
+
     /**
      * @brief display the current values of the parameters with std::cout
      */
@@ -97,6 +99,8 @@ struct ModelParameters
  */
 class ModelObject : public QObject
 {
+    Q_OBJECT
+
     public :
 
         /**
