@@ -12,7 +12,7 @@
 
 #include "../moc/moc_GridSearchQtObject.cpp"
 
-GridSearchQt::GridSearchQt(Model &model) : m_model(&model), m_useCudaInv(true), m_useCudaMult(false)
+GridSearchQt::GridSearchQt(ModelQt &model) : m_model(&model), m_useCudaInv(true), m_useCudaMult(false)
 {}
 
 void GridSearchQt::setCudaParameters(cbool useCudaInversion, cbool useCudaMultiplication)
@@ -125,7 +125,7 @@ void GridSearchQt::launchTrainWithAllParameters(const std::string resultsFilePat
                                     l_sparcity = m_sparcityValues[kk];
                                 }
 
-                                ModelParameters l_currentParameters;
+                                ModelParametersQt l_currentParameters;
                                 l_currentParameters.m_corpusFilePath    = m_corpusList[aa];
                                 l_currentParameters.m_nbNeurons         = m_nbNeuronsValues[ii];
                                 l_currentParameters.m_leakRate          = m_leakRateValues[jj];
@@ -171,8 +171,6 @@ void GridSearchQt::launchTrainWithAllParameters(const std::string resultsFilePat
                                     l_results.push_back(l_meanCorrectPositionAndWordAll);
 
                                     addResultsInStream(&l_flowResFileReadableData, &l_flowResFileRawData, l_results, aa, l_time, l_currentParameters, l_nbCharParams);
-
-
                                 }
 
                                 // launch the test part
@@ -180,14 +178,19 @@ void GridSearchQt::launchTrainWithAllParameters(const std::string resultsFilePat
                                 {
                                     std::cout << "########## Start the test number : " << l_currentTest++ << " / " << l_nbTrain << std::endl << std::endl;
 
-                                    m_model->launchTests();
-                                    double l_time = static_cast<double>((clock() - l_timeTraining)) / CLOCKS_PER_SEC;
-
-                                    m_model->retrieveTestsSentences();
-
-                                    m_model->displayResults(false,true);
-
+                                    if(m_model->launchTests())
+                                    {
+                                        m_model->retrieveTestsSentences();
+                                        m_model->displayResults(false,true);
+                                    }
                                 }
+
+                                // send results to be displayed in the ui
+                                    ResultsDisplayReservoir l_resultsToDisplay;
+                                    m_model->sentences(l_resultsToDisplay.m_trainSentences, l_resultsToDisplay.m_trainResults, l_resultsToDisplay.m_testResults);
+                                    l_resultsToDisplay.m_absoluteCCW = l_absoluteCorrectPositionAndWordCCW;
+                                    l_resultsToDisplay.m_absoluteAll = l_absoluteCorrectPositionAndWordAll;
+                                    emit sendResultsReservoirSignal(l_resultsToDisplay);
 
                                 if(!doTest && !doTraining)
                                 {
@@ -343,7 +346,7 @@ void GridSearchQt::setCorpusList(const std::vector<std::string> &corpusList)
 }
 
 
-void GridSearchQt::addResultsInStream(std::ofstream *streamReadableData, std::ofstream *streamRawData, const std::vector<double> &results, cint numCorpus, const double time, const ModelParameters parameters, int *nbCharParams)
+void GridSearchQt::addResultsInStream(std::ofstream *streamReadableData, std::ofstream *streamRawData, const std::vector<double> &results, cint numCorpus, const double time, const ModelParametersQt parameters, int *nbCharParams)
 {
     // retrieve string values from parameters
         std::ostringstream l_os1,l_os2,l_os3,l_os4,l_os5,l_os6,l_os7,l_os8,l_os9,l_os10,l_os11, l_os12;

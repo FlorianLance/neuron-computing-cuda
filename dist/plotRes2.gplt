@@ -642,6 +642,53 @@ plot file u ($1==0?$1:1/0):@res4_id:(0.1) t title1 w boxplot, \
      file u ($1==4?$1:1/0):@res4_id:(0.1) t title5 w boxplot, \
      file u ($1==5?$1:1/0):@res4_id:(0.1) t title6 w boxplot
 
+############################################################################################ plot Wout
+
+file = "../dist/data/Results/Xt.txt"
+#file = "../dist/data/Results/random_res/grid_search_raw.txt"
+
+unset multiplot
+set output "../dist/data/Results/Xt.png"
+set terminal png size 2000,2000
+set multiplot layout 1, 1 title "Xt"
+
+unset label
+unset xlabel
+unset ylabel
+unset xrange
+unset xtics
+unset yrange
+unset ytics
+
+
+set xrange [0:1100]
+set xtics 0,65,1100
+set ytics 0,10,500
+set yrange [0:500]
+##set yrange [0:190]
+##set ytics -0,10,190
+#set key right top
+
+set pm3d map
+splot file matrix
+
+#plot file u 1 t "-ga" w linespoint ls 1, \
+#     file u 2 t "-ni" w linespoint ls 2, \
+#     file u 3 t "-wo" w linespoint ls 3, \
+#     file u 4 t "-yotte" w linespoint ls 4, \
+#     file u 5 t "-o" w linespoint ls 5, \
+#     file u 6 t "-to" w linespoint ls 6, \
+#     file u 7 t "sore" w linespoint ls 7, \
+#     file u 8 t "X" w linespoint ls 8
+
+
+#plot file u ($1==0?$1:1/0):@res1_id:(0.1) t title1 w boxplot, \
+#     file u ($1==1?$1:1/0):@res1_id:(0.1) t title2 w boxplot, \
+#     file u ($1==2?$1:1/0):@res1_id:(0.1) t title3 w boxplot, \
+#     file u ($1==3?$1:1/0):@res1_id:(0.1) t title4 w boxplot, \
+#     file u ($1==4?$1:1/0):@res1_id:(0.1) t title5 w boxplot, \
+#     file u ($1==5?$1:1/0):@res1_id:(0.1) t title6 w boxplot
+
 ############################################################################################ plot grammar
 
 unset label

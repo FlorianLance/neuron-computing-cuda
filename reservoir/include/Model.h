@@ -141,8 +141,9 @@ class Model
         /**
          * @brief launchTests
          * @param corpusTestFilePath
+         * @return
          */
-        void launchTests(const std::string &corpusTestFilePath = "");
+        bool launchTests(const std::string &corpusTestFilePath = "");
 
         /**
          * @brief retrieveTrainSentences
@@ -153,6 +154,14 @@ class Model
          * @brief retrieveTestsSentences
          */
         void retrieveTestsSentences();
+
+        /**
+         * @brief sentences
+         * @param trainSentences
+         * @param trainResults
+         * @param testResults
+         */
+        void sentences(Sentences &trainSentences, Sentences &trainResults, Sentences &testResults);
 
         /**
          * @brief displayResults
@@ -183,9 +192,9 @@ class Model
          * @param meanCorrectPositionAndWordAll
          */
         void computeResultsData(cbool trainResults, const std::string &pathSaveAllSentenceRest,
-                                std::vector<double> diffSizeOCW,
-                                std::vector<double> absoluteCorrectPositionAndWordCCW, std::vector<double> correctPositionAndWordCCW,
-                                std::vector<double> absoluteCorrectPositionAndWordAll, std::vector<double> correctPositionAndWordAll,
+                                std::vector<double> &diffSizeOCW,
+                                std::vector<double> &absoluteCorrectPositionAndWordCCW, std::vector<double> &correctPositionAndWordCCW,
+                                std::vector<double> &absoluteCorrectPositionAndWordAll, std::vector<double> &correctPositionAndWordAll,
                                 double &meanDiffSizeOCW,
                                 double &meanAbsoluteCorrectPositionAndWordCCW, double &meanCorrectPositionAndWordCCW,
                                 double &meanAbsoluteCorrectPositionAndWordAll, double &meanCorrectPositionAndWordAll
@@ -196,7 +205,6 @@ class Model
          * @brief saveResults
          */
         void saveResults();
-
 
         /**
          * @brief saveTraining
@@ -209,7 +217,6 @@ class Model
          * @param pathDirectory
          */
         void loadTraining(const std::string &pathDirectory);
-
 
 
         Sentences m_recoveredSentencesTrain;    /**< ... */

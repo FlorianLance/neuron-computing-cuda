@@ -85,7 +85,7 @@ Interface::Interface() : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(m_uiInterface->cbStructure,    SIGNAL(currentIndexChanged(int)), SLOT(updateLanguageParameters(int)));
         QObject::connect(m_uiInterface->cbStructure,    SIGNAL(editTextChanged(QString)), SLOT(updateLanguageParameters(QString)));
         QObject::connect(m_uiInterface->cbGrammar,      SIGNAL(currentIndexChanged(int)), SLOT(updateLanguageParameters(int)));
-        QObject::connect(m_uiInterface->cbGrammar,      SIGNAL(editTextChanged(QString)), SLOT(updateLanguageParameters(QString)));
+        QObject::connect(m_uiInterface->cbGrammar,      SIGNAL(editTextChanged(QString)), SLOT(updateLanguageParameters(QString)));        
 
         // lock
         QObject::connect(m_pWInterface, SIGNAL(lockInterfaceSignal(bool)), this, SLOT(lockInterface(bool)));
@@ -102,7 +102,17 @@ Interface::Interface() : m_uiInterface(new Ui::UI_Reservoir)
 
         // gridsearch
         GridSearchQt *l_gridSearchQt = m_pWInterface->gridSearch();
-        QObject::connect(l_gridSearchQt, SIGNAL(sendCurrentParametersSignal(ModelParameters)), this, SLOT(displayCurrentParameters(ModelParameters)));
+        QObject::connect(l_gridSearchQt, SIGNAL(sendCurrentParametersSignal(ModelParametersQt)), this, SLOT(displayCurrentParameters(ModelParametersQt)));
+        QObject::connect(l_gridSearchQt, SIGNAL(sendResultsReservoirSignal(ResultsDisplayReservoir)), this, SLOT(displayCurrentResults(ResultsDisplayReservoir)));
+
+        // model
+        ModelQt *l_model = m_pWInterface->model();
+        QObject::connect(l_model->reservoir(), SIGNAL(sendComputingState(int,int,QString)), this, SLOT(updateProgressBar(int, int, QString)));
+
+
+    // interface setting
+        m_uiInterface->pbComputing->setRange(0,100);
+        m_uiInterface->pbComputing->setValue(0);
 
     // init thread
         m_pWInterface->moveToThread(&m_TInterface);
@@ -137,10 +147,14 @@ void Interface::closeEvent(QCloseEvent *event)
 void Interface::addCorpus()
 {
     QString l_sPathCorpus = QFileDialog::getOpenFileName(this, "Load corpus file", "../data/input/Corpus", "Corpus file (*.txt)");
-    m_uiInterface->lwCorpus->addItem(l_sPathCorpus);
 
-    // send item
-    emit addCorpusSignal(l_sPathCorpus);
+    if(l_sPathCorpus.size() > 0)
+    {        
+        m_uiInterface->lwCorpus->addItem(l_sPathCorpus);
+
+        // send item
+        emit addCorpusSignal(l_sPathCorpus);
+    }
 }
 
 void Interface::removeCorpus()
@@ -160,6 +174,11 @@ void Interface::saveTraining()
 {
     QString l_sPathTrainingFile = QFileDialog::getExistingDirectory(this, "Select directory", "../data/training");
 
+    if(l_sPathTrainingFile.size() == 0)
+    {
+        return;
+    }
+
     // send directory path
     emit saveTrainingSignal(l_sPathTrainingFile);
 }
@@ -167,6 +186,11 @@ void Interface::saveTraining()
 void Interface::loadTraining()
 {
     QString l_sPathTrainingFile = QFileDialog::getExistingDirectory(this, "Select directory", "../data/training");
+
+    if(l_sPathTrainingFile.size() == 0 )
+    {
+        return;
+    }
 
     QFile l_fileW(l_sPathTrainingFile + "/w.txt");
     QFile l_fileWin(l_sPathTrainingFile + "/wIn.txt");
@@ -319,6 +343,7 @@ void Interface::lockInterface(bool lock)
 
 }
 
+
 void Interface::displayValidityOperation(bool operationValid, int indexParameter)
 {
     QPalette l_palette;
@@ -355,7 +380,7 @@ void Interface::displayValidityOperation(bool operationValid, int indexParameter
     }
 }
 
-void Interface::displayCurrentParameters(ModelParameters params)
+void Interface::displayCurrentParameters(ModelParametersQt params)
 {
     m_uiInterface->laNeuronsValue->setText(QString::number(params.m_nbNeurons));
     m_uiInterface->laLeakRateValue->setText(QString::number(params.m_leakRate));
@@ -365,11 +390,96 @@ void Interface::displayCurrentParameters(ModelParameters params)
     m_uiInterface->laSparcityValue->setText(QString::number(params.m_sparcity));
 }
 
+void Interface::displayCurrentResults(ResultsDisplayReservoir results)
+{
+    int l_widthTb = m_uiInterface->tbResults->width();
+
+    QFont l_font("Calibri", 9);
+    QFontMetrics l_fm(l_font);
+    int pixelsWide = l_fm.width("W");
+    m_uiInterface->tbResults->setFont(l_font);
+    int l_numberCharLine = 2*l_widthTb / pixelsWide;
+
+    QString l_display = m_uiInterface->tbResults->toPlainText();
+
+    if(results.m_trainResults.size() > 0)
+    {
+        l_display += "##################### TRAINING :\n";
+    }
+
+    for(int ii = 0; ii < results.m_trainSentences.size(); ++ii)
+    {
+        l_display += "Corpus sentence     : ";
+
+        for(int jj = 0; jj < results.m_trainSentences[ii].size(); ++jj)
+        {
+            l_display+= QString::fromStdString(results.m_trainSentences[ii][jj]) + " ";
+        }
+        l_display += "\nSentence retrieved : ";
+
+        for(int jj = 0; jj < results.m_trainResults[ii].size(); ++jj)
+        {
+            l_display+= QString::fromStdString(results.m_trainResults[ii][jj]) + " ";
+        }
+        l_display += "\nResults computed    : ";
+
+        if(results.m_absoluteCCW.size() == results.m_trainSentences.size())
+        {
+            l_display += "CCW : "  + QString::number(results.m_absoluteCCW[ii]) + " ALL : " +  QString::number(results.m_absoluteAll[ii]) + "\n";
+        }
+
+        for(int jj = 0; jj < l_numberCharLine; ++jj)
+        {
+            l_display += "-";
+        }
+
+        l_display += "\n";
+    }
+
+    if(results.m_testResults.size() > 0)
+    {
+        l_display += "\n##################### TEST :\n";
+
+        for(int ii = 0; ii < results.m_testResults.size(); ++ii)
+        {
+            l_display += "Sentence retrieved : ";
+
+            for(int jj = 0; jj < results.m_testResults[ii].size(); ++jj)
+            {
+                l_display+= QString::fromStdString(results.m_testResults[ii][jj]) + " ";
+            }
+
+            l_display += "\n";
+
+            for(int jj = 0; jj < l_numberCharLine; ++jj)
+            {
+                l_display += "-";
+            }
+
+            l_display += "\n";
+        }
+    }
+
+    m_uiInterface->tbResults->setPlainText(l_display);
+    m_uiInterface->tbResults->verticalScrollBar()->setValue(m_uiInterface->tbResults->verticalScrollBar()->maximum());
+
+//    QTextCursor l_cursor = m_uiInterface->tbResults->textCursor();
+    //    l_cursor.movePosition(QTextCursor::End);
+}
+
+void Interface::updateProgressBar(int currentValue, int valueMax, QString text)
+{
+    m_uiInterface->pbComputing->setMaximum(valueMax);
+    m_uiInterface->pbComputing->setValue(currentValue);
+    m_uiInterface->laStateComputing->setText(text);
+}
+
 InterfaceWorker::InterfaceWorker() : m_gridSearch(new GridSearchQt(m_model)), m_nbOfCorpus(0)
 {
     qRegisterMetaType<ReservoirParameters>("ReservoirParameters");
     qRegisterMetaType<LanguageParameters>("LanguageParameters");
-    qRegisterMetaType<ModelParameters>("ModelParameters");
+    qRegisterMetaType<ModelParametersQt>("ModelParameters");
+    qRegisterMetaType<ResultsDisplayReservoir>("ResultsDisplayReservoir");
 }
 
 InterfaceWorker::~InterfaceWorker()
@@ -380,6 +490,11 @@ InterfaceWorker::~InterfaceWorker()
 GridSearchQt *InterfaceWorker::gridSearch() const
 {
     return m_gridSearch;
+}
+
+ModelQt *InterfaceWorker::model()
+{
+    return &m_model;
 }
 
 void InterfaceWorker::addCorpus(QString corpusPath)
@@ -434,6 +549,8 @@ void InterfaceWorker::start()
         std::cerr << "Cannot start, no corpus is defined. " << std::endl;
         return;
     }
+
+    emit startInitDisplaySignal();
 
     // define language parameters
         Sentence l_grammar, l_structure;
@@ -556,12 +673,18 @@ void InterfaceWorker::stop()
 
 void InterfaceWorker::saveLastTraining(QString pathDirectory)
 {
-    m_model.saveTraining(pathDirectory.toStdString());
-    qDebug() << "Trianing saved in the directory : " << pathDirectory;
+    if(pathDirectory.size() > 0)
+    {
+        m_model.saveTraining(pathDirectory.toStdString());
+        qDebug() << "Trianing saved in the directory : " << pathDirectory;
+    }
 }
 
 void InterfaceWorker::loadTraining(QString pathDirectory)
 {
-    m_model.loadTraining(pathDirectory.toStdString());
-    qDebug() << "Trianing loaded in the directory : " << pathDirectory;
+    if(pathDirectory.size() > 0)
+    {
+        m_model.loadTraining(pathDirectory.toStdString());
+        qDebug() << "Trianing loaded in the directory : " << pathDirectory;
+    }
 }

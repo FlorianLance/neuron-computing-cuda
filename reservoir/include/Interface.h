@@ -174,7 +174,22 @@ class Interface : public QMainWindow
         /**
          * @brief displayCurrentParameters
          */
-        void displayCurrentParameters(ModelParameters params);
+        void displayCurrentParameters(ModelParametersQt params);
+
+        /**
+         * @brief displayCurrentResults
+         * @param results
+         */
+        void displayCurrentResults(ResultsDisplayReservoir results);
+
+
+        /**
+         * @brief updateProgressBar
+         * @param currentValue
+         * @param valueMax
+         * @param text
+         */
+        void updateProgressBar(int currentValue, int valueMax, QString text);
 
 
     signals:
@@ -250,6 +265,13 @@ class InterfaceWorker : public QObject
          */
         GridSearchQt *gridSearch() const;
 
+        /**
+         * @brief model
+         * @return
+         */
+        ModelQt *model();
+
+
     public slots:
 
         /**
@@ -313,6 +335,11 @@ class InterfaceWorker : public QObject
          */
         void endTrainingSignal(bool);
 
+        /**
+         * @brief startInitDisplaySignal TODO
+         */
+        void startInitDisplaySignal();
+
 
     private :
 
@@ -321,7 +348,7 @@ class InterfaceWorker : public QObject
         ReservoirParameters m_reservoirParameters;
         LanguageParameters m_languageParameters;
 
-        Model m_model;
+        ModelQt m_model;
         GridSearchQt *m_gridSearch;
 
         QStringList m_corpusList;

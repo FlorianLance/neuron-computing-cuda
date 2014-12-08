@@ -83,6 +83,13 @@ void Model::retrieveTestsSentences()
         attributeOcwToConstructions(l_recoveredConstructionTest, l_testOCW, m_recoveredSentencesTest, "X");
 }
 
+void Model::sentences(Sentences &trainSentences, Sentences &trainResults, Sentences &testResults)
+{
+    trainSentences = m_trainSentence;
+    trainResults   = m_recoveredSentencesTrain;
+    testResults    = m_recoveredSentencesTest;
+}
+
 
 void Model::displayResults(const bool trainResults, const bool testResults)
 {
@@ -161,9 +168,9 @@ void Model::setResultsTestToCompare(const std::string &resultsTestFilePath)
 
 
 void Model::computeResultsData(cbool trainResults, const std::string &pathSaveAllSentenceRest,
-                        std::vector<double> diffSizeOCW,
-                        std::vector<double> absoluteCorrectPositionAndWordCCW, std::vector<double> correctPositionAndWordCCW,
-                        std::vector<double> absoluteCorrectPositionAndWordAll, std::vector<double> correctPositionAndWordAll,
+                        std::vector<double> &diffSizeOCW,
+                        std::vector<double> &absoluteCorrectPositionAndWordCCW, std::vector<double> &correctPositionAndWordCCW,
+                        std::vector<double> &absoluteCorrectPositionAndWordAll, std::vector<double> &correctPositionAndWordAll,
                         double &meanDiffSizeOCW,
                         double &meanAbsoluteCorrectPositionAndWordCCW, double &meanCorrectPositionAndWordCCW,
                         double &meanAbsoluteCorrectPositionAndWordAll, double &meanCorrectPositionAndWordAll
@@ -592,7 +599,7 @@ void Model::launchTraining()
 }
 
 
-void Model::launchTests(const std::string &corpusTestFilePath)
+bool Model::launchTests(const std::string &corpusTestFilePath)
 {
     // init time
         clock_t l_testTime = clock();
@@ -602,7 +609,7 @@ void Model::launchTests(const std::string &corpusTestFilePath)
         if(!m_trainingSuccess)
         {
             std::cerr << "The training must be done before the tests. " << std::endl;
-            return;
+            return true;
         }
 
     // check corpus path input
@@ -623,6 +630,19 @@ void Model::launchTests(const std::string &corpusTestFilePath)
         {
             closedClassWords(m_closedClassWords, "X");
         }
+
+    // retrieve corpus test data
+        QVector<QStringList> l_testMeaning,l_testInfo, l_inused;
+        extractAllDataFromCorpusFile(l_corpusFilePath.c_str(), l_inused,l_inused,l_inused, l_testMeaning,l_testInfo,l_inused);
+        convQt2DString2Std2DString(l_testMeaning, m_testMeaning);
+        convQt2DString2Std2DString(l_testInfo, m_testInfo);
+
+        if(m_testMeaning.size() == 0)
+        {
+            std::cerr << "Corpus test is empty. " << std::endl;
+            return false;
+        }
+
 
     // generate CCW python argument
         std::string l_CCWPythonArg;
@@ -668,9 +688,5 @@ void Model::launchTests(const std::string &corpusTestFilePath)
             m_reservoir.test(l_3DMatStimMeanTest, m_3DMatSentencesOutputTest, l_internalStatesTest);
         displayTime("End reservoir testing ", l_testTime, true, m_verbose);
 
-    // retrieve corpus test data
-        QVector<QStringList> l_testMeaning,l_testInfo, l_inused;
-        extractAllDataFromCorpusFile(l_corpusFilePath.c_str(), l_inused,l_inused,l_inused, l_testMeaning,l_testInfo,l_inused);
-        convQt2DString2Std2DString(l_testMeaning, m_testMeaning);
-        convQt2DString2Std2DString(l_testInfo, m_testInfo);
+    return true;
 }

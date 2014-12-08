@@ -42,6 +42,10 @@ Reservoir::Reservoir()
 
     m_useCudaInversion      = true;
     m_useCudaMultiplication = false;
+
+
+    cvNamedWindow("reservoir_display", CV_WINDOW_AUTOSIZE | CV_GUI_NORMAL);
+    cvMoveWindow("reservoir_display",200,200);
 }
 
 void Reservoir::setCudaProperties(cbool cudaInv, cbool cudaMult)
@@ -65,6 +69,11 @@ Reservoir::Reservoir(cuint nbNeurons, cfloat spectralRadius, cfloat inputScaling
         m_sparcity = 10.f/m_nbNeurons;
     }
     m_initialized = true;
+
+
+
+    cvNamedWindow("reservoir_display", CV_WINDOW_AUTOSIZE | CV_GUI_NORMAL);
+    cvMoveWindow("reservoir_display",200,200);
 }
 
 void Reservoir::setParameters(cuint nbNeurons, cfloat spectralRadius, cfloat inputScaling, cfloat leakRate, cfloat sparcity, cfloat ridge, cbool verbose)
@@ -147,6 +156,9 @@ void Reservoir::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTeac
     {
         l_subdivisionBlocks = 8;
     }
+
+    std::cout << "xTot : " << xTot.size[0] << " " <<  xTot.size[1] << " " << xTot.size[2]<< " | " << std::endl;
+    std::cout << "yTeacher : " << yTeacher.size[0] << " " <<  yTeacher.size[1] << " " << yTeacher.size[2]<< " | " << std::endl;
 
     displayTime("START : tikhonovRegularization ", m_oTime, false, m_verbose);
 
@@ -239,8 +251,7 @@ void Reservoir::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTeac
                         }
                     }
                 }
-            // end pragma
-
+            // end pragma            
             m_wOut = l_yTeacherReshaped.t() * l_tempCudaMult;
         }
         else
@@ -286,6 +297,40 @@ void Reservoir::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTeac
         m_wOut = (l_yTeacherReshaped.t() * l_xTotReshaped.t()) * invCV;
     }
 
+
+//    double min, max;
+//    cv::Mat l_subRes(m_wOut.rows, m_wOut.cols, CV_32FC3);
+//    cv::minMaxLoc(m_wOut, &min, &max);
+//    save3Channel2DMatrixToTextStd("../data/Results/mat_out/img_before_" + l_os1.str() + ".txt", l_subRes);
+
+
+//    save2DMatrixToTextStd("../data/Results/Wout.txt", m_wOut);
+//    save2DMatrixToTextStd("../data/Results/WoutT.txt", m_wOut.t());
+
+
+//    for(int ii = 0; ii < m_wOut.rows * m_wOut.cols; ++ii)
+//    {
+//        l_subRes.at<cv::Vec3f>(ii) = cv::Vec3f(-m_wOut.at<float>(ii),-m_wOut.at<float>(ii),-m_wOut.at<float>(ii));
+
+//        cv::Vec3f l_value = l_subRes.at<cv::Vec3f>(ii);
+//        l_value[0] *= 255./max;
+//        l_value[1] *= 255./max;
+//        l_value[2] *= 255./max;
+
+//        l_subRes.at<cv::Vec3f>(ii) = l_value;
+//    }
+
+//    save3Channel2DMatrixToTextStd("../data/Results/aaaa.txt", l_subRes);
+
+//    cv::imwrite("../data/Results/a.png", l_subRes);
+//    cv::cvtColor(l_subRes, l_subRes, CV_BGR2GRAY );
+//    cv::imwrite("../data/Results/b.png", l_subRes);
+
+////    cv::imshow("reservoir_display", l_subRes);
+//    cv::waitKey(5);
+
+//    std::cout << "m_wOut : " << m_wOut.rows << " " <<  m_wOut.cols << " | " << std::endl;
+
     displayTime("END : tikhonovRegularization ", m_oTime, false, m_verbose);
 }
 
@@ -301,6 +346,8 @@ void Reservoir::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher, 
 
     displayTime("START : sub train ", m_oTime, false, m_verbose);
 
+    std::cout << "meaningInputTrain : " << meaningInputTrain.size[0] << " " << meaningInputTrain.size[1] << " " << meaningInputTrain.size[2] << std::endl;
+
         int l_sizeTot[3] = {meaningInputTrain.size[0], 1 + meaningInputTrain.size[2] + m_nbNeurons,  meaningInputTrain.size[1]};
         xTot = cv::Mat (3,l_sizeTot, CV_32FC1, cv::Scalar(0.f)); //  will contain the internal states of the reservoir for all sentences and all timesteps
 
@@ -312,11 +359,10 @@ void Reservoir::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher, 
         float l_invLeakRate = 1.f - m_leakRate;
 
 //        fillRandomMat_(xTot);
-
-
 //        #pragma omp parallel for num_threads(7)
+        if(m_verbose)
+            std::cout << "[ " << meaningInputTrain.size[0] << " -> ";
 
-        std::cout << "[ " << meaningInputTrain.size[0] << " -> ";
         #pragma omp parallel for
             for(int ii = 0; ii < meaningInputTrain.size[0]; ++ii)
             {
@@ -362,35 +408,35 @@ void Reservoir::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher, 
                     l_x = (l_xPrev * l_invLeakRate) + (l_xTemp * m_leakRate);
 
 
-//                    cv::Mat display(l_X.rows, l_X.cols, CV_8UC3);
-//                    for(int oo = 0; oo < display.rows * display.cols; ++oo)
-//                    {
-//                        float l_val = l_X.at<float>(oo);
-//                        if(l_val < 0)
-//                        {
-//                            int l_val2 = static_cast<int>(255*l_val);
-//                            if(l_val2 > 255)
-//                            {
-//                                l_val = 255;
-//                            }
+                    cv::Mat display(l_X.rows, l_X.cols, CV_8UC3);
+                    for(int oo = 0; oo < display.rows * display.cols; ++oo)
+                    {
+                        float l_val = l_X.at<float>(oo);
+                        if(l_val < 0)
+                        {
+                            int l_val2 = static_cast<int>(255*l_val);
+                            if(l_val2 > 255)
+                            {
+                                l_val = 255;
+                            }
 
-//                            display.at<cv::Vec3b>(oo) = cv::Vec3b(l_val2,0,122);
-//                        }
-//                        else
-//                        {
-//                            int l_val2 =  -static_cast<int>(255*l_val);
-//                            if(l_val2 > 255)
-//                            {
-//                                l_val = 255;
-//                            }
-//                            display.at<cv::Vec3b>(oo) = cv::Vec3b(0,l_val2,122);
-//                        }
-//                    }
+                            display.at<cv::Vec3b>(oo) = cv::Vec3b(l_val2,0,122);
+                        }
+                        else
+                        {
+                            int l_val2 =  -static_cast<int>(255*l_val);
+                            if(l_val2 > 255)
+                            {
+                                l_val = 255;
+                            }
+                            display.at<cv::Vec3b>(oo) = cv::Vec3b(0,l_val2,122);
+                        }
+                    }
 
 //                    save2DMatrixToTextStd("../data/display.txt", l_X);
-//                    display *= 255;
-//                    cv::imshow("reservoir_display", display);
-//                    cv::waitKey(5);
+                    display *= 255;
+                    cv::imshow("reservoir_display", display);
+                    cv::waitKey(5);
 
                     cv::Mat l_temp2(l_temp.rows + l_x.rows, 1, CV_32FC1);
 
@@ -416,6 +462,18 @@ void Reservoir::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher, 
                         xTot.at<float>(ii,jj,kk) = l_X.at<float>(jj,kk);
                     }
                 }
+
+                if(ii==0)
+                {
+                    save2DMatrixToTextStd("../data/Results/X.txt", l_X);
+                    save2DMatrixToTextStd("../data/Results/Xt.txt", l_X.t());
+                }
+                else if(ii==1)
+                {
+                    save2DMatrixToTextStd("../data/Results/X2.txt", l_X);
+                    save2DMatrixToTextStd("../data/Results/Xt2.txt", l_X.t());
+                }
+
             }
         // end pragma
         std::cout << "]" << std::endl;
@@ -460,7 +518,7 @@ void Reservoir::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher, 
 
     displayTime("END : train ", m_oTime, false, m_verbose);
 
-    saveTraining("../data/training/last"); // TODO : check if directory exists
+//    saveTraining("../data/training/last"); // TODO : check if directory exists
 }
 
 
@@ -559,7 +617,7 @@ void Reservoir::test(const cv::Mat &meaningInputTest, cv::Mat &sentencesOutputTe
         }
     // end omp parallel
 
-        displayTime("END : test", m_oTime, false, m_verbose);
+    displayTime("END : test", m_oTime, false, m_verbose);
 }
 
 void Reservoir::saveTraining(const string &path)

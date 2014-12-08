@@ -9,7 +9,8 @@
 #ifndef GRIDSEARCHQT_H
 #define GRIDSEARCHQT_H
 
-#include <Model.h>
+//#include <Model.h>
+#include <ModelQtObject.h>
 
 template <typename T>
 /**
@@ -24,6 +25,19 @@ static void display(std::vector<T> vec)
     }
     std::cout << std::endl;
 }
+
+
+
+struct ResultsDisplayReservoir
+{
+    std::vector<double> m_absoluteCCW;
+    std::vector<double> m_absoluteAll;
+
+    Sentences m_trainSentences;
+    Sentences m_trainResults;
+    Sentences m_testResults;
+};
+
 
 /**
  * @brief The GridSearchQt class
@@ -46,7 +60,7 @@ class GridSearchQt : public QObject
          * @brief GridSearchQt constructor.
          * @param [in] model : model to be used for the generation.
          */
-        GridSearchQt(Model &model);
+        GridSearchQt(ModelQt &model);
 
         /**
          * @brief Set the cuda parameters.
@@ -90,7 +104,15 @@ class GridSearchQt : public QObject
 
     signals :
 
-        void sendCurrentParametersSignal(ModelParameters);
+        /**
+         * @brief sendCurrentParametersSignal
+         */
+        void sendCurrentParametersSignal(ModelParametersQt);
+
+        /**
+         * @brief sendResultsReservoirSignal
+         */
+        void sendResultsReservoirSignal(ResultsDisplayReservoir);
 
     private :
 
@@ -104,7 +126,7 @@ class GridSearchQt : public QObject
          * @param parameters
          * @param nbCharParams
          */
-        void addResultsInStream(std::ofstream *streamReadableData, std::ofstream *streamRawData, const std::vector<double> &results, cint numCorpus, const double time, const ModelParameters parameters, int *nbCharParams);
+        void addResultsInStream(std::ofstream *streamReadableData, std::ofstream *streamRawData, const std::vector<double> &results, cint numCorpus, const double time, const ModelParametersQt parameters, int *nbCharParams);
 
 
         template<typename T>
@@ -155,7 +177,7 @@ class GridSearchQt : public QObject
         std::vector<double> m_spectralRadiusValues; /**< spectral radius grid search values */
         std::vector<std::string> m_corpusList;      /**< corpus list to be used in the grid search */
 
-        Model *m_model;                             /**< pointer to the model */
+        ModelQt *m_model;                             /**< pointer to the model */
 };
 
 

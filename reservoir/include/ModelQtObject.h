@@ -9,7 +9,8 @@
 #define MODELQTOBJECT_H
 
 
-#include "Reservoir.h"
+//#include "Reservoir.h"
+#include "ReservoirQtObject.h"
 #include "CorpusProcessing.h"
 
 
@@ -17,10 +18,8 @@
  * @brief The ModelParameters struct
  * Defines the parameters used by the model.
  */
-struct ModelParameters
+struct ModelParametersQt
 {
-
-
     /**
      * @brief display the current values of the parameters with std::cout
      */
@@ -77,6 +76,8 @@ struct ModelParameters
         m_sparcity       = m_nbNeurons / 10.0;
     }
 
+    bool m_useLoadedTraining;
+
     // cuda
     bool m_useCudaInv;              /**< uses the cuda inversion ? */
     bool m_useCudaMult;             /**< uses the cuda multiplication ? */
@@ -97,7 +98,7 @@ struct ModelParameters
 /**
  * @brief The Model class
  */
-class ModelObject : public QObject
+class ModelQt : public QObject
 {
     Q_OBJECT
 
@@ -106,26 +107,29 @@ class ModelObject : public QObject
         /**
          * @brief Model default constructor.
          */
-        ModelObject();
+        ModelQt();
 
         /**
          * @brief Model constructor.
          * @param [in] parameters : parameters used for initializeing the reservoirs and the pathes
          */
-        ModelObject(const ModelParameters &parameters);
+        ModelQt(const ModelParametersQt &parameters);
+
+
+        ~ModelQt();
 
         /**
          * @brief return the parameters of the model.
          * @return a ModelParameters
          */
-        ModelParameters parameters() const;
+        ModelParametersQt parameters() const;
 
         /**
-         * @brief resetModelF
+         * @brief resetModel
          * @param newParameters
          * @param verbose
          */
-        void resetModelF(const ModelParameters &newParameters, cbool verbose);
+        void resetModelParameters(const ModelParametersQt &newParameters, cbool verbose);
 
         /**
          * @brief setGrammar
@@ -135,15 +139,16 @@ class ModelObject : public QObject
         void setGrammar(const Sentence &grammar, const Sentence &structure);
 
         /**
-         * @brief launchTrainingF
+         * @brief launchTraining
          */
-        void launchTrainingF();
+        void launchTraining();
 
         /**
-         * @brief launchTestsF
+         * @brief launchTests
          * @param corpusTestFilePath
+         * @return
          */
-        void launchTestsF(const std::string &corpusTestFilePath = "");
+        bool launchTests(const std::string &corpusTestFilePath = "");
 
         /**
          * @brief retrieveTrainSentences
@@ -154,6 +159,14 @@ class ModelObject : public QObject
          * @brief retrieveTestsSentences
          */
         void retrieveTestsSentences();
+
+        /**
+         * @brief sentences
+         * @param trainSentences
+         * @param trainResults
+         * @param testResults
+         */
+        void sentences(Sentences &trainSentences, Sentences &trainResults, Sentences &testResults);
 
         /**
          * @brief displayResults
@@ -168,30 +181,6 @@ class ModelObject : public QObject
          */
         void setResultsTestToCompare(const std::string &resultsTestFilePath);
 
-
-        /**
-         * @brief computeCCWResult
-         * @param trainResults
-         * @param CCWrightAbsolutePercentage
-         * @param CCWcorrectPositionAndWordPercentage
-         */
-        void computeCCWResult(cbool trainResults, std::vector<double> &CCWrightAbsolutePercentage, std::vector<double> &CCWcorrectPositionAndWordPercentage);
-
-        /**
-         * @brief compareResults
-         * @param trainResults
-         * @param correctPositionAndWordPercentage
-         * @param sentenceRightAbsolutePercentage
-         * @param sizeDifferencePercentage
-         * @param totalWordNumber
-         * @param totalWordCorrectNumber
-         */
-        void compareResults(cbool trainResults, std::vector<double> &correctPositionAndWordPercentage,
-                                                std::vector<double> &sentenceRightAbsolutePercentage,
-                                                std::vector<double> &sizeDifferencePercentage,
-                                                int &totalWordNumber, int &totalWordCorrectNumber);
-
-
         /**
          * @brief computeResultsData
          * @param trainResults
@@ -199,20 +188,48 @@ class ModelObject : public QObject
          * @param diffSizeOCW
          * @param absoluteCorrectPositionAndWordCCW
          * @param correctPositionAndWordCCW
+         * @param absoluteCorrectPositionAndWordAll
+         * @param correctPositionAndWordAll
          * @param meanDiffSizeOCW
          * @param meanAbsoluteCorrectPositionAndWordCCW
          * @param meanCorrectPositionAndWordCCW
+         * @param meanAbsoluteCorrectPositionAndWordAll
+         * @param meanCorrectPositionAndWordAll
          */
         void computeResultsData(cbool trainResults, const std::string &pathSaveAllSentenceRest,
-                                std::vector<double> diffSizeOCW, std::vector<double> absoluteCorrectPositionAndWordCCW, std::vector<double> correctPositionAndWordCCW,
-                                double &meanDiffSizeOCW, double &meanAbsoluteCorrectPositionAndWordCCW, double &meanCorrectPositionAndWordCCW);
-
+                                std::vector<double> &diffSizeOCW,
+                                std::vector<double> &absoluteCorrectPositionAndWordCCW, std::vector<double> &correctPositionAndWordCCW,
+                                std::vector<double> &absoluteCorrectPositionAndWordAll, std::vector<double> &correctPositionAndWordAll,
+                                double &meanDiffSizeOCW,
+                                double &meanAbsoluteCorrectPositionAndWordCCW, double &meanCorrectPositionAndWordCCW,
+                                double &meanAbsoluteCorrectPositionAndWordAll, double &meanCorrectPositionAndWordAll
+                                );
 
 
         /**
          * @brief saveResults
          */
         void saveResults();
+
+        /**
+         * @brief saveTraining
+         * @param pathDirectory
+         */
+        void saveTraining(const std::string &pathDirectory);
+
+        /**
+         * @brief loadTraining
+         * @param pathDirectory
+         */
+        void loadTraining(const std::string &pathDirectory);
+
+
+        /**
+         * @brief reservoir
+         * @return
+         */
+        ReservoirQt *reservoir();
+
 
         Sentences m_recoveredSentencesTrain;    /**< ... */
         Sentences m_recoveredSentencesTest;     /**< ... */
@@ -248,11 +265,12 @@ class ModelObject : public QObject
         Sentences m_desiredSentencesTest;       /**< ... */
 
         // parameters
-        ModelParameters m_parameters;           /**< reservoir parameters and corpus pathes */
+        ModelParametersQt m_parameters;           /**< reservoir parameters and corpus pathes */
 
         // reservoir
-        Reservoir m_reservoir;                  /**< reservoir structure */
+        ReservoirQt *m_reservoir;                  /**< reservoir structure */
+//        Reservoir2<float> m_res1;
+//        Reservoir2<double> m_res2;
 };
 
 #endif
-
