@@ -30,6 +30,7 @@
 #include "gpuMat/cudaInversions.h"
 #include "gpuMat/cudaMultiplications.h"
 
+
 /**
  * @brief The Reservoir class
  */

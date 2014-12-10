@@ -22,7 +22,7 @@ $ENV{P_DIST}      = $PDist;
 our $PScripts     = $CurrentDirectory . "/";
 our $PDistLIB     = $PDist . "lib/";
 our $PThird_party  = $PBase . "../swooz/swooz-3rdparty/";
-our $PLocalThird_party = $PBase . "3rdparty/";
+our $PLocalThird_party = $PBase . "3rdParty/";
 
 
 ####################################################################################### CHECK CUDA PATH
@@ -49,8 +49,10 @@ sub buildOrder {
 
 # executables scripts to be generated for each project
 my @ExecScriptParams = (# reservoir
-                        "reservoir-test",           "x86",  "reservoir-test.exe",
-                        "reservoir-test-x64",           "amd64",  "reservoir-test-x64.exe",
+                        "reservoir",       "x86",  "reservoir.exe",
+                        "reservoir-x64",   "amd64",  "reservoir-x64.exe",
+                        "reservoir-interface",       "x86",  "reservoir-interface.exe",
+                        "reservoir-interface-x64",   "amd64",  "reservoir-interface-x64.exe",
 );
 
 sub executablesNumber {
@@ -98,6 +100,9 @@ $ENV{THIRD_PARTY_FREEGLUT}   = $PThird_party . "freeglut/";
 ##################### QT
 $ENV{THIRD_PARTY_QT}    = $PThird_party . "Qt/4.8.3/";
 $ENV{THIRD_PARTY_QT_64} = $PThird_party . "Qt/amd64/4.8.3/";
+#$ENV{THIRD_PARTY_QT}    = $PLocalThird_party . "qt/4.8.3/";
+#$ENV{THIRD_PARTY_QT} = $PLocalThird_party . "qt/5.1.0/";
+#$ENV{THIRD_PARTY_QT_64} = $PLocalThird_party . "qt/amd64/5.1.0/";
 ##################### BOOST
 $ENV{THIRD_PARTY_BOOST}  = $PLocalThird_party . "boost/";
 $ENV{THIRD_PARTY_BOOST_64} = $PLocalThird_party . "boost/amd64/";
@@ -137,7 +142,9 @@ our $CurrentPath = $ENV{PATH};
 
 my $PathsToAdd = ";";
 
-$PathsToAdd = $ENV{THIRD_PARTY_QT} . "bin/;" . $PathsToAdd;
+
+#$PathsToAdd = $ENV{THIRD_PARTY_QT} . "bin/;" . $PathsToAdd;
+$PathsToAdd = $ENV{THIRD_PARTY_QT_64} . "bin/;" . $PathsToAdd;
 $PathsToAdd = $ENV{CUDA_PATH} . "/bin/;" . $PathsToAdd;
 
 

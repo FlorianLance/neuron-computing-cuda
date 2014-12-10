@@ -9,9 +9,10 @@
 #ifndef _INTERFACE_
 #define _INTERFACE_
 
+//#include <QtWidgets/qmainwindow.h>
+//#include <QtCore/qthread.h>
 #include <QMainWindow>
 #include <QThread>
-
 #include <QtGui>
 
 //#include "SWViewerWorker.h"
@@ -22,6 +23,10 @@
 //#include "GridSearch.h"
 #include "GridSearchQtObject.h"
 
+
+#include "DisplayImageWidget.h"
+
+#include "qcustomplot.h"
 
 
 namespace Ui {
@@ -45,7 +50,6 @@ struct LanguageParameters
 
 struct ReservoirParameters
 {
-
     bool m_useLoadedTraining;
     bool m_useOnlyStartValue;
 
@@ -64,6 +68,13 @@ struct ReservoirParameters
     double m_spectralRadiusEnd;
     double m_ridgeEnd;
     double m_sparcityEnd;
+
+    int m_neuronsNbOfUses;
+    int m_leakRateNbOfUses;
+    int m_issNbOfUses;
+    int m_spectralRadiusNbOfUses;
+    int m_ridgeNbOfUses;
+    int m_sparcityNbOfUses;
 
     bool m_neuronsEnabled;
     bool m_leakRateEnabled;
@@ -99,7 +110,7 @@ class Interface : public QMainWindow
         /**
          * \brief Constructor of Interface
          */
-        Interface();
+        Interface(QApplication *parent);
 
         /**
          * \brief Destructor of Interface
@@ -170,7 +181,6 @@ class Interface : public QMainWindow
          */
         void displayValidityOperation(bool operationValid, int indexParameter);
 
-
         /**
          * @brief displayCurrentParameters
          */
@@ -182,7 +192,6 @@ class Interface : public QMainWindow
          */
         void displayCurrentResults(ResultsDisplayReservoir results);
 
-
         /**
          * @brief updateProgressBar
          * @param currentValue
@@ -190,6 +199,31 @@ class Interface : public QMainWindow
          * @param text
          */
         void updateProgressBar(int currentValue, int valueMax, QString text);
+
+        /**
+         * @brief plotData
+         * @param values
+         */
+        void plotData(QVector<QVector<double> > values);
+
+        /**
+         * @brief initPlot
+         * @param nbCurves
+         * @param lenghtCurves
+         * @param name
+         */
+        void initPlot(int nbCurves, int lenghtCurves, QString name);
+
+        /**
+         * @brief cleanResultsDisplay
+         */
+        void cleanResultsDisplay();
+
+        /**
+         * @brief displayLogInfo
+         * @param info
+         */
+        void displayLogInfo(QString info);
 
 
     signals:
@@ -224,12 +258,24 @@ class Interface : public QMainWindow
          */
         void sendLanguageParametersSignal(LanguageParameters);
 
+        /**
+         * @brief leaveProgram
+         */
+        void leaveProgram();
+
     private :
 
-
-    public :
+        QFile m_logFile;
 
         // widgets & ui
+        DisplayImageWidget *m_imageDisplay;
+        QVector<QCustomPlot*> m_plotList;
+
+
+        QVector<QVector<double> > m_allValuesPlot;
+//        QVBoxLayout *m_plotLayout;
+
+//        QCustomPlot *m_plotDisplay;
         Ui::UI_Reservoir* m_uiInterface;   /**< qt main window */
 
         // threads & workers
@@ -344,6 +390,8 @@ class InterfaceWorker : public QObject
     private :
 
         int m_nbOfCorpus;
+
+
 
         ReservoirParameters m_reservoirParameters;
         LanguageParameters m_languageParameters;

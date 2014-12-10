@@ -16,6 +16,8 @@
 #include <QtGui>
 
 
+#include <omp.h>
+
 using namespace std;
 
 static void fillRandomMat_(cv::Mat &mat)
@@ -40,15 +42,14 @@ static void fillRandomMat_(cv::Mat &mat)
 
 ReservoirQt::ReservoirQt()
 {
+    m_numThread = omp_get_max_threads( );
+
     m_initialized = false;
     m_verbose = true;
 
     m_useCudaInversion      = true;
     m_useCudaMultiplication = false;
-
-
-    cvNamedWindow("reservoir_display", CV_WINDOW_AUTOSIZE | CV_GUI_NORMAL);
-    cvMoveWindow("reservoir_display",200,200);
+    m_sendMatrices = false;
 }
 
 void ReservoirQt::setCudaProperties(cbool cudaInv, cbool cudaMult)
@@ -63,6 +64,10 @@ void ReservoirQt::setCudaProperties(cbool cudaInv, cbool cudaMult)
 ReservoirQt::ReservoirQt(cuint nbNeurons, cfloat spectralRadius, cfloat inputScaling, cfloat leakRate, cfloat sparcity, cfloat ridge, cbool verbose) :
  m_nbNeurons(nbNeurons), m_spectralRadius(spectralRadius), m_inputScaling(inputScaling), m_leakRate(leakRate), m_ridge(ridge), m_verbose(verbose)
 {
+
+    m_numThread = omp_get_max_threads( );
+    m_sendMatrices = false;
+
     if(sparcity > 0.f)
     {
         m_sparcity = sparcity;
@@ -72,11 +77,6 @@ ReservoirQt::ReservoirQt(cuint nbNeurons, cfloat spectralRadius, cfloat inputSca
         m_sparcity = 10.f/m_nbNeurons;
     }
     m_initialized = true;
-
-
-
-    cvNamedWindow("reservoir_display", CV_WINDOW_AUTOSIZE | CV_GUI_NORMAL);
-    cvMoveWindow("reservoir_display",200,200);
 }
 
 void ReservoirQt::setParameters(cuint nbNeurons, cfloat spectralRadius, cfloat inputScaling, cfloat leakRate, cfloat sparcity, cfloat ridge, cbool verbose)
@@ -103,7 +103,7 @@ void ReservoirQt::setParameters(cuint nbNeurons, cfloat spectralRadius, cfloat i
 void ReservoirQt::generateMatrixW()
 {
     // debug
-    displayTime("START : generate W ", m_oTime, false, m_verbose);
+    emit sendLogInfo(QString::fromStdString(displayTime("START : generate W ", m_oTime, false, m_verbose)));
 
     // init w matrix [N x N]
     m_w = cv::Mat(m_nbNeurons, m_nbNeurons, CV_32FC1, cv::Scalar(0.f));
@@ -119,13 +119,12 @@ void ReservoirQt::generateMatrixW()
         }
 
     // debug
-    displayTime("END : generate W ", m_oTime, false, m_verbose);
+    emit sendLogInfo(QString::fromStdString(displayTime("END : generate W ", m_oTime, false, m_verbose)));
 }
 
 void ReservoirQt::generateWIn(cuint dimInput)
 {
-    // debug
-    displayTime("START : generate WIn ", m_oTime, false, m_verbose);
+    emit sendLogInfo(QString::fromStdString(displayTime("START : generate WIn ", m_oTime, false, m_verbose)));
 
     // init wIn
         m_wIn = cv::Mat(m_nbNeurons, dimInput + 1, CV_32FC1);
@@ -138,14 +137,12 @@ void ReservoirQt::generateWIn(cuint dimInput)
             (*it) = (static_cast <float> (rand()) / l_randMax) * m_inputScaling;
         }
 
-    // debug
-    displayTime("END : generate WIn ", m_oTime, false, m_verbose);
+    emit sendLogInfo(QString::fromStdString(displayTime("END : generate WIn ", m_oTime, false, m_verbose)));
 }
 
 
-
 void ReservoirQt::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTeacher, cuint dimInput)
-{    
+{
     int l_subdivisionBlocks = 2;
     if(m_nbNeurons > 3000)
     {
@@ -160,10 +157,7 @@ void ReservoirQt::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTe
         l_subdivisionBlocks = 8;
     }
 
-//    std::cout << "xTot : " << xTot.size[0] << " " <<  xTot.size[1] << " " << xTot.size[2]<< " | " << std::endl;
-//    std::cout << "yTeacher : " << yTeacher.size[0] << " " <<  yTeacher.size[1] << " " << yTeacher.size[2]<< " | " << std::endl;
-
-    displayTime("START : tikhonovRegularization ", m_oTime, false, m_verbose);
+    emit sendLogInfo(QString::fromStdString(displayTime("START : tikhonovRegularization ", m_oTime, false, m_verbose)));
 
     cv::Mat l_xTotReshaped(xTot.size[1], xTot.size[0] * xTot.size[2], CV_32FC1);
 
@@ -180,7 +174,7 @@ void ReservoirQt::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTe
         }
     // end pragma
 
-    displayTime("1 : tikhonovRegularization ", m_oTime, false, m_verbose);
+    emit sendLogInfo(QString::fromStdString(displayTime("1 : tikhonovRegularization ", m_oTime, false, m_verbose)));
     emit sendComputingState(60, 100, QString("Tikhonov-1"));
 
     cv::Mat l_mat2inv;
@@ -203,10 +197,15 @@ void ReservoirQt::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTe
 
     if(m_useCudaInversion)
     {
-        swCuda::squareMatrixSingularValueDecomposition(l_mat2inv,matCudaS,matCudaU,matCudaVT);
+        if(!swCuda::squareMatrixSingularValueDecomposition(l_mat2inv,matCudaS,matCudaU,matCudaVT))
+        {
+            std::string l_error("-ERROR : squareMatrixSingularValueDecomposition");
+            std::cerr << l_error << std::endl;
+            emit sendLogInfo(QString::fromStdString(l_error));
+        }
         l_mat2inv.release();
 
-        displayTime("2 : tikhonovRegularization ", m_oTime, false, m_verbose);
+        emit sendLogInfo(QString::fromStdString(displayTime("2 : tikhonovRegularization ", m_oTime, false, m_verbose)));
         emit sendComputingState(80, 100, QString("Tikhonov-3"));
 
         for(int ii = 0; ii < matCudaS.rows;++ii)
@@ -235,7 +234,7 @@ void ReservoirQt::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTe
             invCuda = (matCudaVT.t() * matCudaS * matCudaU.t());
         }
 
-        displayTime("3 : tikhonovRegularization ", m_oTime, false, m_verbose);
+        emit sendLogInfo(QString::fromStdString(displayTime("3 : tikhonovRegularization ", m_oTime, false, m_verbose)));
         emit sendComputingState(90, 100, QString("Tikhonov-4"));
 
         if(m_useCudaMultiplication)
@@ -288,7 +287,7 @@ void ReservoirQt::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTe
         cv::invert(l_mat2inv, invCV, cv::DECOMP_SVD);
         l_mat2inv.release();
 
-        displayTime("2-3 : tikhonovRegularization ", m_oTime, false, m_verbose);
+        emit sendLogInfo(QString::fromStdString(displayTime("2-3 : tikhonovRegularization ", m_oTime, false, m_verbose)));
         emit sendComputingState(90, 100, QString("Tikhonov-4"));
 
 
@@ -310,52 +309,51 @@ void ReservoirQt::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTe
 
     }
 
-    displayTime("END : tikhonovRegularization ", m_oTime, false, m_verbose);
+    emit sendLogInfo(QString::fromStdString(displayTime("END : tikhonovRegularization ", m_oTime, false, m_verbose)));
 }
+
 
 void ReservoirQt::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher, cv::Mat &sentencesOutputTrain, cv::Mat &xTot)
 {
-    m_oTime = clock();
+    // update progress bar
+        int l_steps = 0;
+        emit sendComputingState(0, meaningInputTrain.size[0]*2, QString("Build X"));
 
-    displayTime("START : train ", m_oTime, false, m_verbose);
+    // init time
+        m_oTime = clock();
+
+    emit sendLogInfo(QString::fromStdString(displayTime("START : train ", m_oTime, false, m_verbose)));
 
     // generate matrices
         generateMatrixW();
         generateWIn(meaningInputTrain.size[2]);
 
-    displayTime("START : sub train ", m_oTime, false, m_verbose);
+    emit sendLogInfo(QString::fromStdString(displayTime("START : sub train ", m_oTime, false, m_verbose)));
 
-//    std::cout << "meaningInputTrain : " << meaningInputTrain.size[0] << " " << meaningInputTrain.size[1] << " " << meaningInputTrain.size[2] << std::endl;
-
+    // init x tot
         int l_sizeTot[3] = {meaningInputTrain.size[0], 1 + meaningInputTrain.size[2] + m_nbNeurons,  meaningInputTrain.size[1]};
         xTot = cv::Mat (3,l_sizeTot, CV_32FC1, cv::Scalar(0.f)); //  will contain the internal states of the reservoir for all sentences and all timesteps
 
+    // init x
         cv::Mat l_X2Copy = cv::Mat::zeros(1 + meaningInputTrain.size[2] + m_nbNeurons, meaningInputTrain.size[1], CV_32FC1);
 
+    // init x prev
         int l_size[1] = {m_w.rows};
         cv::Mat l_xPrev2Copy(1,l_size, CV_32FC1, cv::Scalar(0.f));
 
-        float l_invLeakRate = 1.f - m_leakRate;
+    float l_invLeakRate = 1.f - m_leakRate;
 
-        if(m_verbose)
-            std::cout << "[ " << meaningInputTrain.size[0] << " -> ";
+    // mutex for openmp threads
+        QMutex l_lockerMainThread;
 
-        // mutex for openmp threads
-            QMutex l_lockerMainThread;
+    // info for generating the real time plot
+        int l_numberCurve = 10; // TODO  : parameterize
+        int l_lengthCurve = meaningInputTrain.size[0] * meaningInputTrain.size[1];
+        emit sendInfoPlot(l_numberCurve, l_lengthCurve, QString("train"));
 
-        // update progress bar
-            int l_steps = 0;
-            emit sendComputingState(0, meaningInputTrain.size[0]*2, QString("Build X"));
-
-        #pragma omp parallel for
+        #pragma omp parallel for num_threads(m_numThread)
             for(int ii = 0; ii < meaningInputTrain.size[0]; ++ii)
             {
-                if(m_verbose)
-                {
-                    printf("-");
-//                    printf("input train : %d / %d\n", ii,meaningInputTrain.size[0]);
-                }
-
                 cv::Mat l_X = l_X2Copy.clone();
                 cv::Mat l_xPrev, l_x;
                 cv::Mat l_subMean(meaningInputTrain.size[1], meaningInputTrain.size[2], CV_32FC1, meaningInputTrain.data + meaningInputTrain.step[0] *ii);
@@ -417,11 +415,6 @@ void ReservoirQt::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher
                         }
                     }
 
-//                    save2DMatrixToTextStd("../data/display.txt", l_X);
-                    display *= 255;
-                    cv::imshow("reservoir_display", display);
-                    cv::waitKey(5);
-
                     cv::Mat l_temp2(l_temp.rows + l_x.rows, 1, CV_32FC1);
 
                     for(int kk = 0; kk < l_temp.rows + l_x.rows; ++kk)
@@ -452,14 +445,44 @@ void ReservoirQt::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher
                     emit sendComputingState(++l_steps, meaningInputTrain.size[0]*2, QString("Build X"));
                 l_lockerMainThread.unlock();
 
+                // send data only if the multi thread is disabled
+                if(m_sendMatrices)
+                {
+                    if(m_numThread == 1)
+                    {
+                        cv::Mat l_rgb2Display(100,l_X.cols, CV_8UC3);
+                        int l_currentCol = 0;
+                        QVector<QVector<double> > l_values;
+
+                        for(int jj = 100; jj < 200; ++jj) // l_X.rows
+                        {
+                            QVector<double> l_line;
+                            for(int kk = 0; kk < l_X.cols; ++kk)
+                            {
+                                l_rgb2Display.at<cv::Vec3b>(l_currentCol,kk) = cv::Vec3b(255*l_X.at<float>(jj,kk), 255*l_X.at<float>(jj,kk),255*l_X.at<float>(jj,kk));
+                                l_line.push_back(l_X.at<float>(jj,kk));
+                            }
+                            ++l_currentCol;
+
+                            l_values.push_back(l_line);
+                        }
+
+                        QImage l_image2Send = mat2QImage(l_rgb2Display);
+
+                        l_image2Send = l_image2Send.scaled(500, 500,Qt::KeepAspectRatio);
+
+                        emit sendMatriceImage2Display(l_image2Send);
+                        emit sendMatriceData(l_values);
+                    }
+                }
             }
         // end pragma
-        std::cout << "]" << std::endl;
 
-        l_X2Copy.release();
-        l_xPrev2Copy.release();
+        // clean inused matrices
+            l_X2Copy.release();
+            l_xPrev2Copy.release();
 
-        displayTime("END : sub train ", m_oTime, false, m_verbose);
+        emit sendLogInfo(QString::fromStdString(displayTime("END : sub train ", m_oTime, false, m_verbose)));
 
         emit sendComputingState(50, 100, QString("Tychonov-start"));
         tikhonovRegularization(xTot, teacher, meaningInputTrain.size[2]);
@@ -496,25 +519,32 @@ void ReservoirQt::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher
             }
         // end pragma
 
-    displayTime("END : train ", m_oTime, false, m_verbose);
+    emit sendLogInfo(QString::fromStdString(displayTime("END : train ", m_oTime, false, m_verbose)));
     emit sendComputingState(100, 100, QString("End training"));
-
-//    saveTraining("../data/training/last"); // TODO : check if directory exists
 }
 
 
 void ReservoirQt::test(const cv::Mat &meaningInputTest, cv::Mat &sentencesOutputTest, cv::Mat &xTot)
 {
+    // update progress bar
+        int l_steps = 0;
+        emit sendComputingState(0, meaningInputTest.size[0], QString("Build X"));
 
-    m_oTime = clock();
+    // init time
+        m_oTime = clock();
 
-    displayTime("START : test", m_oTime, false, m_verbose);
+    // mutex for openmp threads
+        QMutex l_lockerMainThread;
 
-    int l_sizeTot[3] = {meaningInputTest.size[0], 1 + meaningInputTest.size[2] + m_nbNeurons,  meaningInputTest.size[1]};
-    xTot = cv::Mat (3,l_sizeTot, CV_32FC1); //  will contain the internal states of the reservoir for all sentences and all timesteps
+    emit sendLogInfo(QString::fromStdString(displayTime("START : test", m_oTime, false, m_verbose)));
 
-    int l_sizeOut[3] = {l_sizeTot[0], l_sizeTot[2], m_wOut.rows};
-    sentencesOutputTest = cv::Mat(3, l_sizeOut, CV_32FC1);
+    // init x tot
+        int l_sizeTot[3] = {meaningInputTest.size[0], 1 + meaningInputTest.size[2] + m_nbNeurons,  meaningInputTest.size[1]};
+        xTot = cv::Mat (3,l_sizeTot, CV_32FC1); //  will contain the internal states of the reservoir for all sentences and all timesteps
+
+    // init sentences output
+        int l_sizeOut[3] = {l_sizeTot[0], l_sizeTot[2], m_wOut.rows};
+        sentencesOutputTest = cv::Mat(3, l_sizeOut, CV_32FC1);
 
     float l_invLeakRate = 1.f - m_leakRate;
 
@@ -595,10 +625,16 @@ void ReservoirQt::test(const cv::Mat &meaningInputTest, cv::Mat &sentencesOutput
                     xTot.at<float>(ii,jj,kk) = l_X.at<float>(jj,kk);
                 }
             }
+
+            l_lockerMainThread.lock();
+                emit sendComputingState(++l_steps, meaningInputTest.size[0], QString("Build X"));
+            l_lockerMainThread.unlock();
+
         }
     // end omp parallel
 
-    displayTime("END : test", m_oTime, false, m_verbose);
+    emit sendLogInfo(QString::fromStdString(displayTime("END : test", m_oTime, false, m_verbose)));
+    emit sendComputingState(100, 100, QString("End test"));
 }
 
 void ReservoirQt::saveTraining(const string &path)
@@ -625,8 +661,27 @@ void ReservoirQt::updateMatricesWithLoadedTraining()
     }
     else
     {
-        std::cerr << "-ERROR : updateMatricesWithLoadedTraining, no matrices loaded, can not update training matrices. " << std::endl;
+        std::string l_error("-ERROR : updateMatricesWithLoadedTraining, no matrices loaded, can not update training matrices. ");
+        std::cerr << l_error << std::endl;
+        emit sendLogInfo(QString::fromStdString(l_error));
     }
+}
+
+void ReservoirQt::disableMaxOmpThreadNumber(bool disable)
+{
+    if(!disable)
+    {
+        m_numThread = omp_get_max_threads( );
+    }
+    else
+    {
+        m_numThread = 1;
+    }
+}
+
+void ReservoirQt::enableDisplay(bool enable)
+{
+    m_sendMatrices = enable;
 }
 
 

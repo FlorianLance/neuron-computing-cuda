@@ -174,12 +174,11 @@ void GridSearch::launchTrainWithAllParameters(const std::string resultsFilePath,
                                 {
                                     std::cout << "########## Start the test number : " << l_currentTest++ << " / " << l_nbTrain << std::endl << std::endl;
 
-                                    m_model->launchTests();
-                                    double l_time = static_cast<double>((clock() - l_timeTraining)) / CLOCKS_PER_SEC;
-
-                                    m_model->retrieveTestsSentences();
-
-                                    m_model->displayResults(false,true);
+                                    if(m_model->launchTests())
+                                    {
+                                        m_model->retrieveTestsSentences();
+                                        m_model->displayResults(false,true);
+                                    }
 
                                 }
 
@@ -216,7 +215,7 @@ void GridSearch::deleteParameterValues()
     m_spectralRadiusValues.clear();
 }
 
-bool GridSearch::setParameterValues(const GridSearch::ReservoirParameter parameterId, cdouble startValue, cdouble endValue, const std::string operation, cbool useOnlyStartValue)
+bool GridSearch::setParameterValues(const GridSearch::ReservoirParameter parameterId, cdouble startValue, cdouble endValue, const std::string operation, cbool useOnlyStartValue, cint nbOfTimesForEachValues)
 {
     bool l_operationValid = true;
 
@@ -254,11 +253,13 @@ bool GridSearch::setParameterValues(const GridSearch::ReservoirParameter paramet
         {
             if(parameterId != NEURONS_NB)
             {
-                l_valuesD.push_back(l_value);
+                for(int ii = 0; ii < nbOfTimesForEachValues; ++ii)
+                    l_valuesD.push_back(l_value);
             }
             else
             {
-                l_valuesI.push_back(static_cast<int>(l_value));
+                for(int ii = 0; ii < nbOfTimesForEachValues; ++ii)
+                    l_valuesI.push_back(static_cast<int>(l_value));
             }
 
             l_value = applyOperation(l_value, operation);
@@ -277,11 +278,13 @@ bool GridSearch::setParameterValues(const GridSearch::ReservoirParameter paramet
         {
             if(parameterId != NEURONS_NB)
             {
-                l_valuesD.push_back(l_value);
+                for(int ii = 0; ii < nbOfTimesForEachValues; ++ii)
+                    l_valuesD.push_back(l_value);
             }
             else
             {
-                l_valuesI.push_back(static_cast<int>(l_value));
+                for(int ii = 0; ii < nbOfTimesForEachValues; ++ii)
+                    l_valuesI.push_back(static_cast<int>(l_value));
             }
 
             l_value = applyOperation(l_value, operation);
@@ -298,11 +301,13 @@ bool GridSearch::setParameterValues(const GridSearch::ReservoirParameter paramet
     {
         if(parameterId != NEURONS_NB)
         {
-            l_valuesD.push_back(l_value);
+            for(int ii = 0; ii < nbOfTimesForEachValues; ++ii)
+                l_valuesD.push_back(l_value);
         }
         else
         {
-            l_valuesI.push_back(static_cast<int>(l_value));
+            for(int ii = 0; ii < nbOfTimesForEachValues; ++ii)
+                l_valuesI.push_back(static_cast<int>(l_value));
         }
     }
 

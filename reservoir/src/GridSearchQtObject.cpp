@@ -225,7 +225,7 @@ void GridSearchQt::deleteParameterValues()
     m_spectralRadiusValues.clear();
 }
 
-bool GridSearchQt::setParameterValues(const GridSearchQt::ReservoirParameter parameterId, cdouble startValue, cdouble endValue, const std::string operation, cbool useOnlyStartValue)
+bool GridSearchQt::setParameterValues(const GridSearchQt::ReservoirParameter parameterId, cdouble startValue, cdouble endValue, const std::string operation, cbool useOnlyStartValue, cint nbOfTimesForEachValues)
 {
     bool l_operationValid = true;
 
@@ -263,11 +263,13 @@ bool GridSearchQt::setParameterValues(const GridSearchQt::ReservoirParameter par
         {
             if(parameterId != NEURONS_NB)
             {
-                l_valuesD.push_back(l_value);
+                for(int ii = 0; ii < nbOfTimesForEachValues; ++ii)
+                    l_valuesD.push_back(l_value);
             }
             else
             {
-                l_valuesI.push_back(static_cast<int>(l_value));
+                for(int ii = 0; ii < nbOfTimesForEachValues; ++ii)
+                    l_valuesI.push_back(static_cast<int>(l_value));
             }
 
             l_value = applyOperation(l_value, operation);
@@ -286,11 +288,13 @@ bool GridSearchQt::setParameterValues(const GridSearchQt::ReservoirParameter par
         {
             if(parameterId != NEURONS_NB)
             {
-                l_valuesD.push_back(l_value);
+                for(int ii = 0; ii < nbOfTimesForEachValues; ++ii)
+                    l_valuesD.push_back(l_value);
             }
             else
             {
-                l_valuesI.push_back(static_cast<int>(l_value));
+                for(int ii = 0; ii < nbOfTimesForEachValues; ++ii)
+                    l_valuesI.push_back(static_cast<int>(l_value));
             }
 
             l_value = applyOperation(l_value, operation);
@@ -307,11 +311,13 @@ bool GridSearchQt::setParameterValues(const GridSearchQt::ReservoirParameter par
     {
         if(parameterId != NEURONS_NB)
         {
-            l_valuesD.push_back(l_value);
+            for(int ii = 0; ii < nbOfTimesForEachValues; ++ii)
+                l_valuesD.push_back(l_value);
         }
         else
         {
-            l_valuesI.push_back(static_cast<int>(l_value));
+            for(int ii = 0; ii < nbOfTimesForEachValues; ++ii)
+                l_valuesI.push_back(static_cast<int>(l_value));
         }
     }
 

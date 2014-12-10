@@ -19,23 +19,32 @@ LINK=link
 ############################################################################## OBJ LISTS
 
 RESERVOIR_OBJ=\
-    $(LIBDIR)/Reservoir.obj $(LIBDIR)/Model.obj $(LIBDIR)/inversions.obj $(LIBDIR)/multiplications.obj $(LIBDIR)/GridSearch.obj $(LIBDIR)/Generalization.obj $(LIBDIR)/main.obj $(LIBDIR)/Interface.obj\
-    $(LIBDIR)/ReservoirQtObject.obj $(LIBDIR)/ModelQtObject.obj $(LIBDIR)/GridSearchQtObject.obj\
+    $(LIBDIR)/Reservoir.obj $(LIBDIR)/Model.obj $(LIBDIR)/inversions.obj $(LIBDIR)/multiplications.obj $(LIBDIR)/GridSearch.obj $(LIBDIR)/Generalization.obj $(LIBDIR)/main.obj\
+
+RESERVOIR_RFMODULE=\
+    $(RESERVOIR_OBJ)
+
+RESERVOIR_COMMAND=\
+    $(RESERVOIR_OBJ)
+
+RESERVOIR_QT_INTERFACE_OBJ=\
+    $(LIBDIR)/ReservoirQtObject.obj $(LIBDIR)/ModelQtObject.obj $(LIBDIR)/inversions.obj $(LIBDIR)/multiplications.obj\
+    $(LIBDIR)/qcustomplot.obj $(LIBDIR)/GridSearchQtObject.obj $(LIBDIR)/DisplayImageWidget.obj $(LIBDIR)/Interface.obj\
 
 ############################################################################## MOC LIST
 
 RESERVOIR_MOC=\
     $(MOCDIR)/moc_Interface.cpp $(MOCDIR)/moc_ReservoirQtObject.cpp $(MOCDIR)/moc_ModelQtObject.cpp $(MOCDIR)/moc_GridSearchQtObject.cpp\
-    $(MOCDIR)/moc_DisplayImageWidget.cpp\
+    $(MOCDIR)/moc_DisplayImageWidget.cpp $(MOCDIR)/moc_qcustomplot.cpp\
 
 ############################################################################## Makefile commands
 
 !if "$(ARCH)" == "x86"
-all: $(QTGENW)/UI_Interface.h $(RESERVOIR_MOC) $(BINDIR)/reservoir-test.exe
+all: $(QTGENW)/UI_Interface.h $(RESERVOIR_MOC) $(BINDIR)/reservoir-interface.exe $(BINDIR)/reservoir.exe
 !endif
 
 !if "$(ARCH)" == "amd64"
-all: $(QTGENW)/UI_Interface.h $(RESERVOIR_MOC) $(BINDIR)/reservoir-test-x64.exe
+all: $(QTGENW)/UI_Interface.h $(RESERVOIR_MOC) $(BINDIR)/reservoir-interface-x64.exe $(BINDIR)/reservoir-x64.exe
 !endif
 
 ############################################################################## exe files
@@ -43,11 +52,18 @@ all: $(QTGENW)/UI_Interface.h $(RESERVOIR_MOC) $(BINDIR)/reservoir-test-x64.exe
 WIN_CONFIG = $(SETARGV) $(BINMODE) $(WINLIBS)
 
 # exec files to be generated
-$(BINDIR)/reservoir-test.exe: $(RESERVOIR_OBJ) $(LIBS_RESERVOIR)
-        $(LINK) /OUT:$(BINDIR)/reservoir-test.exe $(LFLAGS_RESERVOIR) $(RESERVOIR_OBJ) $(LIBS_RESERVOIR) $(WIN_CONFIG)
+$(BINDIR)/reservoir-interface.exe: $(RESERVOIR_QT_INTERFACE_OBJ) $(LIBS_RESERVOIR)
+        $(LINK) /OUT:$(BINDIR)/reservoir-interface.exe $(LFLAGS_RESERVOIR) $(RESERVOIR_QT_INTERFACE_OBJ) $(LIBS_RESERVOIR) $(WIN_CONFIG)
 
-$(BINDIR)/reservoir-test-x64.exe: $(RESERVOIR_OBJ) $(LIBS_RESERVOIR)
-        $(LINK) /OUT:$(BINDIR)/reservoir-test-x64.exe $(LFLAGS_RESERVOIR) $(RESERVOIR_OBJ) $(LIBS_RESERVOIR) $(WIN_CONFIG)
+$(BINDIR)/reservoir-interface-x64.exe: $(RESERVOIR_QT_INTERFACE_OBJ) $(LIBS_RESERVOIR)
+        $(LINK) /OUT:$(BINDIR)/reservoir-interface-x64.exe $(LFLAGS_RESERVOIR) $(RESERVOIR_QT_INTERFACE_OBJ) $(LIBS_RESERVOIR) $(WIN_CONFIG)
+
+# exec files to be generated
+$(BINDIR)/reservoir.exe: $(RESERVOIR_COMMAND) $(LIBS_RESERVOIR)
+        $(LINK) /OUT:$(BINDIR)/reservoir.exe $(LFLAGS_RESERVOIR) $(RESERVOIR_COMMAND) $(LIBS_RESERVOIR) $(WIN_CONFIG)
+
+$(BINDIR)/reservoir-x64.exe: $(RESERVOIR_COMMAND) $(LIBS_RESERVOIR)
+        $(LINK) /OUT:$(BINDIR)/reservoir-x64.exe $(LFLAGS_RESERVOIR) $(RESERVOIR_COMMAND) $(LIBS_RESERVOIR) $(WIN_CONFIG)
 
 ##################################################### sources files
 
@@ -81,6 +97,13 @@ $(LIBDIR)/Interface.obj: ./src/Interface.cpp
 $(LIBDIR)/DisplayImageWidget.obj: ./src/DisplayImageWidget.cpp
         $(CC) -c ./src/DisplayImageWidget.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/DisplayImageWidget.obj"
 
+$(LIBDIR)/DisplayCurvesWidget.obj: ./src/DisplayCurvesWidget.cpp
+        $(CC) -c ./src/DisplayCurvesWidget.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/DisplayCurvesWidget.obj"
+
+$(LIBDIR)/qcustomplot.obj: ./src/qcustomplot.cpp
+        $(CC) -c ./src/qcustomplot.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/qcustomplot.obj"
+
+
 ############################################################################## Qt ui files
 
 $(QTGENW)/UI_Interface.h: $(FORMDIR)/interfaceReservoir.ui
@@ -102,3 +125,6 @@ $(MOCDIR)/moc_GridSearchQtObject.cpp: ./include/GridSearchQtObject.h
 
 $(MOCDIR)/moc_DisplayImageWidget.cpp: ./include/DisplayImageWidget.h
          moc  ./include/DisplayImageWidget.h -o $@
+
+$(MOCDIR)/moc_qcustomplot.cpp: ./include/qcustomplot.h
+         moc  ./include/qcustomplot.h -o $@

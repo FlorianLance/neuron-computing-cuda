@@ -70,9 +70,10 @@ class GridSearch
          * @param [in] startValue   : the starting value of the parameter
          * @param [in] endValue     : the ending value of the parameter
          * @param [in] operation    : operator to apply to the value for defining the range : ex "+2" "*5.1" -"2.3"
-         * @param [in] useOnlyStartValue : uses only the start value
+         * @param [in] useOnlyStartValue      : uses only the start value
+         * @param [in] nbOfTimesForEachValues : the number of times a value will be used
          */
-        bool setParameterValues(const ReservoirParameter parameterId, cdouble startValue, cdouble endValue, const std::string operation = "*2", cbool useOnlyStartValue = false);
+        bool setParameterValues(const ReservoirParameter parameterId, cdouble startValue, cdouble endValue, const std::string operation = "*2", cbool useOnlyStartValue = false, cint nbOfTimesForEachValues = 1);
 
         /**
          * @brief deleteParameterValues

@@ -14,10 +14,23 @@
 #include <time.h>
 
 
+#include <QDateTime>
+
+int main(int argc, char* argv[])
+{
+    srand(1);
+    culaWarmup(1);
+
+    QApplication l_oApp(argc, argv);
+    Interface l_oViewerInterface(&l_oApp);
+    l_oViewerInterface.move(50,50);
+    l_oViewerInterface.show();
+
+    return l_oApp.exec();
+}
 
 
-
-Interface::Interface() : m_uiInterface(new Ui::UI_Reservoir)
+Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
 {
     // init main widget
     m_uiInterface->setupUi(this);
@@ -32,17 +45,36 @@ Interface::Interface() : m_uiInterface(new Ui::UI_Reservoir)
         l_listStructure << "P0 A1 O2 R3 Q0";
         m_uiInterface->cbStructure->addItems(l_listStructure);
 
+    // create log file
+        QDateTime l_dateTime;
+        l_dateTime = l_dateTime.currentDateTime();
+        QDate l_date = l_dateTime.date();
+        QTime l_time = QTime::currentTime();
+        QString l_nameLogFile = "../log/logs_reservoir_interface_" + l_date.toString("dd_MM_yyyy") + "_" +  QString::number(l_time.hour()) + "h" + QString::number(l_time.minute()) + "m" + QString::number(l_time.second()) + "s.txt";
+        m_logFile.setFileName(l_nameLogFile);
+        if (!m_logFile.open(QIODevice::WriteOnly | QIODevice::Text))
+        {
+           qWarning() << "Cannot write log file. Start of the path must be ./dist, and ../log must exist. ";
+        }
+
     // init worker
         m_pWInterface = new InterfaceWorker();
 
+    // init widgets
+        m_uiInterface->scrollAreaPlot->setWidgetResizable(true);
+        m_uiInterface->pbStop->setVisible(false);
+
+
     // init connections
+        QObject::connect(this, SIGNAL(leaveProgram()), parent, SLOT(quit()));
+
         // push button
         QObject::connect(m_uiInterface->pbStart,        SIGNAL(clicked()), m_pWInterface, SLOT(start()));
         QObject::connect(m_uiInterface->pbStop,         SIGNAL(clicked()), m_pWInterface, SLOT(stop()));
         QObject::connect(m_uiInterface->pbAddCorpus,    SIGNAL(clicked()), this, SLOT(addCorpus()));
         QObject::connect(m_uiInterface->pbRemoveCorpus, SIGNAL(clicked()), this, SLOT(removeCorpus()));
         QObject::connect(m_uiInterface->pbSaveLastTrainingFile, SIGNAL(clicked()), this, SLOT(saveTraining()));
-        QObject::connect(m_uiInterface->pbLoadTrainingFile, SIGNAL(clicked()), this, SLOT(loadTraining()));
+        QObject::connect(m_uiInterface->pbClearResults, SIGNAL(clicked()), this, SLOT(cleanResultsDisplay()));
 
         // radio button
         QObject::connect(m_uiInterface->rbTrain,    SIGNAL(clicked()), SLOT(updateReservoirParameters()));
@@ -62,6 +94,13 @@ Interface::Interface() : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(m_uiInterface->sbEndSpectralRadius,    SIGNAL(valueChanged(double)), SLOT(updateReservoirParameters(double)));
         QObject::connect(m_uiInterface->sbEndRidge,             SIGNAL(valueChanged(double)), SLOT(updateReservoirParameters(double)));
         QObject::connect(m_uiInterface->sbEndSparcity,          SIGNAL(valueChanged(double)), SLOT(updateReservoirParameters(double)));
+        QObject::connect(m_uiInterface->sbNbUseNeurons,         SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
+        QObject::connect(m_uiInterface->sbNbUseNeurons,         SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
+        QObject::connect(m_uiInterface->sbNbUseLeakRate,        SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
+        QObject::connect(m_uiInterface->sbNbUseISS,             SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
+        QObject::connect(m_uiInterface->sbNbUseSpectralRadius,  SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
+        QObject::connect(m_uiInterface->sbNbUseRidge,           SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
+        QObject::connect(m_uiInterface->sbNbUseSparcity,        SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
 
         // checkbox
         QObject::connect(m_uiInterface->cbNeurons,              SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
@@ -108,7 +147,12 @@ Interface::Interface() : m_uiInterface(new Ui::UI_Reservoir)
         // model
         ModelQt *l_model = m_pWInterface->model();
         QObject::connect(l_model->reservoir(), SIGNAL(sendComputingState(int,int,QString)), this, SLOT(updateProgressBar(int, int, QString)));
-
+        QObject::connect(m_uiInterface->cbEnableDisplay, SIGNAL(clicked(bool)), l_model->reservoir(), SLOT(disableMaxOmpThreadNumber(bool)));
+        QObject::connect(m_uiInterface->cbEnableDisplay, SIGNAL(clicked(bool)), l_model->reservoir(), SLOT(enableDisplay(bool)));
+//        QObject::connect(l_model->reservoir(), SIGNAL(sendMatriceImage2Display(QImage)), m_imageDisplay, SLOT(refreshDisplay(QImage)));
+        QObject::connect(l_model->reservoir(), SIGNAL(sendMatriceData(QVector<QVector<double> >)), this, SLOT(plotData(QVector<QVector<double> >)));
+        QObject::connect(l_model->reservoir(), SIGNAL(sendInfoPlot(int,int,QString)), this, SLOT(initPlot(int,int,QString)));
+        QObject::connect(l_model->reservoir(), SIGNAL(sendLogInfo(QString)), this, SLOT(displayLogInfo(QString)));
 
     // interface setting
         m_uiInterface->pbComputing->setRange(0,100);
@@ -146,6 +190,7 @@ void Interface::closeEvent(QCloseEvent *event)
 
 void Interface::addCorpus()
 {
+
     QString l_sPathCorpus = QFileDialog::getOpenFileName(this, "Load corpus file", "../data/input/Corpus", "Corpus file (*.txt)");
 
     if(l_sPathCorpus.size() > 0)
@@ -271,6 +316,13 @@ void Interface::updateReservoirParameters()
     l_params.m_ridgeEnd                 = m_uiInterface->sbEndRidge->value();
     l_params.m_sparcityEnd              = m_uiInterface->sbEndSparcity->value();
 
+    l_params.m_neuronsNbOfUses          = m_uiInterface->sbNbUseNeurons->value();
+    l_params.m_leakRateNbOfUses         = m_uiInterface->sbNbUseLeakRate->value();
+    l_params.m_issNbOfUses              = m_uiInterface->sbNbUseISS->value();
+    l_params.m_spectralRadiusNbOfUses   = m_uiInterface->sbNbUseSpectralRadius->value();
+    l_params.m_ridgeNbOfUses            = m_uiInterface->sbNbUseRidge->value();
+    l_params.m_sparcityNbOfUses         = m_uiInterface->sbNbUseSparcity->value();
+
     l_params.m_neuronsEnabled           = m_uiInterface->cbNeurons->isChecked();
     l_params.m_leakRateEnabled          = m_uiInterface->cbLeakRate->isChecked();
     l_params.m_issEnabled               = m_uiInterface->cbIS->isChecked();
@@ -317,6 +369,13 @@ void Interface::lockInterface(bool lock)
     m_uiInterface->sbEndRidge->setDisabled(lock);
     m_uiInterface->sbEndSparcity->setDisabled(lock);
 
+    m_uiInterface->sbNbUseNeurons->setDisabled(lock);
+    m_uiInterface->sbNbUseLeakRate->setDisabled(lock);
+    m_uiInterface->sbNbUseISS->setDisabled(lock);
+    m_uiInterface->sbNbUseSpectralRadius->setDisabled(lock);
+    m_uiInterface->sbNbUseRidge->setDisabled(lock);
+    m_uiInterface->sbNbUseSparcity->setDisabled(lock);
+
     m_uiInterface->cbNeurons->setDisabled(lock);
     m_uiInterface->cbLeakRate->setDisabled(lock);
     m_uiInterface->cbIS->setDisabled(lock);
@@ -336,6 +395,7 @@ void Interface::lockInterface(bool lock)
 
     m_uiInterface->pbAddCorpus->setDisabled(lock);
     m_uiInterface->pbRemoveCorpus->setDisabled(lock);
+    m_uiInterface->pbClearResults->setDisabled(lock);
 
     m_uiInterface->pbStart->setDisabled(lock);
     m_uiInterface->pbLoadTrainingFile->setDisabled(lock);
@@ -462,9 +522,6 @@ void Interface::displayCurrentResults(ResultsDisplayReservoir results)
 
     m_uiInterface->tbResults->setPlainText(l_display);
     m_uiInterface->tbResults->verticalScrollBar()->setValue(m_uiInterface->tbResults->verticalScrollBar()->maximum());
-
-//    QTextCursor l_cursor = m_uiInterface->tbResults->textCursor();
-    //    l_cursor.movePosition(QTextCursor::End);
 }
 
 void Interface::updateProgressBar(int currentValue, int valueMax, QString text)
@@ -474,12 +531,92 @@ void Interface::updateProgressBar(int currentValue, int valueMax, QString text)
     m_uiInterface->laStateComputing->setText(text);
 }
 
+
+void Interface::plotData(QVector<QVector<double> > values)
+{
+    if(m_allValuesPlot.size() == 0)
+    {
+        for(int ii = 0; ii < values.size(); ++ii)
+        {
+            QVector<double> l_init;
+            m_allValuesPlot.push_back(l_init);
+        }
+    }
+
+    for(int ii = 0; ii < values.size(); ++ii)
+    {
+        for(int jj = 0; jj < values[ii].size(); ++jj)
+        {
+            m_allValuesPlot[ii].push_back(values[ii][jj]);
+        }
+    }
+
+
+//    for(int ii = 0; ii < )
+
+//    qDebug() << "plot :" << values.size() << " " << values[0].size();
+//    qDebug() << "start";
+    QVector<double> l_xValues;
+
+    for(int ii = 0; ii < m_allValuesPlot[0].size(); ++ii)
+    {
+        l_xValues.push_back(ii);
+    }
+
+    for(int ii = 0; ii < m_plotList.size(); ++ii)
+    {
+        m_plotList[ii]->graph(0)->setPen(QPen(Qt::blue));
+        m_plotList[ii]->graph(0)->setData(l_xValues, m_allValuesPlot[ii]);
+        m_plotList[ii]->replot();
+    }
+}
+
+void Interface::initPlot(int nbCurves, int lenghtCurves, QString name)
+{
+    qDeleteAll(m_plotList.begin(), m_plotList.end());
+    m_plotList.clear();
+    m_allValuesPlot.clear();
+
+    for(int ii = 0; ii < nbCurves; ++ii)
+    {
+        QCustomPlot *l_plotDisplay = new QCustomPlot(this);
+
+        l_plotDisplay->setFixedHeight(100);
+        m_plotList.push_back(l_plotDisplay);
+        m_uiInterface->vlPlot->addWidget(m_plotList.back());
+        m_plotList.back()->addGraph();
+
+        m_plotList.back()->xAxis->setLabel("x");
+        m_plotList.back()->yAxis->setLabel("y");
+        m_plotList.back()->xAxis->setRange(0, lenghtCurves);
+        m_plotList.back()->yAxis->setRange(-1, 1);
+    }
+}
+
+void Interface::cleanResultsDisplay()
+{
+    m_uiInterface->tbResults->clear();
+}
+
+void Interface::displayLogInfo(QString info)
+{
+    if(m_logFile.isOpen())
+    {
+        QTextStream l_stream(&m_logFile);
+        l_stream << info;
+    }
+
+    m_uiInterface->tbInfos->setPlainText(m_uiInterface->tbInfos->toPlainText() + info);
+    m_uiInterface->tbInfos->verticalScrollBar()->setValue(m_uiInterface->tbInfos->verticalScrollBar()->maximum());
+}
+
 InterfaceWorker::InterfaceWorker() : m_gridSearch(new GridSearchQt(m_model)), m_nbOfCorpus(0)
 {
     qRegisterMetaType<ReservoirParameters>("ReservoirParameters");
     qRegisterMetaType<LanguageParameters>("LanguageParameters");
-    qRegisterMetaType<ModelParametersQt>("ModelParameters");
+    qRegisterMetaType<ModelParametersQt>("ModelParametersQt");
     qRegisterMetaType<ResultsDisplayReservoir>("ResultsDisplayReservoir");
+    qRegisterMetaType<QVector<QVector<double> > >("QVector<QVector<double> >");
 }
 
 InterfaceWorker::~InterfaceWorker()
@@ -580,7 +717,8 @@ void InterfaceWorker::start()
 
         if(m_reservoirParameters.m_neuronsEnabled)
         {
-            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::NEURONS_NB,         m_reservoirParameters.m_neuronsStart,         m_reservoirParameters.m_neuronsEnd, m_reservoirParameters.m_neuronsOperation.toStdString(), l_onlyStartValue);
+            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::NEURONS_NB, m_reservoirParameters.m_neuronsStart, m_reservoirParameters.m_neuronsEnd,
+                                                                m_reservoirParameters.m_neuronsOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_neuronsNbOfUses);
             emit displayValidityOperationSignal(l_operationValid, GridSearchQt::NEURONS_NB);
             if(!l_operationValid)
             {
@@ -589,7 +727,8 @@ void InterfaceWorker::start()
         }
         if(m_reservoirParameters.m_leakRateEnabled)
         {
-            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::LEAK_RATE,          m_reservoirParameters.m_leakRateStart,        m_reservoirParameters.m_leakRateEnd, m_reservoirParameters.m_leakRateOperation.toStdString(), l_onlyStartValue);
+            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::LEAK_RATE,m_reservoirParameters.m_leakRateStart, m_reservoirParameters.m_leakRateEnd,
+                                                                m_reservoirParameters.m_leakRateOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_leakRateNbOfUses);
             emit displayValidityOperationSignal(l_operationValid, GridSearchQt::LEAK_RATE);
             if(!l_operationValid)
             {
@@ -598,7 +737,8 @@ void InterfaceWorker::start()
         }
         if(m_reservoirParameters.m_issEnabled)
         {
-            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::INPUT_SCALING,      m_reservoirParameters.m_issStart,             m_reservoirParameters.m_issEnd, m_reservoirParameters.m_issOperation.toStdString(), l_onlyStartValue);
+            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::INPUT_SCALING,m_reservoirParameters.m_issStart, m_reservoirParameters.m_issEnd,
+                                                                m_reservoirParameters.m_issOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_issNbOfUses);
             emit displayValidityOperationSignal(l_operationValid, GridSearchQt::INPUT_SCALING);
             if(!l_operationValid)
             {
@@ -607,7 +747,8 @@ void InterfaceWorker::start()
         }
         if(m_reservoirParameters.m_spectralRadiusEnabled)
         {
-            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::SPECTRAL_RADIUS,    m_reservoirParameters.m_spectralRadiusStart,  m_reservoirParameters.m_spectralRadiusEnd, m_reservoirParameters.m_spectralRadiusOperation.toStdString(), l_onlyStartValue);
+            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::SPECTRAL_RADIUS,    m_reservoirParameters.m_spectralRadiusStart,  m_reservoirParameters.m_spectralRadiusEnd,
+                                                                m_reservoirParameters.m_spectralRadiusOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_spectralRadiusNbOfUses);
             emit displayValidityOperationSignal(l_operationValid, GridSearchQt::SPECTRAL_RADIUS);
             if(!l_operationValid)
             {
@@ -616,7 +757,8 @@ void InterfaceWorker::start()
         }
         if(m_reservoirParameters.m_ridgeEnabled)
         {
-            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::RIDGE,              m_reservoirParameters.m_ridgeStart,           m_reservoirParameters.m_ridgeEnd, m_reservoirParameters.m_ridgeOperation.toStdString(), l_onlyStartValue);
+            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::RIDGE,m_reservoirParameters.m_ridgeStart, m_reservoirParameters.m_ridgeEnd,
+                                                                m_reservoirParameters.m_ridgeOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_ridgeNbOfUses);
             emit displayValidityOperationSignal(l_operationValid, GridSearchQt::RIDGE);
             if(!l_operationValid)
             {
@@ -625,7 +767,8 @@ void InterfaceWorker::start()
         }
         if(m_reservoirParameters.m_sparcityEnabled)
         {
-            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::SPARCITY,           m_reservoirParameters.m_sparcityStart,        m_reservoirParameters.m_sparcityEnd, m_reservoirParameters.m_sparcityOperation.toStdString(), l_onlyStartValue);
+            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::SPARCITY, m_reservoirParameters.m_sparcityStart,  m_reservoirParameters.m_sparcityEnd,
+                                                                m_reservoirParameters.m_sparcityOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_sparcityNbOfUses);
             emit displayValidityOperationSignal(l_operationValid, GridSearchQt::SPARCITY);
             if(!l_operationValid)
             {
@@ -638,7 +781,6 @@ void InterfaceWorker::start()
             std::cerr << "Cannot start, " << l_OperationInvalid << " operation are invalid. (Displayed in red)" << std::endl;
             return;
         }
-
 
         bool l_doTrain, l_doTest;
 

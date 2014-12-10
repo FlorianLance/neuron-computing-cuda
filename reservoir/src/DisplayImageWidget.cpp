@@ -1,6 +1,6 @@
 
 /**
- * \file DisplayImageWidget.c++
+ * \file DisplayImageWidget.cpp
  * \brief Defines DisplayImageWidget
  * \author Florian Lance
  * \date 22/01/13
@@ -9,7 +9,7 @@
 
 #include "DisplayImageWidget.h"
 
-#include "moc_SWDisplayImageWidget.cpp"
+#include "moc_DisplayImageWidget.cpp"
 
 #include <QResizeEvent>
 #include <iostream>

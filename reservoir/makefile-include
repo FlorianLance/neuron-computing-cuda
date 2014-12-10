@@ -111,6 +111,9 @@ INC_BOOST   = -I"$(THIRD_PARTY_BOOST)"\
 
 INC_QT      = -I"$(THIRD_PARTY_QT)"/include/QtOpenGL -I"$(THIRD_PARTY_QT)"/include/QtGui -I"$(THIRD_PARTY_QT)"/include/QtCore -I"$(THIRD_PARTY_QT)"/include/Qt -I"$(THIRD_PARTY_QT)"/include\
 
+#INC_QT      = -I"$(THIRD_PARTY_QT)"/include/QtOpenGL -I"$(THIRD_PARTY_QT)"/include/QtGui -I"$(THIRD_PARTY_QT)"/include/QtCore -I"$(THIRD_PARTY_QT)"/include/QtWidgets -I"$(THIRD_PARTY_QT)"/include\
+
+
 INC_CV      = -I"$(THIRD_PARTY_OPENCV)"\modules/core/include -I"$(THIRD_PARTY_OPENCV)"\modules/imgproc/include\
                   -I"$(THIRD_PARTY_OPENCV)"\modules/objdetect/include -I"$(THIRD_PARTY_OPENCV)"\modules/features2d/include\
                   -I"$(THIRD_PARTY_OPENCV)"\modules/features2d/include -I"$(THIRD_PARTY_OPENCV)"\modules/flann/include\
@@ -124,7 +127,7 @@ INC_ARMADILLO = -I"$(THIRD_PARTY_ARMADILLO)"\
 
 COMMON        = $(INC_RES) $(INC_OTHERS) $(INC_VS)
 
-RESERVOIR_INC = $(COMMON) $(INC_QT) $(INC_UI) $(INC_MOC) $(INC_CV) $(INC_CULA)
+RESERVOIR_INC = $(COMMON) $(INC_UI) $(INC_MOC) $(INC_CV) $(INC_CULA) $(INC_QT)
 
 #$(INC_EIGEN) $(INC_ARMADILLO) $(INC_BOOST)
 
@@ -141,8 +144,8 @@ LIBS_COMMON	=
 
 ############################ FLAGS
 
-CFLAGS_STA = -nologo -Ox -GF -Gy -W3 -MT -EHsc -DWIN32 -MP$(NUMBER_OF_PROCESSORS) -openmp
-CFLAGS_DYN = -nologo -Ox -GF -Gy -W3 -MD -EHsc -DWIN32 -MP$(NUMBER_OF_PROCESSORS) -openmp
+CFLAGS_STA = -nologo -Ox -GF -Gy -W3 -MT -EHsc -DWIN32 -MP$(NUMBER_OF_PROCESSORS) -openmp #-DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -DQT_WIDGET_LIB
+CFLAGS_DYN = -nologo -Ox -GF -Gy -W3 -MD -EHsc -DWIN32 -MP$(NUMBER_OF_PROCESSORS) -openmp #-DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -DQT_WIDGET_LIB
 #CFLAGS_STA = -nologo -Ox -GF -Gy -W3 -MT -EHsc -DWIN32 -MP$(NUMBER_OF_PROCESSORS)
 #CFLAGS_DYN = -nologo -Ox -GF -Gy -W3 -MD -EHsc -DWIN32 -MP$(NUMBER_OF_PROCESSORS)
 
@@ -160,6 +163,8 @@ CFLAGS_CUDA_GPUMAT = $(INC_RES) $(INC_CUDA) $(INC_CULA) $(COMMON_CUDA_FLAGS) -od
 
 
 LIBS_QT 	= $(THIRD_PARTY_QT)/lib/QtOpenGL4.lib $(THIRD_PARTY_QT)/lib/QtCore4.lib $(THIRD_PARTY_QT)/lib/QtGui4.lib $(THIRD_PARTY_QT)/lib/qtmain.lib\
+
+#LIBS_QT 	= $(THIRD_PARTY_QT)/lib/Qt5OpenGL.lib $(THIRD_PARTY_QT)/lib/Qt5Core.lib $(THIRD_PARTY_QT)/lib/Qt5Gui.lib $(THIRD_PARTY_QT)/lib/qtmain.lib\
 
 LIBS_CV		= $(THIRD_PARTY_OPENCV)/build/lib/Release/opencv_highgui249.lib $(THIRD_PARTY_OPENCV)/build/lib/Release/opencv_core249.lib\
                   $(THIRD_PARTY_OPENCV)/build/lib/Release/opencv_imgproc249.lib $(THIRD_PARTY_OPENCV)/build/lib/Release/opencv_objdetect249.lib\

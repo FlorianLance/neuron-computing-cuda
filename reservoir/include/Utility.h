@@ -9,13 +9,22 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
+
 // std
 #include <iostream>
 #include <fstream>
 #include <iomanip>
 
+
+
 // qt
 #include <QtGui>
+//#include <QtWidgets>
+//#include <Qtcore/qfile.h>
+//#include <Qtcore/qvector.h>
+//#include <Qtcore/qstringlist.h>
+//#include <Qtcore/qtextstream.h>
+
 
 // opencv
 #include "opencv2/highgui/highgui.hpp"
@@ -196,23 +205,27 @@ static void initMatrix(cv::Mat &mat, const int numDim, int *sizes, bool initWith
  * @param time
  * @param skipNextLine
  * @param verboseAcivated
+ * @return
  */
-static void displayTime(const std::string info, const clock_t time, const bool skipNextLine = false, const bool verboseAcivated = true)
+static std::string displayTime(const std::string info, const clock_t time, const bool skipNextLine = false, const bool verboseActivated = true)
 {
-    if(!verboseAcivated)
-    {
-        return;
-    }
 
     std::ostringstream l_oss;
     l_oss << ((float)(clock() - time) / CLOCKS_PER_SEC);
 
-    std::cout << "  [TIME] " << info << " : " << l_oss.str() << std::endl;
+    std::string l_string2Display = "  [STEP] " + info +  " : " + l_oss.str() + "s\n";
 
     if(skipNextLine)
     {
-        std::cout << std::endl;
+        l_string2Display += "\n";
     }
+
+    if(verboseActivated)
+    {
+        std::cout << l_string2Display;
+    }
+
+    return l_string2Display;
 }
 
 /**
@@ -1047,6 +1060,31 @@ static int compareMatrices(const cv::Mat &mat1, const cv::Mat &mat2, int &nbValu
     }
 
     return 0;
+}
+
+
+/**
+ * \brief Convert opencv mat3b to Qt QImage
+ * \param [in] oMat : mat to be converted
+ * \return  qimage result
+ */
+static QImage mat2QImage(const cv::Mat3b &oMat)
+{
+    QImage l_oQImage(oMat.cols, oMat.rows, QImage::Format_ARGB32);
+
+    for (int jj = 0; jj < oMat.rows; ++jj)
+    {
+        const cv::Vec3b *l_oMatRow = oMat[jj];
+
+        QRgb *l_oQIRow = (QRgb*)l_oQImage.scanLine(jj);
+
+        for (int ii = 0; ii < oMat.cols; ++ii)
+        {
+            l_oQIRow[ii] = qRgba(l_oMatRow[ii][2], l_oMatRow[ii][1], l_oMatRow[ii][0], 255);
+        }
+    }
+
+    return l_oQImage;
 }
 
 

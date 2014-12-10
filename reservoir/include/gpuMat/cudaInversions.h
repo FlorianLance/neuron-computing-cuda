@@ -132,7 +132,14 @@ namespace swCuda
             l_VT = new float[M.cols * M.cols * sizeof(float)];
 
         // singular value decompostion with cuda
-            svdDecomposition(l_M, M.rows, M.cols, l_S, l_VT, l_U);
+            if(!svdDecomposition(l_M, M.rows, M.cols, l_S, l_VT, l_U))
+            {
+                delete[] l_S; l_S = NULL;
+                delete[] l_U; l_U = NULL;
+                delete[] l_VT; l_VT = NULL;
+                delete[] l_M; l_M = NULL;
+                return false;
+            }
 
         // fill result mat
             if(l_32b)

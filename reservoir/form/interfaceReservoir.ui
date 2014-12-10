@@ -14,7 +14,7 @@
    <string>Neurons-Reservoir-Computing-Interface</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout_2" columnstretch="1,0,0,0">
+   <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,0">
     <item row="1" column="2">
      <widget class="QGroupBox" name="groupBox_4">
       <property name="title">
@@ -26,7 +26,7 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>40</height>
+           <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
@@ -40,7 +40,17 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="2" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+       <item row="0" column="2">
+        <widget class="QProgressBar" name="pbComputing">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="value">
+          <number>0</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
         <widget class="QPushButton" name="pbStop">
          <property name="enabled">
           <bool>false</bool>
@@ -48,7 +58,7 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>40</height>
+           <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
@@ -62,17 +72,7 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0" colspan="2">
-        <widget class="QProgressBar" name="pbComputing">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="value">
-          <number>0</number>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2">
+       <item row="0" column="3">
         <widget class="QLabel" name="laStateComputing">
          <property name="text">
           <string>Idle</string>
@@ -103,6 +103,9 @@
        <item row="0" column="0">
         <widget class="QTextBrowser" name="tbInfos">
          <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="readOnly">
           <bool>false</bool>
          </property>
         </widget>
@@ -122,7 +125,7 @@
        <string>RESULTS</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_11">
-       <item row="1" column="0">
+       <item row="2" column="0">
         <widget class="QPushButton" name="pbDirectoResults">
          <property name="enabled">
           <bool>false</bool>
@@ -141,17 +144,23 @@
        <item row="0" column="0" colspan="2">
         <widget class="QTextBrowser" name="tbResults"/>
        </item>
-       <item row="1" column="1">
+       <item row="1" column="0">
         <widget class="QPushButton" name="pbClearResults">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
          </property>
          <property name="text">
           <string>Clear results</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0" colspan="2">
+       <item row="2" column="1">
         <widget class="QLabel" name="laDirectoryResult">
          <property name="text">
           <string>...</string>
@@ -306,61 +315,19 @@
            </layout>
           </widget>
          </item>
-         <item row="0" column="0">
-          <layout class="QGridLayout" name="gridLayout_3">
-           <item row="0" column="0">
-            <widget class="QGroupBox" name="groupBox_3">
-             <property name="title">
-              <string>CORPUS LIST</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_5">
-              <item row="0" column="0" rowspan="2" colspan="2">
-               <widget class="QListWidget" name="lwCorpus">
-                <property name="maximumSize">
-                 <size>
-                  <width>500</width>
-                  <height>200</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="2">
-               <widget class="QPushButton" name="pbRemoveCorpus">
-                <property name="maximumSize">
-                 <size>
-                  <width>150</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Remove corpus</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="2">
-               <widget class="QPushButton" name="pbAddCorpus">
-                <property name="maximumSize">
-                 <size>
-                  <width>150</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Add corpus</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
-         </item>
          <item row="1" column="0">
           <widget class="QGroupBox" name="groupBox_5">
            <property name="title">
             <string>RESERVOIR PARAMETERS</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_6">
+            <item row="6" column="0">
+             <widget class="QLabel" name="label_7">
+              <property name="text">
+               <string>Input scaling</string>
+              </property>
+             </widget>
+            </item>
             <item row="2" column="2">
              <widget class="QLabel" name="label_3">
               <property name="text">
@@ -385,13 +352,6 @@
               </property>
               <property name="value">
                <double>0.200000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="0">
-             <widget class="QLabel" name="label_7">
-              <property name="text">
-               <string>Input scaling</string>
               </property>
              </widget>
             </item>
@@ -837,10 +797,73 @@
               </property>
              </widget>
             </item>
-            <item row="1" column="0" colspan="11">
+            <item row="2" column="11" rowspan="8">
+             <widget class="Line" name="line_17">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="12">
+             <widget class="QLabel" name="laNbOfUse">
+              <property name="text">
+               <string>Nb of use </string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="13">
              <widget class="Line" name="line_15">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="12">
+             <widget class="Line" name="line_18">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="12">
+             <widget class="QSpinBox" name="sbNbUseNeurons">
+              <property name="value">
+               <number>1</number>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="12">
+             <widget class="QSpinBox" name="sbNbUseLeakRate">
+              <property name="value">
+               <number>1</number>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="12">
+             <widget class="QSpinBox" name="sbNbUseISS">
+              <property name="value">
+               <number>1</number>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="12">
+             <widget class="QSpinBox" name="sbNbUseSpectralRadius">
+              <property name="value">
+               <number>1</number>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="12">
+             <widget class="QSpinBox" name="sbNbUseRidge">
+              <property name="value">
+               <number>1</number>
+              </property>
+             </widget>
+            </item>
+            <item row="9" column="12">
+             <widget class="QSpinBox" name="sbNbUseSparcity">
+              <property name="value">
+               <number>1</number>
               </property>
              </widget>
             </item>
@@ -897,6 +920,55 @@
            </layout>
           </widget>
          </item>
+         <item row="0" column="0">
+          <layout class="QGridLayout" name="gridLayout_3">
+           <item row="0" column="0">
+            <widget class="QGroupBox" name="groupBox_3">
+             <property name="title">
+              <string>CORPUS LIST</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_5">
+              <item row="0" column="0" rowspan="2" colspan="2">
+               <widget class="QListWidget" name="lwCorpus">
+                <property name="maximumSize">
+                 <size>
+                  <width>500</width>
+                  <height>200</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2">
+               <widget class="QPushButton" name="pbRemoveCorpus">
+                <property name="maximumSize">
+                 <size>
+                  <width>150</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Remove corpus</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QPushButton" name="pbAddCorpus">
+                <property name="maximumSize">
+                 <size>
+                  <width>150</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Add corpus</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </item>
         </layout>
        </widget>
       </item>
@@ -933,39 +1005,72 @@
         <item row="0" column="0">
          <widget class="QGroupBox" name="groupBox_10">
           <property name="title">
-           <string>GroupBox</string>
+           <string>MATRICE X TOT</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_13">
+          <layout class="QGridLayout" name="gridLayout_13" columnstretch="1,5">
            <item row="0" column="0">
             <widget class="QGroupBox" name="groupBox_11">
              <property name="title">
               <string>SETTINGS</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_15">
-              <item row="0" column="0">
-               <widget class="QPushButton" name="pushButton">
+              <item row="0" column="1">
+               <widget class="QPushButton" name="pbUpdateMatriceDisplay">
                 <property name="text">
-                 <string>PushButton</string>
+                 <string>Update</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="0">
-               <widget class="QSpinBox" name="spinBox_2"/>
+              <item row="1" column="1">
+               <widget class="QSpinBox" name="sbStartMatrixValue">
+                <property name="maximum">
+                 <number>500000</number>
+                </property>
+               </widget>
               </item>
-              <item row="2" column="0">
-               <widget class="QSpinBox" name="spinBox"/>
+              <item row="2" column="1">
+               <widget class="QSpinBox" name="sbEndMatrixValue">
+                <property name="maximum">
+                 <number>500000</number>
+                </property>
+                <property name="value">
+                 <number>50</number>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QCheckBox" name="cbEnableDisplay">
+                <property name="text">
+                 <string>Enable display</string>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QGroupBox" name="groupBox_12">
+            <widget class="QGroupBox" name="gbPlot">
              <property name="title">
-              <string>VISUALIZATION</string>
+              <string>PLOT</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_16">
-              <item row="0" column="0">
-               <widget class="QWidget" name="wVisualization" native="true"/>
+              <item row="0" column="1">
+               <widget class="QScrollArea" name="scrollAreaPlot">
+                <property name="widgetResizable">
+                 <bool>false</bool>
+                </property>
+                <widget class="QWidget" name="scrollAreaWidgetContents">
+                 <property name="geometry">
+                  <rect>
+                   <x>0</x>
+                   <y>0</y>
+                   <width>69</width>
+                   <height>554</height>
+                  </rect>
+                 </property>
+                 <layout class="QVBoxLayout" name="vlPlot"/>
+                </widget>
+               </widget>
               </item>
              </layout>
             </widget>

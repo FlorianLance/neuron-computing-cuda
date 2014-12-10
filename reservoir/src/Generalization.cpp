@@ -41,37 +41,6 @@ void Generalization::retrieveRandomSentenceList(cint sizeCorpus, cint nbSentence
 
 void Generalization::retrieveSubSentenceCorpusRandomized(std::vector<int> &randomSentenceList, QVector<QStringList> &subMeaning, QVector<QStringList> &subInfo, QVector<QStringList>& subSentence)
 {
-//    for(int ii = 0; ii < randomSentenceList.size(); ++ii)
-//    {
-//        QStringList l_randomSubSentence = m_trainSentence[randomSentenceList[ii]];
-//        std::random_shuffle(l_randomSubSentence.begin(), l_randomSubSentence.end());
-
-//        subMeaning.push_back(m_trainMeaning[randomSentenceList[ii]]);
-//        subInfo.push_back(m_trainInfo[randomSentenceList[ii]]);
-//        subSentence.push_back(l_randomSubSentence);
-//    }
-
-//    for(int ii = 0; ii < m_trainSentence.size(); ++ii)
-//    {
-//        bool l_addSentence = true;
-
-//        for(int jj = 0; jj < randomSentenceList.size(); ++jj)
-//        {
-//            if(randomSentenceList[jj] == ii)
-//            {
-//                l_addSentence = false;
-//                break;
-//            }
-//        }
-
-//        if(l_addSentence)
-//        {
-//            subMeaning.push_back(m_trainMeaning[ii]);
-//            subInfo.push_back(m_trainInfo[ii]);
-//            subSentence.push_back(m_trainSentence[ii]);
-//        }
-//    }
-
     for(int ii = 0; ii < m_trainSentence.size(); ++ii)
     {
         bool l_addSentence = true;
@@ -105,54 +74,7 @@ void Generalization::retrieveSubSentenceCorpusRandomized(std::vector<int> &rando
 
 void Generalization::retrieveSubMeaningCorpusRandomized(std::vector<int> &randomSentenceList, QVector<QStringList> &subMeaning, QVector<QStringList> &subInfo, QVector<QStringList>& subSentence)
 {
-    for(int ii = 0; ii < randomSentenceList.size(); ++ii)
-    {
-        QStringList l_randomSubMeaning = m_trainMeaning[randomSentenceList[ii]];
-
-        // detect "," string
-            int l_comaId = 0; // no coma in the sentence
-            for(int jj = 0; jj < l_randomSubMeaning.size(); ++jj)
-            {
-                if(l_randomSubMeaning[jj] == ",")
-                {
-                    l_comaId = jj;
-                }
-            }
-
-        // split sequence
-            if(l_comaId != 0)
-            {
-                QStringList  l_part1;
-                QStringList  l_part2;
-                for(int jj = 0; jj < l_randomSubMeaning.size(); ++jj)
-                {
-                    if(jj < l_comaId)
-                    {
-                        l_part1 << l_randomSubMeaning[jj];
-                    }
-                    else if(jj > l_comaId)
-                    {
-                        l_part2 << l_randomSubMeaning[jj];
-                    }
-                }
-
-            // shuffle list
-                std::random_shuffle(l_part1.begin(), l_part1.end());
-                std::random_shuffle(l_part2.begin(), l_part2.end());
-                l_randomSubMeaning.clear();
-                l_randomSubMeaning << l_part1 << "," << l_part2;
-            }
-            else
-            {
-                std::random_shuffle(l_randomSubMeaning.begin(), l_randomSubMeaning.end());
-            }
-
-        subMeaning.push_back(l_randomSubMeaning);
-        subInfo.push_back(m_trainInfo[randomSentenceList[ii]]);
-        subSentence.push_back(m_trainSentence[randomSentenceList[ii]]);
-    }
-
-    for(int ii = 0; ii < m_trainMeaning.size(); ++ii)
+    for(int ii = 0; ii < m_trainSentence.size(); ++ii)
     {
         bool l_addSentence = true;
 
@@ -161,7 +83,48 @@ void Generalization::retrieveSubMeaningCorpusRandomized(std::vector<int> &random
             if(randomSentenceList[jj] == ii)
             {
                 l_addSentence = false;
-                break;
+
+                QStringList l_randomSubMeaning = m_trainMeaning[randomSentenceList[jj]];
+                // detect "," string
+                    int l_comaId = 0; // no coma in the sentence
+                    for(int kk = 0; kk < l_randomSubMeaning.size(); ++kk)
+                    {
+                        if(l_randomSubMeaning[kk] == ",")
+                        {
+                            l_comaId = kk;
+                        }
+                    }
+                // split sequence
+                    if(l_comaId != 0)
+                    {
+                        QStringList  l_part1;
+                        QStringList  l_part2;
+                        for(int kk = 0; kk < l_randomSubMeaning.size(); ++kk)
+                        {
+                            if(kk < l_comaId)
+                            {
+                                l_part1 << l_randomSubMeaning[kk];
+                            }
+                            else if(kk > l_comaId)
+                            {
+                                l_part2 << l_randomSubMeaning[kk];
+                            }
+                        }
+                    // shuffle list
+                        std::random_shuffle(l_part1.begin(), l_part1.end());
+                        std::random_shuffle(l_part2.begin(), l_part2.end());
+                        l_randomSubMeaning.clear();
+                        l_randomSubMeaning << l_part1 << "," << l_part2;
+                    }
+                    else
+                    {
+                        std::random_shuffle(l_randomSubMeaning.begin(), l_randomSubMeaning.end());
+                    }
+
+                subMeaning.push_back(l_randomSubMeaning);
+                subInfo.push_back(m_trainInfo[randomSentenceList[jj]]);
+                subSentence.push_back(m_trainSentence[randomSentenceList[jj]]);
+
             }
         }
 
@@ -171,8 +134,8 @@ void Generalization::retrieveSubMeaningCorpusRandomized(std::vector<int> &random
             subInfo.push_back(m_trainInfo[ii]);
             subSentence.push_back(m_trainSentence[ii]);
         }
-    }
 
+    }
 }
 
 void Generalization::randomChangeCorpusGeneralization(cint numberRandomSentences, const QString pathRandomCorpus, cbool randomMeaning)

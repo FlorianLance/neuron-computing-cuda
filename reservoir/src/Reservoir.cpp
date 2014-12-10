@@ -42,10 +42,6 @@ Reservoir::Reservoir()
 
     m_useCudaInversion      = true;
     m_useCudaMultiplication = false;
-
-
-    cvNamedWindow("reservoir_display", CV_WINDOW_AUTOSIZE | CV_GUI_NORMAL);
-    cvMoveWindow("reservoir_display",200,200);
 }
 
 void Reservoir::setCudaProperties(cbool cudaInv, cbool cudaMult)
@@ -69,11 +65,6 @@ Reservoir::Reservoir(cuint nbNeurons, cfloat spectralRadius, cfloat inputScaling
         m_sparcity = 10.f/m_nbNeurons;
     }
     m_initialized = true;
-
-
-
-    cvNamedWindow("reservoir_display", CV_WINDOW_AUTOSIZE | CV_GUI_NORMAL);
-    cvMoveWindow("reservoir_display",200,200);
 }
 
 void Reservoir::setParameters(cuint nbNeurons, cfloat spectralRadius, cfloat inputScaling, cfloat leakRate, cfloat sparcity, cfloat ridge, cbool verbose)
@@ -433,10 +424,10 @@ void Reservoir::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher, 
                         }
                     }
 
-//                    save2DMatrixToTextStd("../data/display.txt", l_X);
-                    display *= 255;
-                    cv::imshow("reservoir_display", display);
-                    cv::waitKey(5);
+////                    save2DMatrixToTextStd("../data/display.txt", l_X);
+//                    display *= 255;
+//                    cv::imshow("reservoir_display", display);
+//                    cv::waitKey(5);
 
                     cv::Mat l_temp2(l_temp.rows + l_x.rows, 1, CV_32FC1);
 
@@ -463,20 +454,21 @@ void Reservoir::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher, 
                     }
                 }
 
-                if(ii==0)
-                {
-                    save2DMatrixToTextStd("../data/Results/X.txt", l_X);
-                    save2DMatrixToTextStd("../data/Results/Xt.txt", l_X.t());
-                }
-                else if(ii==1)
-                {
-                    save2DMatrixToTextStd("../data/Results/X2.txt", l_X);
-                    save2DMatrixToTextStd("../data/Results/Xt2.txt", l_X.t());
-                }
+//                if(ii==0)
+//                {
+//                    save2DMatrixToTextStd("../data/Results/X.txt", l_X);
+//                    save2DMatrixToTextStd("../data/Results/Xt.txt", l_X.t());
+//                }
+//                else if(ii==1)
+//                {
+//                    save2DMatrixToTextStd("../data/Results/X2.txt", l_X);
+//                    save2DMatrixToTextStd("../data/Results/Xt2.txt", l_X.t());
+//                }
 
             }
         // end pragma
-        std::cout << "]" << std::endl;
+        if(m_verbose)
+            std::cout << "]" << std::endl;
 
         l_X2Copy.release();
         l_xPrev2Copy.release();

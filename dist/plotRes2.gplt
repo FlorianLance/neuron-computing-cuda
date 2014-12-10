@@ -237,345 +237,345 @@ g(x)=c*x+d
 #set multiplot layout 3, 2 title "Analyse random sentence/meaning influence"
 
 ####################### corpus 1
-file = file11
-plot file u @corpus_id:@res5_id
-min_y = GPVAL_DATA_Y_MIN
-max_y = GPVAL_DATA_Y_MAX
-ylen = max_y - min_y
-min_x = GPVAL_DATA_X_MIN
-max_x = GPVAL_DATA_X_MAX
-set table "../dist/data/Results/mean.txt" # put the mean value out
-plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
-unset table
-set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
-plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
-unset table
-fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
-fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
-mean=f(0)               #mean value
-mean_squared=g(0)	#mean of the squared value
-standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
-standard_deviation2 = sqrt(-(mean_squared-mean**2))
-c1_min_y = min_y
-c1_max_y = max_y
-c1_mean  = mean
-c1_std   = standard_deviation2
-####################### corpus 2
-file = file12
-plot file u @corpus_id:@res5_id
-min_y = GPVAL_DATA_Y_MIN
-max_y = GPVAL_DATA_Y_MAX
-ylen = max_y - min_y
-min_x = GPVAL_DATA_X_MIN
-max_x = GPVAL_DATA_X_MAX
-set table "../dist/data/Results/mean.txt" # put the mean value out
-plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
-unset table
-set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
-plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
-unset table
-fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
-fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
-mean=f(0)               #mean value
-mean_squared=g(0)	#mean of the squared value
-standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
-standard_deviation2 = sqrt(-(mean_squared-mean**2))
-c2_min_y = min_y
-c2_max_y = max_y
-c2_mean  = mean
-c2_std   = standard_deviation2
-####################### corpus 3
-file = file13
-plot file u @corpus_id:@res5_id
-min_y = GPVAL_DATA_Y_MIN
-max_y = GPVAL_DATA_Y_MAX
-ylen = max_y - min_y
-min_x = GPVAL_DATA_X_MIN
-max_x = GPVAL_DATA_X_MAX
-set table "../dist/data/Results/mean.txt" # put the mean value out
-plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
-unset table
-set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
-plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
-unset table
-fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
-fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
-mean=f(0)               #mean value
-mean_squared=g(0)	#mean of the squared value
-standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
-standard_deviation2 = sqrt(-(mean_squared-mean**2))
-c3_min_y = min_y
-c3_max_y = max_y
-c3_mean  = mean
-c3_std   = standard_deviation2
-####################### corpus 4
-file = file14
-plot file u @corpus_id:@res5_id
-min_y = GPVAL_DATA_Y_MIN
-max_y = GPVAL_DATA_Y_MAX
-ylen = max_y - min_y
-min_x = GPVAL_DATA_X_MIN
-max_x = GPVAL_DATA_X_MAX
-set table "../dist/data/Results/mean.txt" # put the mean value out
-plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
-unset table
-set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
-plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
-unset table
-fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
-fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
-mean=f(0)               #mean value
-mean_squared=g(0)	#mean of the squared value
-standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
-standard_deviation2 = sqrt(-(mean_squared-mean**2))
-c4_min_y = min_y
-c4_max_y = max_y
-c4_mean  = mean
-c4_std   = standard_deviation2
-####################### corpus 5
-file = file15
-plot file u @corpus_id:@res5_id
-min_y = GPVAL_DATA_Y_MIN
-max_y = GPVAL_DATA_Y_MAX
-ylen = max_y - min_y
-min_x = GPVAL_DATA_X_MIN
-max_x = GPVAL_DATA_X_MAX
-set table "../dist/data/Results/mean.txt" # put the mean value out
-plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
-unset table
-set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
-plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
-unset table
-fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
-fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
-mean=f(0)               #mean value
-mean_squared=g(0)	#mean of the squared value
-standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
-standard_deviation2 = sqrt(-(mean_squared-mean**2))
-c5_min_y = min_y
-c5_max_y = max_y
-c5_mean  = mean
-c5_std   = standard_deviation2
-####################### corpus 6
-file = file16
-plot file u @corpus_id:@res5_id
-min_y = GPVAL_DATA_Y_MIN
-max_y = GPVAL_DATA_Y_MAX
-ylen = max_y - min_y
-min_x = GPVAL_DATA_X_MIN
-max_x = GPVAL_DATA_X_MAX
-set table "../dist/data/Results/mean.txt" # put the mean value out
-plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
-unset table
-set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
-plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
-unset table
-fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
-fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
-mean=f(0)               #mean value
-mean_squared=g(0)	#mean of the squared value
-standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
-standard_deviation2 = sqrt(-(mean_squared-mean**2))
-c6_min_y = min_y
-c6_max_y = max_y
-c6_mean  = mean
-c6_std   = standard_deviation2
-####################### corpus 7
-file = file17
-plot file u @corpus_id:@res5_id
-min_y = GPVAL_DATA_Y_MIN
-max_y = GPVAL_DATA_Y_MAX
-ylen = max_y - min_y
-min_x = GPVAL_DATA_X_MIN
-max_x = GPVAL_DATA_X_MAX
-set table "../dist/data/Results/mean.txt" # put the mean value out
-plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
-unset table
-set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
-plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
-unset table
-fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
-fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
-mean=f(0)               #mean value
-mean_squared=g(0)	#mean of the squared value
-standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
-standard_deviation2 = sqrt(-(mean_squared-mean**2))
-c7_min_y = min_y
-c7_max_y = max_y
-c7_mean  = mean
-c7_std   = standard_deviation2
-####################### corpus 7
-file = file18
-plot file u @corpus_id:@res5_id
-min_y = GPVAL_DATA_Y_MIN
-max_y = GPVAL_DATA_Y_MAX
-ylen = max_y - min_y
-min_x = GPVAL_DATA_X_MIN
-max_x = GPVAL_DATA_X_MAX
-set table "../dist/data/Results/mean.txt" # put the mean value out
-plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
-unset table
-set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
-plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
-unset table
-fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
-fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
-mean=f(0)               #mean value
-mean_squared=g(0)	#mean of the squared value
-standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
-standard_deviation2 = sqrt(-(mean_squared-mean**2))
-c8_min_y = min_y
-c8_max_y = max_y
-c8_mean  = mean
-c8_std   = standard_deviation2
-####################### corpus 7
-file = file19
-plot file u @corpus_id:@res5_id
-min_y = GPVAL_DATA_Y_MIN
-max_y = GPVAL_DATA_Y_MAX
-ylen = max_y - min_y
-min_x = GPVAL_DATA_X_MIN
-max_x = GPVAL_DATA_X_MAX
-set table "../dist/data/Results/mean.txt" # put the mean value out
-plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
-unset table
-set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
-plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
-unset table
-fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
-fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
-mean=f(0)               #mean value
-mean_squared=g(0)	#mean of the squared value
-standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
-standard_deviation2 = sqrt(-(mean_squared-mean**2))
-c9_min_y = min_y
-c9_max_y = max_y
-c9_mean  = mean
-c9_std   = standard_deviation2
+#file = file11
+#plot file u @corpus_id:@res5_id
+#min_y = GPVAL_DATA_Y_MIN
+#max_y = GPVAL_DATA_Y_MAX
+#ylen = max_y - min_y
+#min_x = GPVAL_DATA_X_MIN
+#max_x = GPVAL_DATA_X_MAX
+#set table "../dist/data/Results/mean.txt" # put the mean value out
+#plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
+#unset table
+#set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
+#plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
+#unset table
+#fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
+#fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
+#mean=f(0)               #mean value
+#mean_squared=g(0)	#mean of the squared value
+#standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
+#standard_deviation2 = sqrt(-(mean_squared-mean**2))
+#c1_min_y = min_y
+#c1_max_y = max_y
+#c1_mean  = mean
+#c1_std   = standard_deviation2
+######################## corpus 2
+#file = file12
+#plot file u @corpus_id:@res5_id
+#min_y = GPVAL_DATA_Y_MIN
+#max_y = GPVAL_DATA_Y_MAX
+#ylen = max_y - min_y
+#min_x = GPVAL_DATA_X_MIN
+#max_x = GPVAL_DATA_X_MAX
+#set table "../dist/data/Results/mean.txt" # put the mean value out
+#plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
+#unset table
+#set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
+#plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
+#unset table
+#fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
+#fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
+#mean=f(0)               #mean value
+#mean_squared=g(0)	#mean of the squared value
+#standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
+#standard_deviation2 = sqrt(-(mean_squared-mean**2))
+#c2_min_y = min_y
+#c2_max_y = max_y
+#c2_mean  = mean
+#c2_std   = standard_deviation2
+######################## corpus 3
+#file = file13
+#plot file u @corpus_id:@res5_id
+#min_y = GPVAL_DATA_Y_MIN
+#max_y = GPVAL_DATA_Y_MAX
+#ylen = max_y - min_y
+#min_x = GPVAL_DATA_X_MIN
+#max_x = GPVAL_DATA_X_MAX
+#set table "../dist/data/Results/mean.txt" # put the mean value out
+#plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
+#unset table
+#set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
+#plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
+#unset table
+#fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
+#fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
+#mean=f(0)               #mean value
+#mean_squared=g(0)	#mean of the squared value
+#standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
+#standard_deviation2 = sqrt(-(mean_squared-mean**2))
+#c3_min_y = min_y
+#c3_max_y = max_y
+#c3_mean  = mean
+#c3_std   = standard_deviation2
+######################## corpus 4
+#file = file14
+#plot file u @corpus_id:@res5_id
+#min_y = GPVAL_DATA_Y_MIN
+#max_y = GPVAL_DATA_Y_MAX
+#ylen = max_y - min_y
+#min_x = GPVAL_DATA_X_MIN
+#max_x = GPVAL_DATA_X_MAX
+#set table "../dist/data/Results/mean.txt" # put the mean value out
+#plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
+#unset table
+#set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
+#plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
+#unset table
+#fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
+#fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
+#mean=f(0)               #mean value
+#mean_squared=g(0)	#mean of the squared value
+#standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
+#standard_deviation2 = sqrt(-(mean_squared-mean**2))
+#c4_min_y = min_y
+#c4_max_y = max_y
+#c4_mean  = mean
+#c4_std   = standard_deviation2
+######################## corpus 5
+#file = file15
+#plot file u @corpus_id:@res5_id
+#min_y = GPVAL_DATA_Y_MIN
+#max_y = GPVAL_DATA_Y_MAX
+#ylen = max_y - min_y
+#min_x = GPVAL_DATA_X_MIN
+#max_x = GPVAL_DATA_X_MAX
+#set table "../dist/data/Results/mean.txt" # put the mean value out
+#plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
+#unset table
+#set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
+#plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
+#unset table
+#fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
+#fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
+#mean=f(0)               #mean value
+#mean_squared=g(0)	#mean of the squared value
+#standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
+#standard_deviation2 = sqrt(-(mean_squared-mean**2))
+#c5_min_y = min_y
+#c5_max_y = max_y
+#c5_mean  = mean
+#c5_std   = standard_deviation2
+######################## corpus 6
+#file = file16
+#plot file u @corpus_id:@res5_id
+#min_y = GPVAL_DATA_Y_MIN
+#max_y = GPVAL_DATA_Y_MAX
+#ylen = max_y - min_y
+#min_x = GPVAL_DATA_X_MIN
+#max_x = GPVAL_DATA_X_MAX
+#set table "../dist/data/Results/mean.txt" # put the mean value out
+#plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
+#unset table
+#set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
+#plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
+#unset table
+#fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
+#fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
+#mean=f(0)               #mean value
+#mean_squared=g(0)	#mean of the squared value
+#standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
+#standard_deviation2 = sqrt(-(mean_squared-mean**2))
+#c6_min_y = min_y
+#c6_max_y = max_y
+#c6_mean  = mean
+#c6_std   = standard_deviation2
+######################## corpus 7
+#file = file17
+#plot file u @corpus_id:@res5_id
+#min_y = GPVAL_DATA_Y_MIN
+#max_y = GPVAL_DATA_Y_MAX
+#ylen = max_y - min_y
+#min_x = GPVAL_DATA_X_MIN
+#max_x = GPVAL_DATA_X_MAX
+#set table "../dist/data/Results/mean.txt" # put the mean value out
+#plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
+#unset table
+#set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
+#plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
+#unset table
+#fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
+#fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
+#mean=f(0)               #mean value
+#mean_squared=g(0)	#mean of the squared value
+#standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
+#standard_deviation2 = sqrt(-(mean_squared-mean**2))
+#c7_min_y = min_y
+#c7_max_y = max_y
+#c7_mean  = mean
+#c7_std   = standard_deviation2
+######################## corpus 7
+#file = file18
+#plot file u @corpus_id:@res5_id
+#min_y = GPVAL_DATA_Y_MIN
+#max_y = GPVAL_DATA_Y_MAX
+#ylen = max_y - min_y
+#min_x = GPVAL_DATA_X_MIN
+#max_x = GPVAL_DATA_X_MAX
+#set table "../dist/data/Results/mean.txt" # put the mean value out
+#plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
+#unset table
+#set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
+#plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
+#unset table
+#fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
+#fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
+#mean=f(0)               #mean value
+#mean_squared=g(0)	#mean of the squared value
+#standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
+#standard_deviation2 = sqrt(-(mean_squared-mean**2))
+#c8_min_y = min_y
+#c8_max_y = max_y
+#c8_mean  = mean
+#c8_std   = standard_deviation2
+######################## corpus 7
+#file = file19
+#plot file u @corpus_id:@res5_id
+#min_y = GPVAL_DATA_Y_MIN
+#max_y = GPVAL_DATA_Y_MAX
+#ylen = max_y - min_y
+#min_x = GPVAL_DATA_X_MIN
+#max_x = GPVAL_DATA_X_MAX
+#set table "../dist/data/Results/mean.txt" # put the mean value out
+#plot file u ((min_x + max_x)/2.0):@res5_id smooth unique w p
+#unset table
+#set table "../dist/data/Results/mean_squared.txt"	#put the mean of squared value out
+#plot file u ((max_x + min_x)/2.0):(@res5_id**2) smooth unique w p
+#unset table
+#fit f(x) "../dist/data/Results/mean.txt" u 0:2 via a,b	#Read the mean and mean of squared value
+#fit g(x) "../dist/data/Results/mean_squared.txt" u 0:2 via c,d
+#mean=f(0)               #mean value
+#mean_squared=g(0)	#mean of the squared value
+#standard_deviation=sqrt(mean_squared-mean**2)	#standard deviation
+#standard_deviation2 = sqrt(-(mean_squared-mean**2))
+#c9_min_y = min_y
+#c9_max_y = max_y
+#c9_mean  = mean
+#c9_std   = standard_deviation2
 
 
-set output "../dist/data/Results/random1.png"
-set terminal png size 2500,1500
-set multiplot layout 2, 2 title "Analyse random sentence/meaning influence"
+#set output "../dist/data/Results/random1.png"
+#set terminal png size 2500,1500
+#set multiplot layout 2, 2 title "Analyse random sentence/meaning influence"
 
 
 
 ################################ test
 
 
-#min_x = random_sentence_min_x
-#max_x = random_sentence_max_x
-#min_y = random_sentence_min_y
-#max_y = random_sentence_max_y
-#mean  = random_sentence_mean
-#std   = random_sentence_std
+##min_x = random_sentence_min_x
+##max_x = random_sentence_max_x
+##min_y = random_sentence_min_y
+##max_y = random_sentence_max_y
+##mean  = random_sentence_mean
+##std   = random_sentence_std
 
-#set xlabel "word correct position %";
-#set ylabel "gramar correct position %";
-#set label 1 at (min_x+max_x)/7.,max_y "max" offset 0,0.5
-#set label 2 at (min_x+max_x)/7.,min_y "min" offset 0,-0.5
-#set label 3 at (min_x+max_x)/7.,mean "mean" offset 0,0.5
-#set label 4 at (min_x+max_x)/9.,std "std" offset 0,0.5
+##set xlabel "word correct position %";
+##set ylabel "gramar correct position %";
+##set label 1 at (min_x+max_x)/7.,max_y "max" offset 0,0.5
+##set label 2 at (min_x+max_x)/7.,min_y "min" offset 0,-0.5
+##set label 3 at (min_x+max_x)/7.,mean "mean" offset 0,0.5
+##set label 4 at (min_x+max_x)/9.,std "std" offset 0,0.5
 
-#set style boxplot nooutliers
-print c1_min_y
-print c1_max_y
-print c1_mean
-print c1_std
-print c1_mean-c1_std
-print c1_std-c1_mean
-print c1_mean + c1_mean - c1_std
-print c1_std + c1_std - c1_mean
-
-
-set xrange [-1:9]
-set yrange [-5:105]
-set ytics 0,10,100
-
-set xtics 0,1,8;
-
-set xlabel "corpus id"
-set ylabel "gramar absolute correct position %"
+##set style boxplot nooutliers
+#print c1_min_y
+#print c1_max_y
+#print c1_mean
+#print c1_std
+#print c1_mean-c1_std
+#print c1_std-c1_mean
+#print c1_mean + c1_mean - c1_std
+#print c1_std + c1_std - c1_mean
 
 
-plot file11 u @corpus_id:@res5_id:(0.1) t title1 w boxplot, \
-     file12 u @corpus_id:@res5_id:(0.1) t title2 w boxplot, \
-     file13 u @corpus_id:@res5_id:(0.1) t title3 w boxplot, \
-     file14 u @corpus_id:@res5_id:(0.1) t title4 w boxplot, \
-     file15 u @corpus_id:@res5_id:(0.1) t title5 w boxplot, \
-     file16 u @corpus_id:@res5_id:(0.1) t title6 w boxplot, \
-     file17 u @corpus_id:@res5_id:(0.1) t title7 w boxplot, \
-     file18 u @corpus_id:@res5_id:(0.1) t title8 w boxplot, \
-     file19 u @corpus_id:@res5_id:(0.1) t title9 w boxplot
+#set xrange [-1:9]
+#set yrange [-5:105]
+#set ytics 0,10,100
 
-set xrange [-1:5]
-set xtics 0,1,4;
-plot file11 u @corpus_id:@res5_id:(0.1) t title1 w boxplot, \
-     file16 u (1):@res5_id:(0.1) t title_6 w boxplot, \
-     file17 u (2):@res5_id:(0.1) t title_7 w boxplot, \
-     file18 u (3):@res5_id:(0.1) t title_8 w boxplot, \
-     file19 u (4):@res5_id:(0.1) t title_9 w boxplot
+#set xtics 0,1,8;
 
-set xrange [-1:5]
-set xtics 0,1,4;
-plot file11 u @corpus_id:@res5_id:(0.1) t title1 w boxplot, \
-     file12 u (1):@res5_id:(0.1) t title2 w boxplot, \
-     file13 u (2):@res5_id:(0.1) t title3 w boxplot, \
-     file14 u (3):@res5_id:(0.1) t title4 w boxplot, \
-     file15 u (4):@res5_id:(0.1) t title5 w boxplot
+#set xlabel "corpus id"
+#set ylabel "gramar absolute correct position %"
 
 
-set xrange [-1:9]
-set xtics 0,1,8;
+#plot file11 u @corpus_id:@res5_id:(0.1) t title1 w boxplot, \
+#     file12 u @corpus_id:@res5_id:(0.1) t title2 w boxplot, \
+#     file13 u @corpus_id:@res5_id:(0.1) t title3 w boxplot, \
+#     file14 u @corpus_id:@res5_id:(0.1) t title4 w boxplot, \
+#     file15 u @corpus_id:@res5_id:(0.1) t title5 w boxplot, \
+#     file16 u @corpus_id:@res5_id:(0.1) t title6 w boxplot, \
+#     file17 u @corpus_id:@res5_id:(0.1) t title7 w boxplot, \
+#     file18 u @corpus_id:@res5_id:(0.1) t title8 w boxplot, \
+#     file19 u @corpus_id:@res5_id:(0.1) t title9 w boxplot
 
-set label 1 at 4,5 "box min -> mean - 3*(mean-std)" offset 0,0.5
-set label 2 at 4,1 "box hight -> mean + 3*(mean-std)" offset 0,0.5
-set label 3 at 4,-2 "whisker min -> min value" offset 0,0.5
-set label 4 at 4,-5 "whisker hight -> max value" offset 0,0.5
+#set xrange [-1:5]
+#set xtics 0,1,4;
+#plot file11 u @corpus_id:@res5_id:(0.1) t title1 w boxplot, \
+#     file16 u (1):@res5_id:(0.1) t title_6 w boxplot, \
+#     file17 u (2):@res5_id:(0.1) t title_7 w boxplot, \
+#     file18 u (3):@res5_id:(0.1) t title_8 w boxplot, \
+#     file19 u (4):@res5_id:(0.1) t title_9 w boxplot
 
-plot file11 u @corpus_id:(c1_mean - 3*(c1_mean - c1_std)):(c1_min_y):(c1_max_y):(c1_mean + 3*(c1_mean - c1_std)) t title1 w candlesticks, \
-     file12 u @corpus_id:(c2_mean - 3*(c2_mean - c2_std)):(c2_min_y):(c2_max_y):(c2_mean + 3*(c2_mean - c2_std)) t title2 w candlesticks, \
-     file13 u @corpus_id:(c3_mean - 3*(c3_mean - c3_std)):(c3_min_y):(c3_max_y):(c3_mean + 3*(c3_mean - c3_std)) t title3 w candlesticks, \
-     file14 u @corpus_id:(c4_mean - 3*(c4_mean - c4_std)):(c4_min_y):(c4_max_y):(c4_mean + 3*(c4_mean - c4_std)) t title4 w candlesticks, \
-     file15 u @corpus_id:(c5_mean - 3*(c5_mean - c5_std)):(c5_min_y):(c5_max_y):(c5_mean + 3*(c5_mean - c5_std)) t title5 w candlesticks, \
-     file16 u @corpus_id:(c6_mean - 3*(c6_mean - c6_std)):(c6_min_y):(c6_max_y):(c6_mean + 3*(c6_mean - c6_std)) t title6 w candlesticks, \
-     file17 u @corpus_id:(c7_mean - 3*(c7_mean - c7_std)):(c7_min_y):(c7_max_y):(c7_mean + 3*(c7_mean - c7_std)) t title7 w candlesticks, \
-     file18 u @corpus_id:(c8_mean - 3*(c8_mean - c8_std)):(c8_min_y):(c8_max_y):(c8_mean + 3*(c8_mean - c8_std)) t title8 w candlesticks, \
-     file19 u @corpus_id:(c9_mean - 3*(c9_mean - c9_std)):(c9_min_y):(c9_max_y):(c9_mean + 3*(c9_mean - c9_std)) t title9 w candlesticks
+#set xrange [-1:5]
+#set xtics 0,1,4;
+#plot file11 u @corpus_id:@res5_id:(0.1) t title1 w boxplot, \
+#     file12 u (1):@res5_id:(0.1) t title2 w boxplot, \
+#     file13 u (2):@res5_id:(0.1) t title3 w boxplot, \
+#     file14 u (3):@res5_id:(0.1) t title4 w boxplot, \
+#     file15 u (4):@res5_id:(0.1) t title5 w boxplot
 
-unset multiplot
-set output "../dist/data/Results/random2.png"
-set terminal png size 1500,2000
-set multiplot layout 2, 1 title "Analyse random sentence/meaning influence"
 
-unset label
-set xlabel "corpus id"
-set ylabel "gramar absolute correct position %"
+#set xrange [-1:9]
+#set xtics 0,1,8;
 
-set key left bottom
+#set label 1 at 4,5 "box min -> mean - 3*(mean-std)" offset 0,0.5
+#set label 2 at 4,1 "box hight -> mean + 3*(mean-std)" offset 0,0.5
+#set label 3 at 4,-2 "whisker min -> min value" offset 0,0.5
+#set label 4 at 4,-5 "whisker hight -> max value" offset 0,0.5
 
-plot file20 u @corpus_id:@res5_id:(0.1) t title1 w boxplot, \
-     file21 u @corpus_id:@res5_id:(0.1) t title2 w boxplot, \
-     file22 u @corpus_id:@res5_id:(0.1) t title3 w boxplot, \
-     file23 u @corpus_id:@res5_id:(0.1) t title4 w boxplot, \
-     file24 u @corpus_id:@res5_id:(0.1) t title5 w boxplot, \
-     file25 u @corpus_id:@res5_id:(0.1) t title6 w boxplot, \
-     file26 u @corpus_id:@res5_id:(0.1) t title7 w boxplot, \
-     file27 u @corpus_id:@res5_id:(0.1) t title8 w boxplot, \
-     file28 u @corpus_id:@res5_id:(0.1) t title9 w boxplot
+#plot file11 u @corpus_id:(c1_mean - 3*(c1_mean - c1_std)):(c1_min_y):(c1_max_y):(c1_mean + 3*(c1_mean - c1_std)) t title1 w candlesticks, \
+#     file12 u @corpus_id:(c2_mean - 3*(c2_mean - c2_std)):(c2_min_y):(c2_max_y):(c2_mean + 3*(c2_mean - c2_std)) t title2 w candlesticks, \
+#     file13 u @corpus_id:(c3_mean - 3*(c3_mean - c3_std)):(c3_min_y):(c3_max_y):(c3_mean + 3*(c3_mean - c3_std)) t title3 w candlesticks, \
+#     file14 u @corpus_id:(c4_mean - 3*(c4_mean - c4_std)):(c4_min_y):(c4_max_y):(c4_mean + 3*(c4_mean - c4_std)) t title4 w candlesticks, \
+#     file15 u @corpus_id:(c5_mean - 3*(c5_mean - c5_std)):(c5_min_y):(c5_max_y):(c5_mean + 3*(c5_mean - c5_std)) t title5 w candlesticks, \
+#     file16 u @corpus_id:(c6_mean - 3*(c6_mean - c6_std)):(c6_min_y):(c6_max_y):(c6_mean + 3*(c6_mean - c6_std)) t title6 w candlesticks, \
+#     file17 u @corpus_id:(c7_mean - 3*(c7_mean - c7_std)):(c7_min_y):(c7_max_y):(c7_mean + 3*(c7_mean - c7_std)) t title7 w candlesticks, \
+#     file18 u @corpus_id:(c8_mean - 3*(c8_mean - c8_std)):(c8_min_y):(c8_max_y):(c8_mean + 3*(c8_mean - c8_std)) t title8 w candlesticks, \
+#     file19 u @corpus_id:(c9_mean - 3*(c9_mean - c9_std)):(c9_min_y):(c9_max_y):(c9_mean + 3*(c9_mean - c9_std)) t title9 w candlesticks
 
-set xlabel "corpus id"
-set ylabel "all words absolute correct position %"
+#unset multiplot
+#set output "../dist/data/Results/random2.png"
+#set terminal png size 1500,2000
+#set multiplot layout 2, 1 title "Analyse random sentence/meaning influence"
 
-plot file20 u @corpus_id:@res2_id:(0.1) t title1 w boxplot, \
-     file21 u @corpus_id:@res2_id:(0.1) t title2 w boxplot, \
-     file22 u @corpus_id:@res2_id:(0.1) t title3 w boxplot, \
-     file23 u @corpus_id:@res2_id:(0.1) t title4 w boxplot, \
-     file24 u @corpus_id:@res2_id:(0.1) t title5 w boxplot, \
-     file25 u @corpus_id:@res2_id:(0.1) t title6 w boxplot, \
-     file26 u @corpus_id:@res2_id:(0.1) t title7 w boxplot, \
-     file27 u @corpus_id:@res2_id:(0.1) t title8 w boxplot, \
-     file28 u @corpus_id:@res2_id:(0.1) t title9 w boxplot
+#unset label
+#set xlabel "corpus id"
+#set ylabel "gramar absolute correct position %"
+
+#set key left bottom
+
+#plot file20 u @corpus_id:@res5_id:(0.1) t title1 w boxplot, \
+#     file21 u @corpus_id:@res5_id:(0.1) t title2 w boxplot, \
+#     file22 u @corpus_id:@res5_id:(0.1) t title3 w boxplot, \
+#     file23 u @corpus_id:@res5_id:(0.1) t title4 w boxplot, \
+#     file24 u @corpus_id:@res5_id:(0.1) t title5 w boxplot, \
+#     file25 u @corpus_id:@res5_id:(0.1) t title6 w boxplot, \
+#     file26 u @corpus_id:@res5_id:(0.1) t title7 w boxplot, \
+#     file27 u @corpus_id:@res5_id:(0.1) t title8 w boxplot, \
+#     file28 u @corpus_id:@res5_id:(0.1) t title9 w boxplot
+
+#set xlabel "corpus id"
+#set ylabel "all words absolute correct position %"
+
+#plot file20 u @corpus_id:@res2_id:(0.1) t title1 w boxplot, \
+#     file21 u @corpus_id:@res2_id:(0.1) t title2 w boxplot, \
+#     file22 u @corpus_id:@res2_id:(0.1) t title3 w boxplot, \
+#     file23 u @corpus_id:@res2_id:(0.1) t title4 w boxplot, \
+#     file24 u @corpus_id:@res2_id:(0.1) t title5 w boxplot, \
+#     file25 u @corpus_id:@res2_id:(0.1) t title6 w boxplot, \
+#     file26 u @corpus_id:@res2_id:(0.1) t title7 w boxplot, \
+#     file27 u @corpus_id:@res2_id:(0.1) t title8 w boxplot, \
+#     file28 u @corpus_id:@res2_id:(0.1) t title9 w boxplot
 
 
 
@@ -596,17 +596,43 @@ file = "../dist/data/Results/random_res/grid_search_raw.txt"
 unset multiplot
 set output "../dist/data/Results/boxplot.png"
 set terminal png size 2000,2000
-set multiplot layout 2, 2 title "Analyse random sentence influence"
+#set multiplot layout 2, 1 title "Analyse random meaning/sentences influence (corpus 120 - 3000 neurons)"
+set multiplot layout 2, 1 title "Analyse random meaning/sentences influence (corpus jap - 500 neurons)"
 
-set xrange [-1:6]
-set xtics 0,1,5;
+set xrange [-1:11]
+set xtics 0,1,10;
+#set xrange [-1:9]
+#set xtics 0,1,8;
 
-title1 = "Corpus 0 -> jap : 24-0r"
-title2 = "Corpus 1 -> jap : 24-5r"
-title3 = "Corpus 2 -> jap : 24-10r"
-title4 = "Corpus 3 -> jap : 24-15r"
-title5 = "Corpus 4 -> jap : 24-20r"
-title6 = "Corpus 5 -> jap : 24-24r"
+
+set yrange [-10:110]
+set ytics 0,10,100;
+
+set key left bottom
+
+title1 = "Corpus 0 -> jap : 24-no_random"
+title7 = "Corpus 1 -> jap : 24-5r_meaning"
+title8 = "Corpus 2 -> jap : 24-10r_meaning"
+title9 = "Corpus 3 -> jap : 24-15r_meaning"
+title10 = "Corpus 4 -> jap : 24-20r_meaning"
+title11 = "Corpus 5 -> jap : 24-24r_meaning"
+title2 = "Corpus 6 -> jap : 24-5r_sentence"
+title3 = "Corpus 7 -> jap : 24-10r_sentence"
+title4 = "Corpus 8 -> jap : 24-15r_sentence"
+title5 = "Corpus 9 -> jap : 24-20r_sentence"
+title6 = "Corpus 10 -> jap : 24-24r_sentence"
+
+#title1 = "Corpus 0 -> 120 : 120-no_random"
+#title2 = "Corpus 1 -> 120 : 120-30r_meaning"
+#title3 = "Corpus 2 -> 120 : 120-60r_meaning"
+#title4 = "Corpus 3 -> 120 : 120-90r_meaning"
+#title5 = "Corpus 4 -> 120 : 120-120r_meaning"
+#title6 = "Corpus 5 -> 120 : 120-30r_sentence"
+#title7 = "Corpus 6 -> 120 : 120-60r_sentence"
+#title8 = "Corpus 7 -> 120 : 120-90r_sentence"
+#title9 = "Corpus 8 -> 120 : 120-120r_sentence"
+
+
 
 set xlabel "corpus id"
 set ylabel "grammar absolute correct position %"
@@ -616,15 +642,35 @@ plot file u ($1==0?$1:1/0):@res1_id:(0.1) t title1 w boxplot, \
      file u ($1==2?$1:1/0):@res1_id:(0.1) t title3 w boxplot, \
      file u ($1==3?$1:1/0):@res1_id:(0.1) t title4 w boxplot, \
      file u ($1==4?$1:1/0):@res1_id:(0.1) t title5 w boxplot, \
-     file u ($1==5?$1:1/0):@res1_id:(0.1) t title6 w boxplot
+     file u ($1==5?$1:1/0):@res1_id:(0.1) t title6 w boxplot, \
+     file u ($1==6?$1:1/0):@res1_id:(0.1) t title7 w boxplot, \
+     file u ($1==7?$1:1/0):@res1_id:(0.1) t title8 w boxplot, \
+     file u ($1==8?$1:1/0):@res1_id:(0.1) t title9 w boxplot, \
+     file u ($1==9?$1:1/0):@res1_id:(0.1) t title10 w boxplot,\
+     file u ($1==10?$1:1/0):@res1_id:(0.1) t title11 w boxplot
 
-set ylabel "grammar correct position %"
-plot file u ($1==0?$1:1/0):@res2_id:(0.1) t title1 w boxplot, \
-     file u ($1==1?$1:1/0):@res2_id:(0.1) t title2 w boxplot, \
-     file u ($1==2?$1:1/0):@res2_id:(0.1) t title3 w boxplot, \
-     file u ($1==3?$1:1/0):@res2_id:(0.1) t title4 w boxplot, \
-     file u ($1==4?$1:1/0):@res2_id:(0.1) t title5 w boxplot, \
-     file u ($1==5?$1:1/0):@res2_id:(0.1) t title6 w boxplot
+#plot file u ($1==0?$1:1/0):@res1_id:(0.1) t title1 w boxplot, \
+#     file u ($1==1?$1:1/0):@res1_id:(0.1) t title2 w boxplot, \
+#     file u ($1==2?$1:1/0):@res1_id:(0.1) t title3 w boxplot, \
+#     file u ($1==3?$1:1/0):@res1_id:(0.1) t title4 w boxplot, \
+#     file u ($1==4?$1:1/0):@res1_id:(0.1) t title5 w boxplot, \
+#     file u ($1==5?$1:1/0):@res1_id:(0.1) t title6 w boxplot, \
+#     file u ($1==6?$1:1/0):@res1_id:(0.1) t title7 w boxplot, \
+#     file u ($1==7?$1:1/0):@res1_id:(0.1) t title8 w boxplot, \
+#     file u ($1==8?$1:1/0):@res1_id:(0.1) t title9 w boxplot
+
+#set ylabel "grammar correct position %"
+#plot file u ($1==0?$1:1/0):@res2_id:(0.1) t title1 w boxplot, \
+#     file u ($1==1?$1:1/0):@res2_id:(0.1) t title2 w boxplot, \
+#     file u ($1==2?$1:1/0):@res2_id:(0.1) t title3 w boxplot, \
+#     file u ($1==3?$1:1/0):@res2_id:(0.1) t title4 w boxplot, \
+#     file u ($1==4?$1:1/0):@res2_id:(0.1) t title5 w boxplot, \
+#     file u ($1==5?$1:1/0):@res2_id:(0.1) t title6 w boxplot, \
+#     file u ($1==6?$1:1/0):@res2_id:(0.1) t title7 w boxplot, \
+#     file u ($1==7?$1:1/0):@res2_id:(0.1) t title8 w boxplot, \
+#     file u ($1==8?$1:1/0):@res2_id:(0.1) t title9 w boxplot, \
+#     file u ($1==9?$1:1/0):@res2_id:(0.1) t title10 w boxplot,\
+#     file u ($1==10?$1:1/0):@res2_id:(0.1) t title11 w boxplot
 
 set ylabel "all words absolute correct position %"
 plot file u ($1==0?$1:1/0):@res3_id:(0.1) t title1 w boxplot, \
@@ -632,45 +678,61 @@ plot file u ($1==0?$1:1/0):@res3_id:(0.1) t title1 w boxplot, \
      file u ($1==2?$1:1/0):@res3_id:(0.1) t title3 w boxplot, \
      file u ($1==3?$1:1/0):@res3_id:(0.1) t title4 w boxplot, \
      file u ($1==4?$1:1/0):@res3_id:(0.1) t title5 w boxplot, \
-     file u ($1==5?$1:1/0):@res3_id:(0.1) t title6 w boxplot
+     file u ($1==5?$1:1/0):@res3_id:(0.1) t title6 w boxplot, \
+     file u ($1==6?$1:1/0):@res3_id:(0.1) t title7 w boxplot, \
+     file u ($1==7?$1:1/0):@res3_id:(0.1) t title8 w boxplot, \
+     file u ($1==8?$1:1/0):@res3_id:(0.1) t title9 w boxplot, \
+     file u ($1==9?$1:1/0):@res3_id:(0.1) t title10 w boxplot,\
+     file u ($1==10?$1:1/0):@res3_id:(0.1) t title11 w boxplot
 
-set ylabel "all words correct position %"
-plot file u ($1==0?$1:1/0):@res4_id:(0.1) t title1 w boxplot, \
-     file u ($1==1?$1:1/0):@res4_id:(0.1) t title2 w boxplot, \
-     file u ($1==2?$1:1/0):@res4_id:(0.1) t title3 w boxplot, \
-     file u ($1==3?$1:1/0):@res4_id:(0.1) t title4 w boxplot, \
-     file u ($1==4?$1:1/0):@res4_id:(0.1) t title5 w boxplot, \
-     file u ($1==5?$1:1/0):@res4_id:(0.1) t title6 w boxplot
+#plot file u ($1==0?$1:1/0):@res3_id:(0.1) t title1 w boxplot, \
+#     file u ($1==1?$1:1/0):@res3_id:(0.1) t title2 w boxplot, \
+#     file u ($1==2?$1:1/0):@res3_id:(0.1) t title3 w boxplot, \
+#     file u ($1==3?$1:1/0):@res3_id:(0.1) t title4 w boxplot, \
+#     file u ($1==4?$1:1/0):@res3_id:(0.1) t title5 w boxplot, \
+#     file u ($1==5?$1:1/0):@res3_id:(0.1) t title6 w boxplot, \
+#     file u ($1==6?$1:1/0):@res3_id:(0.1) t title7 w boxplot, \
+#     file u ($1==7?$1:1/0):@res3_id:(0.1) t title8 w boxplot, \
+#     file u ($1==8?$1:1/0):@res3_id:(0.1) t title9 w boxplot
+
+
+#set ylabel "all words correct position %"
+#plot file u ($1==0?$1:1/0):@res4_id:(0.1) t title1 w boxplot, \
+#     file u ($1==1?$1:1/0):@res4_id:(0.1) t title2 w boxplot, \
+#     file u ($1==2?$1:1/0):@res4_id:(0.1) t title3 w boxplot, \
+#     file u ($1==3?$1:1/0):@res4_id:(0.1) t title4 w boxplot, \
+#     file u ($1==4?$1:1/0):@res4_id:(0.1) t title5 w boxplot, \
+#     file u ($1==5?$1:1/0):@res4_id:(0.1) t title6 w boxplot
 
 ############################################################################################ plot Wout
 
-file = "../dist/data/Results/Xt.txt"
-#file = "../dist/data/Results/random_res/grid_search_raw.txt"
+#file = "../dist/data/Results/Xt.txt"
+##file = "../dist/data/Results/random_res/grid_search_raw.txt"
 
-unset multiplot
-set output "../dist/data/Results/Xt.png"
-set terminal png size 2000,2000
-set multiplot layout 1, 1 title "Xt"
+#unset multiplot
+#set output "../dist/data/Results/Xt.png"
+#set terminal png size 2000,2000
+#set multiplot layout 1, 1 title "Xt"
 
-unset label
-unset xlabel
-unset ylabel
-unset xrange
-unset xtics
-unset yrange
-unset ytics
+#unset label
+#unset xlabel
+#unset ylabel
+#unset xrange
+#unset xtics
+#unset yrange
+#unset ytics
 
 
-set xrange [0:1100]
-set xtics 0,65,1100
-set ytics 0,10,500
-set yrange [0:500]
-##set yrange [0:190]
-##set ytics -0,10,190
-#set key right top
+#set xrange [0:1100]
+#set xtics 0,65,1100
+#set ytics 0,10,500
+#set yrange [0:500]
+###set yrange [0:190]
+###set ytics -0,10,190
+##set key right top
 
-set pm3d map
-splot file matrix
+#set pm3d map
+#splot file matrix
 
 #plot file u 1 t "-ga" w linespoint ls 1, \
 #     file u 2 t "-ni" w linespoint ls 2, \
@@ -691,21 +753,21 @@ splot file matrix
 
 ############################################################################################ plot grammar
 
-unset label
-unset xlabel
-unset ylabel
-unset xrange
-unset xtics
-unset yrange
-unset ytics
-unset multiplot
+#unset label
+#unset xlabel
+#unset ylabel
+#unset xrange
+#unset xtics
+#unset yrange
+#unset ytics
+#unset multiplot
 
-set xrange [-1:101]
-set xtics 0,10,100
-set yrange [-0.2:1.5]
-set ytics -0.2,0.1,1.5
+#set xrange [-1:101]
+#set xtics 0,10,100
+#set yrange [-0.2:1.5]
+#set ytics -0.2,0.1,1.5
 
-set key right top
+#set key right top
 
 
 
