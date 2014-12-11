@@ -19,6 +19,9 @@ class Generalization
 {
     public :
 
+        enum RandomPart{MEANING,INFOS,SENTENCES};
+
+
         /**
          * @brief Generalization constructor.
          * @param [in] model : model to be used for the generation.
@@ -45,6 +48,16 @@ class Generalization
 
 
         /**
+         * @brief retrieveSubInfoRandomized
+         * @param randomSentenceList
+         * @param subMeaning
+         * @param subInfo
+         * @param subSentence
+         */
+        void retrieveSubInfoRandomized(std::vector<int> &randomSentenceList, QVector<QStringList> &subMeaning, QVector<QStringList> &subInfo, QVector<QStringList> &subSentence);
+
+
+        /**
          * @brief retrieveSubMeaningCorpusRandomized
          * @param randomSentenceList
          * @param subMeaning
@@ -57,9 +70,9 @@ class Generalization
          * @brief randomChangeCorpusGeneralization
          * @param numberRandomSentences
          * @param pathRandomCorpus
-         * @param randomMeaning
+         * @param randomPart
          */
-        void randomChangeCorpusGeneralization(cint numberRandomSentences, const QString pathRandomCorpus,cbool randomMeaning = true);
+        void randomChangeCorpusGeneralization(cint numberRandomSentences, const QString pathRandomCorpus, const RandomPart randomPart = SENTENCES);
 
         /**
          * @brief Start the cross verification and save the results in the input paths.

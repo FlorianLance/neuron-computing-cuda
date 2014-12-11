@@ -209,10 +209,11 @@ class Interface : public QMainWindow
         /**
          * @brief initPlot
          * @param nbCurves
-         * @param lenghtCurves
+         * @param sizeDim1Meaning
+         * @param sizeDim2Meaning
          * @param name
          */
-        void initPlot(int nbCurves, int lenghtCurves, QString name);
+        void initPlot(int nbCurves, int sizeDim1Meaning, int sizeDim2Meaning, QString name);
 
         /**
          * @brief cleanResultsDisplay
@@ -224,6 +225,12 @@ class Interface : public QMainWindow
          * @param info
          */
         void displayLogInfo(QString info);
+
+        /**
+         * @brief displayOutputMatrix
+         * @param output
+         */
+        void displayOutputMatrix(cv::Mat output);
 
 
     signals:
@@ -265,11 +272,16 @@ class Interface : public QMainWindow
 
     private :
 
+        int m_sizeDim1Meaning;
+        int m_sizeDim2Meaning;
+
+
         QFile m_logFile;
 
         // widgets & ui
         DisplayImageWidget *m_imageDisplay;
-        QVector<QCustomPlot*> m_plotList;
+        QVector<QCustomPlot*> m_plotListX;
+        QVector<QCustomPlot*> m_plotListOutput;
 
 
         QVector<QVector<double> > m_allValuesPlot;

@@ -14,69 +14,79 @@ int main(int argc, char* argv[])
     // ############################################## GENERALISATION 1
 
         ModelParameters l_parameters;
-        l_parameters.m_nbNeurons = 1000;
-        l_parameters.m_leakRate  = 0.25;
-        l_parameters.m_inputScaling = 0.2;
-        l_parameters.m_spectralRadius = 7.0;
         l_parameters.m_ridge = 1e-5;
-//        l_parameters.m_corpusFilePath = "../data/input/Corpus/120.txt";
-        l_parameters.m_corpusFilePath = "../data/input/Corpus/japan.txt";
+        l_parameters.m_corpusFilePath = "../data/input/Corpus/120.txt";
+//        l_parameters.m_corpusFilePath = "../data/input/Corpus/japan.txt";
 //        l_parameters.m_corpusFilePath = "../data/input/Corpus/462.txt";
-
-        l_parameters.m_sparcity = 10.0 / l_parameters.m_nbNeurons;
-        l_parameters.m_useCudaInv= true;
-        l_parameters.m_useCudaMult = true;
 
         Model l_modelGeneralization(l_parameters);
 
-//        std::string l_grammarStd[] ={"and","is","of","the","to",".","-ed","-ing","-s","by","it","that","was","did",",","from"};
-//        std::string l_structureStd[] = {"P0","A1","O2","R3"};
+        std::string l_grammarStd[] ={"and","is","of","the","to",".","-ed","-ing","-s","by","it","that","was","did",",","from"};
+        std::string l_structureStd[] = {"P0","A1","O2","R3"};
 
-        std::string l_grammarStd[] ={"-ga","-ni","-wo","-yotte","-o","-to","sore"};
-        std::string l_structureStd[] = {"P0","A1","O2","R3", "Q0"};
+//        std::string l_grammarStd[] ={"-ga","-ni","-wo","-yotte","-o","-to","sore"};
+//        std::string l_structureStd[] = {"P0","A1","O2","R3", "Q0"};
 
         Sentence l_grammar = Sentence(l_grammarStd, l_grammarStd + sizeof(l_grammarStd) / sizeof(std::string));
         Sentence l_structure = Sentence(l_structureStd, l_structureStd + sizeof(l_structureStd) / sizeof(std::string));
         l_modelGeneralization.setGrammar(l_grammar, l_structure);
 
         Generalization l_generalization(l_modelGeneralization);
-        l_generalization.randomChangeCorpusGeneralization(5,  "../data/input/Corpus/randomizedCorpus_24_5.txt", true);
-        l_generalization.randomChangeCorpusGeneralization(10, "../data/input/Corpus/randomizedCorpus_24_10.txt", true);
-        l_generalization.randomChangeCorpusGeneralization(15, "../data/input/Corpus/randomizedCorpus_24_15.txt", true);
-        l_generalization.randomChangeCorpusGeneralization(20, "../data/input/Corpus/randomizedCorpus_24_20.txt", true);
-        l_generalization.randomChangeCorpusGeneralization(24, "../data/input/Corpus/randomizedCorpus_24_24.txt", true);
+//        l_generalization.randomChangeCorpusGeneralization(5,  "../data/input/Corpus/randomizedCorpus_24_5-m.txt", Generalization::MEANING);
+//        l_generalization.randomChangeCorpusGeneralization(10, "../data/input/Corpus/randomizedCorpus_24_10-m.txt", Generalization::MEANING);
+//        l_generalization.randomChangeCorpusGeneralization(15, "../data/input/Corpus/randomizedCorpus_24_15-m.txt", Generalization::MEANING);
+//        l_generalization.randomChangeCorpusGeneralization(20, "../data/input/Corpus/randomizedCorpus_24_20-m.txt", Generalization::MEANING);
+//        l_generalization.randomChangeCorpusGeneralization(24, "../data/input/Corpus/randomizedCorpus_24_24-m.txt", Generalization::MEANING);
 
-        l_generalization.randomChangeCorpusGeneralization(5,  "../data/input/Corpus/randomizedCorpus_24_5-s.txt", false);
-        l_generalization.randomChangeCorpusGeneralization(10, "../data/input/Corpus/randomizedCorpus_24_10-s.txt", false);
-        l_generalization.randomChangeCorpusGeneralization(15, "../data/input/Corpus/randomizedCorpus_24_15-s.txt", false);
-        l_generalization.randomChangeCorpusGeneralization(20, "../data/input/Corpus/randomizedCorpus_24_20-s.txt", false);
-        l_generalization.randomChangeCorpusGeneralization(24, "../data/input/Corpus/randomizedCorpus_24_24-s.txt", false);
+//        l_generalization.randomChangeCorpusGeneralization(5,  "../data/input/Corpus/randomizedCorpus_24_5-i.txt", Generalization::INFOS);
+//        l_generalization.randomChangeCorpusGeneralization(10, "../data/input/Corpus/randomizedCorpus_24_10-i.txt", Generalization::INFOS);
+//        l_generalization.randomChangeCorpusGeneralization(15, "../data/input/Corpus/randomizedCorpus_24_15-i.txt", Generalization::INFOS);
+//        l_generalization.randomChangeCorpusGeneralization(20, "../data/input/Corpus/randomizedCorpus_24_20-i.txt", Generalization::INFOS);
+//        l_generalization.randomChangeCorpusGeneralization(24, "../data/input/Corpus/randomizedCorpus_24_24-i.txt", Generalization::INFOS);
 
+//        l_generalization.randomChangeCorpusGeneralization(5,  "../data/input/Corpus/randomizedCorpus_24_5-s.txt", Generalization::SENTENCES);
+//        l_generalization.randomChangeCorpusGeneralization(10, "../data/input/Corpus/randomizedCorpus_24_10-s.txt", Generalization::SENTENCES);
+//        l_generalization.randomChangeCorpusGeneralization(15, "../data/input/Corpus/randomizedCorpus_24_15-s.txt", Generalization::SENTENCES);
+//        l_generalization.randomChangeCorpusGeneralization(20, "../data/input/Corpus/randomizedCorpus_24_20-s.txt", Generalization::SENTENCES);
+//        l_generalization.randomChangeCorpusGeneralization(24, "../data/input/Corpus/randomizedCorpus_24_24-s.txt", Generalization::SENTENCES);
 
-//        l_generalization.randomChangeCorpusGeneralization(30, "../data/input/Corpus/randomizedCorpus_120_30.txt", true);
-//        l_generalization.randomChangeCorpusGeneralization(60, "../data/input/Corpus/randomizedCorpus_120_60.txt", true);
-//        l_generalization.randomChangeCorpusGeneralization(90, "../data/input/Corpus/randomizedCorpus_120_90.txt", true);
-//        l_generalization.randomChangeCorpusGeneralization(120, "../data/input/Corpus/randomizedCorpus_120_120.txt", true);
+        l_generalization.randomChangeCorpusGeneralization(30, "../data/input/Corpus/randomizedCorpus_120_30-m.txt", Generalization::MEANING);
+        l_generalization.randomChangeCorpusGeneralization(60, "../data/input/Corpus/randomizedCorpus_120_60-m.txt", Generalization::MEANING);
+        l_generalization.randomChangeCorpusGeneralization(90, "../data/input/Corpus/randomizedCorpus_120_90-m.txt", Generalization::MEANING);
+        l_generalization.randomChangeCorpusGeneralization(120, "../data/input/Corpus/randomizedCorpus_120_120-m.txt", Generalization::MEANING);
 
-//        l_generalization.randomChangeCorpusGeneralization(30, "../data/input/Corpus/randomizedCorpus_120_30_s.txt", false);
-//        l_generalization.randomChangeCorpusGeneralization(60, "../data/input/Corpus/randomizedCorpus_120_60_s.txt", false);
-//        l_generalization.randomChangeCorpusGeneralization(90, "../data/input/Corpus/randomizedCorpus_120_90_s.txt", false);
-//        l_generalization.randomChangeCorpusGeneralization(120, "../data/input/Corpus/randomizedCorpus_120_120_s.txt", false);
+        l_generalization.randomChangeCorpusGeneralization(30, "../data/input/Corpus/randomizedCorpus_120_30-i.txt", Generalization::INFOS);
+        l_generalization.randomChangeCorpusGeneralization(60, "../data/input/Corpus/randomizedCorpus_120_60-i.txt", Generalization::INFOS);
+        l_generalization.randomChangeCorpusGeneralization(90, "../data/input/Corpus/randomizedCorpus_120_90-i.txt", Generalization::INFOS);
+        l_generalization.randomChangeCorpusGeneralization(120, "../data/input/Corpus/randomizedCorpus_120_120-i.txt", Generalization::INFOS);
+
+        l_generalization.randomChangeCorpusGeneralization(30, "../data/input/Corpus/randomizedCorpus_120_30-s.txt", Generalization::SENTENCES);
+        l_generalization.randomChangeCorpusGeneralization(60, "../data/input/Corpus/randomizedCorpus_120_60-s.txt", Generalization::SENTENCES);
+        l_generalization.randomChangeCorpusGeneralization(90, "../data/input/Corpus/randomizedCorpus_120_90-s.txt", Generalization::SENTENCES);
+        l_generalization.randomChangeCorpusGeneralization(120, "../data/input/Corpus/randomizedCorpus_120_120-s.txt", Generalization::SENTENCES);
 
         GridSearch l_gridSearch(l_modelGeneralization);
         l_gridSearch.setCudaParameters(true, true);
-        l_gridSearch.setParameterValues(GridSearch::NEURONS_NB,     300, 300, "+50", true, 30);
+        l_gridSearch.setParameterValues(GridSearch::NEURONS_NB,     3500, 3500, "+50", true, 30);
         l_gridSearch.setParameterValues(GridSearch::LEAK_RATE,      0.25, 0.25,   "+0.05");
         l_gridSearch.setParameterValues(GridSearch::INPUT_SCALING,  0.2, 0.2, "+0.2");
-        l_gridSearch.setParameterValues(GridSearch::SPECTRAL_RADIUS,7, 7, "+2.0");
+        l_gridSearch.setParameterValues(GridSearch::SPECTRAL_RADIUS,7, 7, "+1.0");
 
         std::vector<std::string> l_corpusList;
-        l_corpusList.push_back("../data/input/Corpus/japan.txt");
-        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_24_5.txt");
-        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_24_10.txt");
-        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_24_15.txt");
-        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_24_20.txt");
-        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_24_24.txt");
+//        l_corpusList.push_back("../data/input/Corpus/japan.txt");
+        // random meaning
+//        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_24_5-m.txt");
+//        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_24_10-m.txt");
+//        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_24_15-m.txt");
+//        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_24_20-m.txt");
+//        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_24_24-m.txt");
+        // random infos
+//        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_24_5-i.txt");
+//        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_24_10-i.txt");
+//        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_24_15-i.txt");
+//        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_24_20-i.txt");
+//        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_24_24-i.txt");
+        // random sentences
 //        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_24_5-s.txt");
 //        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_24_10-s.txt");
 //        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_24_15-s.txt");
@@ -84,15 +94,22 @@ int main(int argc, char* argv[])
 //        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_24_24-s.txt");
 
 
-//        l_corpusList.push_back("../data/input/Corpus/120.txt");
-//        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_120_30.txt");
-//        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_120_60.txt");
-//        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_120_90.txt");
-//        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_120_120.txt");
-//        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_120_30_s.txt");
-//        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_120_60_s.txt");
-//        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_120_90_s.txt");
-//        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_120_120_s.txt");
+        l_corpusList.push_back("../data/input/Corpus/120.txt");
+         // random infos
+        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_120_30-i.txt");
+        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_120_60-i.txt");
+        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_120_90-i.txt");
+        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_120_120-i.txt");
+        // random sentences
+        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_120_30-s.txt");
+        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_120_60-s.txt");
+        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_120_90-s.txt");
+        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_120_120-s.txt");
+        // random meaning
+//        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_120_30-m.txt");
+//        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_120_60-m.txt");
+//        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_120_90-m.txt");
+//        l_corpusList.push_back("../data/input/Corpus/randomizedCorpus_120_120-m.txt");
 
         l_gridSearch.setCorpusList(l_corpusList);
         l_gridSearch.launchTrainWithAllParameters("../data/Results/random_res/grid_search.txt", "../data/Results/random_res/grid_search_raw.txt", true, false, false);

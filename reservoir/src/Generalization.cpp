@@ -8,6 +8,8 @@
 
 #include "Generalization.h"
 
+
+
 Generalization::Generalization(Model &model) : m_model(&model)
 {}
 
@@ -70,6 +72,83 @@ void Generalization::retrieveSubSentenceCorpusRandomized(std::vector<int> &rando
         }
     }
 
+}
+
+void Generalization::retrieveSubInfoRandomized(std::vector<int> &randomSentenceList, QVector<QStringList> &subMeaning, QVector<QStringList> &subInfo, QVector<QStringList> &subSentence)
+{
+    for(int ii = 0; ii < m_trainInfo.size(); ++ii)
+    {
+        bool l_addSentence = true;
+
+        for(int jj = 0; jj < randomSentenceList.size(); ++jj)
+        {
+            if(randomSentenceList[jj] == ii)
+            {
+                 l_addSentence = false;
+
+                 QString l_randomSubInfo = m_trainInfo[randomSentenceList[jj]][0];
+                 QString l_part1, l_part2;
+
+                 for(int kk = 0; kk < l_randomSubInfo.size(); ++kk)
+                 {
+                     if(kk < l_randomSubInfo.size()/2)
+                     {
+                         l_part1 +=  l_randomSubInfo[kk];
+                     }
+                     else
+                     {
+                         l_part2 +=  l_randomSubInfo[kk];
+                     }
+                 }
+
+                 QVector<char> l_part1Letters, l_part2Letters;
+                 QVector<int> l_part1LetttersPositions, l_part2LetttersPositions;
+                 std::string l_part1Std = l_part1.toStdString(), l_part2Std = l_part2.toStdString();
+
+                 for(int kk = 0; kk < l_part1.size(); ++kk)
+                 {
+                    if(l_part1Std[kk] != '_' && l_part1Std[kk] != '[' && l_part1Std[kk] != ']' && l_part1Std[kk] != '-')
+                    {
+                        l_part1Letters.push_back(l_part1Std[kk]);
+                        l_part1LetttersPositions.push_back(kk);
+                    }
+                    if(l_part2Std[kk] != '_' && l_part2Std[kk] != '[' && l_part2Std[kk] != ']' && l_part2Std[kk] != '-')
+                    {
+                        l_part2Letters.push_back(l_part2Std[kk]);
+                        l_part2LetttersPositions.push_back(kk);
+                    }
+                 }
+                 std::random_shuffle(l_part1Letters.begin(), l_part1Letters.end());
+                 std::random_shuffle(l_part2Letters.begin(), l_part2Letters.end());
+
+                 for(int kk = 0; kk < l_part1Letters.size(); ++kk)
+                 {
+                     l_part1[l_part1LetttersPositions[kk]] = l_part1Letters[kk];
+                 }
+                 for(int kk = 0; kk < l_part2Letters.size(); ++kk)
+                 {
+                     l_part2[l_part2LetttersPositions[kk]] = l_part2Letters[kk];
+                 }
+
+                QStringList l_randomSubInfoList;
+                l_randomSubInfoList.push_back(l_part1+l_part2);
+
+                subMeaning.push_back(m_trainMeaning[randomSentenceList[jj]]);
+                subInfo.push_back(l_randomSubInfoList);
+                subSentence.push_back(m_trainSentence[randomSentenceList[jj]]);
+
+                break;
+            }
+        }
+
+        if(l_addSentence)
+        {
+            subMeaning.push_back(m_trainMeaning[ii]);
+            subInfo.push_back(m_trainInfo[ii]);
+            subSentence.push_back(m_trainSentence[ii]);
+        }
+
+    }
 }
 
 void Generalization::retrieveSubMeaningCorpusRandomized(std::vector<int> &randomSentenceList, QVector<QStringList> &subMeaning, QVector<QStringList> &subInfo, QVector<QStringList>& subSentence)
@@ -138,7 +217,7 @@ void Generalization::retrieveSubMeaningCorpusRandomized(std::vector<int> &random
     }
 }
 
-void Generalization::randomChangeCorpusGeneralization(cint numberRandomSentences, const QString pathRandomCorpus, cbool randomMeaning)
+void Generalization::randomChangeCorpusGeneralization(cint numberRandomSentences, const QString pathRandomCorpus, const RandomPart randomPart)
 {
     QVector<QStringList> l_inused;
 
@@ -152,13 +231,17 @@ void Generalization::randomChangeCorpusGeneralization(cint numberRandomSentences
         retrieveRandomSentenceList(l_sizeCorpus, numberRandomSentences, l_randomIdSentences);
 
         QVector<QStringList> l_subData, l_subInfo, l_subMeaning;
-        if(randomMeaning)
+        switch(randomPart)
         {
-            retrieveSubMeaningCorpusRandomized(l_randomIdSentences, l_subData, l_subInfo, l_subMeaning);
-        }
-        else
-        {
-            retrieveSubSentenceCorpusRandomized(l_randomIdSentences, l_subData, l_subInfo, l_subMeaning);
+            case MEANING:
+                retrieveSubMeaningCorpusRandomized(l_randomIdSentences, l_subData, l_subInfo, l_subMeaning);
+            break;
+            case INFOS:
+                retrieveSubInfoRandomized(l_randomIdSentences, l_subData, l_subInfo, l_subMeaning);
+            break;
+            case SENTENCES:
+                retrieveSubSentenceCorpusRandomized(l_randomIdSentences, l_subData, l_subInfo, l_subMeaning);
+            break;
         }
 
         generateCorpus(pathRandomCorpus, l_subData, l_subInfo, l_subMeaning, l_inused, l_inused);

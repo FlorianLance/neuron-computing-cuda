@@ -6,174 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1292</width>
-    <height>736</height>
+    <width>1184</width>
+    <height>815</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Neurons-Reservoir-Computing-Interface</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,0">
-    <item row="1" column="2">
-     <widget class="QGroupBox" name="groupBox_4">
-      <property name="title">
-       <string>COMMANDS</string>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_9">
-       <item row="0" column="0" colspan="2">
-        <widget class="QPushButton" name="pbStart">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>100</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Start</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <widget class="QProgressBar" name="pbComputing">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="value">
-          <number>0</number>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QPushButton" name="pbStop">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>100</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Stop</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="3">
-        <widget class="QLabel" name="laStateComputing">
-         <property name="text">
-          <string>Idle</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="2" column="2">
-     <widget class="QGroupBox" name="groupBox_9">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>150</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>100</height>
-       </size>
-      </property>
-      <property name="title">
-       <string>INFOS</string>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_14">
-       <item row="0" column="0">
-        <widget class="QTextBrowser" name="tbInfos">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="readOnly">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="0" column="2">
-     <widget class="QGroupBox" name="groupBox_8">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="title">
-       <string>RESULTS</string>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_11">
-       <item row="2" column="0">
-        <widget class="QPushButton" name="pbDirectoResults">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>1666666</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Set directory results</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0" colspan="2">
-        <widget class="QTextBrowser" name="tbResults"/>
-       </item>
-       <item row="1" column="0">
-        <widget class="QPushButton" name="pbClearResults">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>100</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Clear results</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLabel" name="laDirectoryResult">
-         <property name="text">
-          <string>...</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
+   <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0">
     <item row="0" column="0" rowspan="4">
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
-       <widget class="QGroupBox" name="groupBox">
+       <widget class="QGroupBox" name="groupBox_12">
         <property name="maximumSize">
          <size>
           <width>600</width>
@@ -181,73 +26,962 @@
          </size>
         </property>
         <property name="title">
-         <string>SETTINGS</string>
+         <string/>
         </property>
-        <layout class="QGridLayout" name="gridLayout_4">
-         <item row="3" column="0">
-          <widget class="QGroupBox" name="groupBox_7">
-           <property name="title">
-            <string>TRAIN / TEST</string>
+        <layout class="QGridLayout" name="gridLayout_17">
+         <item row="0" column="0">
+          <widget class="QTabWidget" name="twInfos">
+           <property name="currentIndex">
+            <number>0</number>
            </property>
-           <layout class="QGridLayout" name="gridLayout_7">
-            <item row="1" column="0" colspan="10">
-             <widget class="Line" name="line_14">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0">
-             <widget class="QPushButton" name="pbSaveLastTrainingFile">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
+           <widget class="QWidget" name="tabSettings">
+            <attribute name="title">
+             <string>SETTINGS</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout">
+             <item>
+              <widget class="QGroupBox" name="gbCorpusList">
+               <property name="title">
+                <string>CORPUS LIST</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_5">
+                <item row="0" column="0" rowspan="2" colspan="2">
+                 <widget class="QListWidget" name="lwCorpus">
+                  <property name="maximumSize">
+                   <size>
+                    <width>500</width>
+                    <height>200</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="2">
+                 <widget class="QPushButton" name="pbRemoveCorpus">
+                  <property name="maximumSize">
+                   <size>
+                    <width>150</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Remove corpus</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="2">
+                 <widget class="QPushButton" name="pbAddCorpus">
+                  <property name="maximumSize">
+                   <size>
+                    <width>100</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Add corpus</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="gbReservoirParameters">
+               <property name="title">
+                <string>RESERVOIR PARAMETERS</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_6">
+                <item row="6" column="0">
+                 <widget class="QLabel" name="label_7">
+                  <property name="text">
+                   <string>Input scaling</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="2">
+                 <widget class="QLabel" name="label_3">
+                  <property name="text">
+                   <string>Start value</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="2">
+                 <widget class="QDoubleSpinBox" name="sbStartIS">
+                  <property name="minimumSize">
+                   <size>
+                    <width>70</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="singleStep">
+                   <double>0.010000000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>0.200000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="4">
+                 <widget class="QDoubleSpinBox" name="sbEndIS">
+                  <property name="singleStep">
+                   <double>0.010000000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>0.200000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="0">
+                 <widget class="QLabel" name="label_2">
+                  <property name="text">
+                   <string>Leak rate</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="0">
+                 <widget class="QLabel" name="label">
+                  <property name="text">
+                   <string>Neurons number</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="3" rowspan="8">
+                 <widget class="Line" name="line_2">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="2">
+                 <widget class="QDoubleSpinBox" name="sbStartLeakRate">
+                  <property name="minimumSize">
+                   <size>
+                    <width>70</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="singleStep">
+                   <double>0.010000000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>0.250000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="4">
+                 <widget class="QDoubleSpinBox" name="sbEndLeakRate">
+                  <property name="value">
+                   <double>0.250000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1" rowspan="8">
+                 <widget class="Line" name="line">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="4">
+                 <widget class="Line" name="line_3">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="4">
+                 <widget class="QLabel" name="label_4">
+                  <property name="text">
+                   <string>End value</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QLabel" name="label_5">
+                  <property name="text">
+                   <string>Name parameter</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="2">
+                 <widget class="Line" name="line_4">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="6">
+                 <widget class="QLabel" name="laOperation">
+                  <property name="text">
+                   <string>Operation </string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="0">
+                 <widget class="Line" name="line_5">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="5" rowspan="8">
+                 <widget class="Line" name="line_6">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="6">
+                 <widget class="Line" name="line_7">
+                  <property name="maximumSize">
+                   <size>
+                    <width>200</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="2">
+                 <widget class="QSpinBox" name="sbStartNeurons">
+                  <property name="minimumSize">
+                   <size>
+                    <width>70</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>100</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="minimum">
+                   <number>10</number>
+                  </property>
+                  <property name="maximum">
+                   <number>100000</number>
+                  </property>
+                  <property name="singleStep">
+                   <number>100</number>
+                  </property>
+                  <property name="value">
+                   <number>1000</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="6">
+                 <widget class="QLineEdit" name="leNeuronsOperation">
+                  <property name="maximumSize">
+                   <size>
+                    <width>200</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>+500</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="4">
+                 <widget class="QSpinBox" name="sbEndNeurons">
+                  <property name="maximum">
+                   <number>100000</number>
+                  </property>
+                  <property name="value">
+                   <number>1000</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="6">
+                 <widget class="QLineEdit" name="leLeakRateOperation">
+                  <property name="maximumSize">
+                   <size>
+                    <width>200</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>+0.05</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="6">
+                 <widget class="QLineEdit" name="leISOperation">
+                  <property name="maximumSize">
+                   <size>
+                    <width>200</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>*10</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="7" column="0">
+                 <widget class="QLabel" name="label_8">
+                  <property name="text">
+                   <string>Spectral radius</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="8" column="0">
+                 <widget class="QLabel" name="label_9">
+                  <property name="text">
+                   <string>Ridge</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="9" column="0">
+                 <widget class="QLabel" name="label_10">
+                  <property name="text">
+                   <string>Sparcity</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="7" column="6">
+                 <widget class="QLineEdit" name="leSpectralRadiusOperation">
+                  <property name="maximumSize">
+                   <size>
+                    <width>200</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>*10</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="8" column="6">
+                 <widget class="QLineEdit" name="leRidgeOperation">
+                  <property name="maximumSize">
+                   <size>
+                    <width>200</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>*10</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="9" column="6">
+                 <widget class="QLineEdit" name="leSparcityOperation">
+                  <property name="maximumSize">
+                   <size>
+                    <width>200</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>+0.0006</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="7" rowspan="8">
+                 <widget class="Line" name="line_8">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="8">
+                 <widget class="QLabel" name="label_11">
+                  <property name="text">
+                   <string>Current value</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="9" column="8" alignment="Qt::AlignHCenter">
+                 <widget class="QLabel" name="laSparcityValue">
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="8" column="8" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+                 <widget class="QLabel" name="laRidgeValue">
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="7" column="8" alignment="Qt::AlignHCenter">
+                 <widget class="QLabel" name="laSpectralRadiusValue">
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="8" alignment="Qt::AlignHCenter">
+                 <widget class="QLabel" name="laISValue">
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="8" alignment="Qt::AlignHCenter">
+                 <widget class="QLabel" name="laLeakRateValue">
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="8" alignment="Qt::AlignHCenter">
+                 <widget class="QLabel" name="laNeuronsValue">
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="8">
+                 <widget class="Line" name="line_9">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="10">
+                 <widget class="QLabel" name="label_18">
+                  <property name="text">
+                   <string>Enabled</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="9">
+                 <widget class="Line" name="line_10">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="9" rowspan="6">
+                 <widget class="Line" name="line_11">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="10">
+                 <widget class="Line" name="line_12">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="10" alignment="Qt::AlignHCenter">
+                 <widget class="QCheckBox" name="cbNeurons">
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="10" alignment="Qt::AlignHCenter">
+                 <widget class="QCheckBox" name="cbLeakRate">
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="10" alignment="Qt::AlignHCenter">
+                 <widget class="QCheckBox" name="cbIS">
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="7" column="10" alignment="Qt::AlignHCenter">
+                 <widget class="QCheckBox" name="cbSpectralRadius">
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="8" column="10" alignment="Qt::AlignHCenter">
+                 <widget class="QCheckBox" name="cbRidge">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="checked">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="9" column="10" alignment="Qt::AlignHCenter">
+                 <widget class="QCheckBox" name="cbSparcity">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="7" column="2" alignment="Qt::AlignHCenter">
+                 <widget class="QDoubleSpinBox" name="sbStartSpectralRadius">
+                  <property name="minimumSize">
+                   <size>
+                    <width>70</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="value">
+                   <double>4.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="7" column="4">
+                 <widget class="QDoubleSpinBox" name="sbEndSpectralRadius">
+                  <property name="value">
+                   <double>4.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="8" column="2" alignment="Qt::AlignVCenter">
+                 <widget class="QDoubleSpinBox" name="sbStartRidge">
+                  <property name="decimals">
+                   <number>5</number>
+                  </property>
+                  <property name="singleStep">
+                   <double>0.000010000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>0.000010000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="8" column="4">
+                 <widget class="QDoubleSpinBox" name="sbEndRidge">
+                  <property name="decimals">
+                   <number>5</number>
+                  </property>
+                  <property name="singleStep">
+                   <double>0.000010000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>0.000010000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="9" column="2">
+                 <widget class="QDoubleSpinBox" name="sbStartSparcity"/>
+                </item>
+                <item row="9" column="4">
+                 <widget class="QDoubleSpinBox" name="sbEndSparcity"/>
+                </item>
+                <item row="0" column="0" colspan="3">
+                 <widget class="QCheckBox" name="cbOnlyStartValue">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="text">
+                   <string>Uses only the start value</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="11" rowspan="8">
+                 <widget class="Line" name="line_17">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="12">
+                 <widget class="QLabel" name="laNbOfUse">
+                  <property name="text">
+                   <string>Nb of use </string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0" colspan="13">
+                 <widget class="Line" name="line_15">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="12">
+                 <widget class="Line" name="line_18">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="12">
+                 <widget class="QSpinBox" name="sbNbUseNeurons">
+                  <property name="value">
+                   <number>1</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="12">
+                 <widget class="QSpinBox" name="sbNbUseLeakRate">
+                  <property name="value">
+                   <number>1</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="12">
+                 <widget class="QSpinBox" name="sbNbUseISS">
+                  <property name="value">
+                   <number>1</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="7" column="12">
+                 <widget class="QSpinBox" name="sbNbUseSpectralRadius">
+                  <property name="value">
+                   <number>1</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="8" column="12">
+                 <widget class="QSpinBox" name="sbNbUseRidge">
+                  <property name="value">
+                   <number>1</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="9" column="12">
+                 <widget class="QSpinBox" name="sbNbUseSparcity">
+                  <property name="value">
+                   <number>1</number>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="gbGrammarStructure">
+               <property name="title">
+                <string>GRAMMAR / STRUCTURE</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_10">
+                <item row="2" column="0">
+                 <widget class="QLabel" name="label_14">
+                  <property name="text">
+                   <string>Structure to be used :</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_13">
+                  <property name="text">
+                   <string>Grammar to be used :</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0" colspan="2">
+                 <widget class="Line" name="line_13">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QComboBox" name="cbGrammar">
+                  <property name="minimumSize">
+                   <size>
+                    <width>400</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="editable">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QComboBox" name="cbStructure">
+                  <property name="editable">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="gbTrainTest">
+               <property name="title">
+                <string>TRAIN / TEST</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_7">
+                <item row="1" column="0" colspan="10">
+                 <widget class="Line" name="line_14">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="0">
+                 <widget class="QPushButton" name="pbSaveLastTrainingFile">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="text">
+                   <string>Save last training</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="0" colspan="10">
+                 <widget class="Line" name="line_16">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QCheckBox" name="cbTrainingFile">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="text">
+                   <string>Uses training file :</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_12">
+                  <property name="text">
+                   <string>To do:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1" colspan="8">
+                 <widget class="QLineEdit" name="leCurrentTrainingFile">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>250</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="9">
+                 <widget class="QPushButton" name="pbLoadTrainingFile">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>100</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Load</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QRadioButton" name="rbTrain">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>50</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Train</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="2">
+                 <widget class="QRadioButton" name="rbTest">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="text">
+                   <string>Test</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="3">
+                 <widget class="QRadioButton" name="rbBoth">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="text">
+                   <string>Both</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="4" colspan="6">
+                 <spacer name="horizontalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+            <zorder>gbCorpusList</zorder>
+            <zorder>gbCorpusList</zorder>
+            <zorder>gbReservoirParameters</zorder>
+            <zorder>gbGrammarStructure</zorder>
+            <zorder>gbTrainTest</zorder>
+           </widget>
+           <widget class="QWidget" name="tabInfos">
+            <attribute name="title">
+             <string>INFOS</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_2">
+             <item>
+              <widget class="QGroupBox" name="gbResults">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="title">
+                <string>RESULTS</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_11">
+                <item row="2" column="0">
+                 <widget class="QPushButton" name="pbDirectoResults">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>1666666</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Set directory results</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0" colspan="2">
+                 <widget class="QTextBrowser" name="tbResults"/>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QPushButton" name="pbClearResults">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>100</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Clear results</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QLabel" name="laDirectoryResult">
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="groupBox_9">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>150</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>100</height>
+                </size>
+               </property>
+               <property name="title">
+                <string>INFOS</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_14">
+                <item row="0" column="0">
+                 <widget class="QTextBrowser" name="tbInfos">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="readOnly">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="tabReplay">
+            <attribute name="title">
+             <string>REPLAY</string>
+            </attribute>
+           </widget>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QGroupBox" name="groupBox_4">
+           <property name="title">
+            <string>COMMANDS</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_9">
+            <item row="0" column="7">
+             <widget class="QLabel" name="laStateComputing">
               <property name="text">
-               <string>Save last training</string>
+               <string>Idle</string>
               </property>
              </widget>
             </item>
-            <item row="3" column="0" colspan="10">
-             <widget class="Line" name="line_16">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QCheckBox" name="cbTrainingFile">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="text">
-               <string>Uses training file :</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_12">
-              <property name="text">
-               <string>To do:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1" colspan="8">
-             <widget class="QLineEdit" name="leCurrentTrainingFile">
+            <item row="1" column="0">
+             <widget class="QPushButton" name="pbStop">
               <property name="enabled">
                <bool>false</bool>
               </property>
               <property name="minimumSize">
                <size>
-                <width>300</width>
-                <height>0</height>
+                <width>0</width>
+                <height>30</height>
                </size>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="9">
-             <widget class="QPushButton" name="pbLoadTrainingFile">
-              <property name="enabled">
-               <bool>true</bool>
               </property>
               <property name="maximumSize">
                <size>
@@ -256,718 +990,252 @@
                </size>
               </property>
               <property name="text">
-               <string>Load</string>
+               <string>Stop</string>
               </property>
              </widget>
             </item>
-            <item row="0" column="1">
-             <widget class="QRadioButton" name="rbTrain">
+            <item row="0" column="1" colspan="6">
+             <widget class="QProgressBar" name="pbComputing">
               <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>50</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Train</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="2">
-             <widget class="QRadioButton" name="rbTest">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="text">
-               <string>Test</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="3">
-             <widget class="QRadioButton" name="rbBoth">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="text">
-               <string>Both</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="4" colspan="6">
-             <spacer name="horizontalSpacer">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QGroupBox" name="groupBox_5">
-           <property name="title">
-            <string>RESERVOIR PARAMETERS</string>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_6">
-            <item row="6" column="0">
-             <widget class="QLabel" name="label_7">
-              <property name="text">
-               <string>Input scaling</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="2">
-             <widget class="QLabel" name="label_3">
-              <property name="text">
-               <string>Start value</string>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="2">
-             <widget class="QDoubleSpinBox" name="sbStartIS">
-              <property name="singleStep">
-               <double>0.010000000000000</double>
-              </property>
-              <property name="value">
-               <double>0.200000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="4">
-             <widget class="QDoubleSpinBox" name="sbEndIS">
-              <property name="singleStep">
-               <double>0.010000000000000</double>
-              </property>
-              <property name="value">
-               <double>0.200000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="0">
-             <widget class="QLabel" name="label_2">
-              <property name="text">
-               <string>Leak rate</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="label">
-              <property name="text">
-               <string>Neurons number</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="3" rowspan="8">
-             <widget class="Line" name="line_2">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="2">
-             <widget class="QDoubleSpinBox" name="sbStartLeakRate">
-              <property name="singleStep">
-               <double>0.010000000000000</double>
-              </property>
-              <property name="value">
-               <double>0.250000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="4">
-             <widget class="QDoubleSpinBox" name="sbEndLeakRate">
-              <property name="value">
-               <double>0.250000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1" rowspan="8">
-             <widget class="Line" name="line">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="4">
-             <widget class="Line" name="line_3">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="4">
-             <widget class="QLabel" name="label_4">
-              <property name="text">
-               <string>End value</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="label_5">
-              <property name="text">
-               <string>Name parameter</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="2">
-             <widget class="Line" name="line_4">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="6">
-             <widget class="QLabel" name="label_6">
-              <property name="text">
-               <string>Operation on the values</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="Line" name="line_5">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="5" rowspan="8">
-             <widget class="Line" name="line_6">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="6">
-             <widget class="Line" name="line_7">
-              <property name="maximumSize">
-               <size>
-                <width>200</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="2">
-             <widget class="QSpinBox" name="sbStartNeurons">
-              <property name="minimum">
-               <number>10</number>
-              </property>
-              <property name="maximum">
-               <number>100000</number>
-              </property>
-              <property name="singleStep">
-               <number>100</number>
-              </property>
-              <property name="value">
-               <number>1000</number>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="6">
-             <widget class="QLineEdit" name="leNeuronsOperation">
-              <property name="maximumSize">
-               <size>
-                <width>200</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>+500</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="4">
-             <widget class="QSpinBox" name="sbEndNeurons">
-              <property name="maximum">
-               <number>100000</number>
-              </property>
-              <property name="value">
-               <number>1000</number>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="6">
-             <widget class="QLineEdit" name="leLeakRateOperation">
-              <property name="maximumSize">
-               <size>
-                <width>200</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>+0.05</string>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="6">
-             <widget class="QLineEdit" name="leISOperation">
-              <property name="maximumSize">
-               <size>
-                <width>200</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>*10</string>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="0">
-             <widget class="QLabel" name="label_8">
-              <property name="text">
-               <string>Spectral radius</string>
-              </property>
-             </widget>
-            </item>
-            <item row="8" column="0">
-             <widget class="QLabel" name="label_9">
-              <property name="text">
-               <string>Ridge</string>
-              </property>
-             </widget>
-            </item>
-            <item row="9" column="0">
-             <widget class="QLabel" name="label_10">
-              <property name="text">
-               <string>Sparcity</string>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="6">
-             <widget class="QLineEdit" name="leSpectralRadiusOperation">
-              <property name="maximumSize">
-               <size>
-                <width>200</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>*10</string>
-              </property>
-             </widget>
-            </item>
-            <item row="8" column="6">
-             <widget class="QLineEdit" name="leRidgeOperation">
-              <property name="maximumSize">
-               <size>
-                <width>200</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>*10</string>
-              </property>
-             </widget>
-            </item>
-            <item row="9" column="6">
-             <widget class="QLineEdit" name="leSparcityOperation">
-              <property name="maximumSize">
-               <size>
-                <width>200</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>+0.0006</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="7" rowspan="8">
-             <widget class="Line" name="line_8">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="8">
-             <widget class="QLabel" name="label_11">
-              <property name="text">
-               <string>Current value</string>
-              </property>
-             </widget>
-            </item>
-            <item row="9" column="8" alignment="Qt::AlignHCenter">
-             <widget class="QLabel" name="laSparcityValue">
-              <property name="text">
-               <string>0</string>
-              </property>
-             </widget>
-            </item>
-            <item row="8" column="8" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
-             <widget class="QLabel" name="laRidgeValue">
-              <property name="text">
-               <string>0</string>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="8" alignment="Qt::AlignHCenter">
-             <widget class="QLabel" name="laSpectralRadiusValue">
-              <property name="text">
-               <string>0</string>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="8" alignment="Qt::AlignHCenter">
-             <widget class="QLabel" name="laISValue">
-              <property name="text">
-               <string>0</string>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="8" alignment="Qt::AlignHCenter">
-             <widget class="QLabel" name="laLeakRateValue">
-              <property name="text">
-               <string>0</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="8" alignment="Qt::AlignHCenter">
-             <widget class="QLabel" name="laNeuronsValue">
-              <property name="text">
-               <string>0</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="8">
-             <widget class="Line" name="line_9">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="10">
-             <widget class="QLabel" name="label_18">
-              <property name="text">
-               <string>Enabled</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="9">
-             <widget class="Line" name="line_10">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="9" rowspan="6">
-             <widget class="Line" name="line_11">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="10">
-             <widget class="Line" name="line_12">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="10" alignment="Qt::AlignHCenter">
-             <widget class="QCheckBox" name="cbNeurons">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="10" alignment="Qt::AlignHCenter">
-             <widget class="QCheckBox" name="cbLeakRate">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="10" alignment="Qt::AlignHCenter">
-             <widget class="QCheckBox" name="cbIS">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="10" alignment="Qt::AlignHCenter">
-             <widget class="QCheckBox" name="cbSpectralRadius">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="8" column="10" alignment="Qt::AlignHCenter">
-             <widget class="QCheckBox" name="cbRidge">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="checked">
                <bool>false</bool>
               </property>
-             </widget>
-            </item>
-            <item row="9" column="10" alignment="Qt::AlignHCenter">
-             <widget class="QCheckBox" name="cbSparcity">
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="2" alignment="Qt::AlignHCenter">
-             <widget class="QDoubleSpinBox" name="sbStartSpectralRadius">
               <property name="value">
-               <double>4.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="4">
-             <widget class="QDoubleSpinBox" name="sbEndSpectralRadius">
-              <property name="value">
-               <double>4.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="8" column="2" alignment="Qt::AlignVCenter">
-             <widget class="QDoubleSpinBox" name="sbStartRidge">
-              <property name="decimals">
-               <number>5</number>
-              </property>
-              <property name="singleStep">
-               <double>0.000010000000000</double>
-              </property>
-              <property name="value">
-               <double>0.000010000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="8" column="4">
-             <widget class="QDoubleSpinBox" name="sbEndRidge">
-              <property name="decimals">
-               <number>5</number>
-              </property>
-              <property name="singleStep">
-               <double>0.000010000000000</double>
-              </property>
-              <property name="value">
-               <double>0.000010000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="9" column="2">
-             <widget class="QDoubleSpinBox" name="sbStartSparcity"/>
-            </item>
-            <item row="9" column="4">
-             <widget class="QDoubleSpinBox" name="sbEndSparcity"/>
-            </item>
-            <item row="0" column="0" colspan="3">
-             <widget class="QCheckBox" name="cbOnlyStartValue">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="text">
-               <string>Uses only the start value</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="11" rowspan="8">
-             <widget class="Line" name="line_17">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="12">
-             <widget class="QLabel" name="laNbOfUse">
-              <property name="text">
-               <string>Nb of use </string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0" colspan="13">
-             <widget class="Line" name="line_15">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="12">
-             <widget class="Line" name="line_18">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="12">
-             <widget class="QSpinBox" name="sbNbUseNeurons">
-              <property name="value">
-               <number>1</number>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="12">
-             <widget class="QSpinBox" name="sbNbUseLeakRate">
-              <property name="value">
-               <number>1</number>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="12">
-             <widget class="QSpinBox" name="sbNbUseISS">
-              <property name="value">
-               <number>1</number>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="12">
-             <widget class="QSpinBox" name="sbNbUseSpectralRadius">
-              <property name="value">
-               <number>1</number>
-              </property>
-             </widget>
-            </item>
-            <item row="8" column="12">
-             <widget class="QSpinBox" name="sbNbUseRidge">
-              <property name="value">
-               <number>1</number>
-              </property>
-             </widget>
-            </item>
-            <item row="9" column="12">
-             <widget class="QSpinBox" name="sbNbUseSparcity">
-              <property name="value">
-               <number>1</number>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QGroupBox" name="groupBox_6">
-           <property name="title">
-            <string>GRAMMAR / STRUCTURE</string>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_10">
-            <item row="2" column="0">
-             <widget class="QLabel" name="label_14">
-              <property name="text">
-               <string>Structure to be used :</string>
+               <number>0</number>
               </property>
              </widget>
             </item>
             <item row="0" column="0">
-             <widget class="QLabel" name="label_13">
-              <property name="text">
-               <string>Grammar to be used :</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0" colspan="2">
-             <widget class="Line" name="line_13">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QComboBox" name="cbGrammar">
+             <widget class="QPushButton" name="pbStart">
               <property name="minimumSize">
                <size>
-                <width>400</width>
-                <height>0</height>
+                <width>0</width>
+                <height>30</height>
                </size>
               </property>
-              <property name="editable">
-               <bool>true</bool>
+              <property name="maximumSize">
+               <size>
+                <width>100</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Start</string>
               </property>
              </widget>
             </item>
-            <item row="2" column="1">
-             <widget class="QComboBox" name="cbStructure">
-              <property name="editable">
-               <bool>true</bool>
+            <item row="1" column="2">
+             <widget class="QCheckBox" name="cbDisableMultiThread">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Disable mutlithread</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QCheckBox" name="cbEnableDisplay">
+              <property name="text">
+               <string>Enable display</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="3">
+             <widget class="QCheckBox" name="cbDisableGPU">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Disable gpu acceleration</string>
               </property>
              </widget>
             </item>
            </layout>
           </widget>
          </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QGroupBox" name="groupBox">
+        <property name="title">
+         <string>Display</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_3">
          <item row="0" column="0">
-          <layout class="QGridLayout" name="gridLayout_3">
-           <item row="0" column="0">
-            <widget class="QGroupBox" name="groupBox_3">
-             <property name="title">
-              <string>CORPUS LIST</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_5">
-              <item row="0" column="0" rowspan="2" colspan="2">
-               <widget class="QListWidget" name="lwCorpus">
-                <property name="maximumSize">
-                 <size>
-                  <width>500</width>
-                  <height>200</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="2">
-               <widget class="QPushButton" name="pbRemoveCorpus">
-                <property name="maximumSize">
-                 <size>
-                  <width>150</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Remove corpus</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="2">
-               <widget class="QPushButton" name="pbAddCorpus">
-                <property name="maximumSize">
-                 <size>
-                  <width>150</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Add corpus</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
+          <widget class="QTabWidget" name="tabPlots">
+           <property name="currentIndex">
+            <number>2</number>
+           </property>
+           <widget class="QWidget" name="tab">
+            <attribute name="title">
+             <string>X</string>
+            </attribute>
+            <layout class="QGridLayout" name="gridLayout_4">
+             <item row="0" column="1">
+              <widget class="QGroupBox" name="gbPlot">
+               <property name="title">
+                <string>PLOT</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_16">
+                <item row="0" column="1">
+                 <widget class="QScrollArea" name="scrollAreaPlotX">
+                  <property name="widgetResizable">
+                   <bool>false</bool>
+                  </property>
+                  <widget class="QWidget" name="scrollAreaWidgetContents">
+                   <property name="geometry">
+                    <rect>
+                     <x>0</x>
+                     <y>0</y>
+                     <width>69</width>
+                     <height>554</height>
+                    </rect>
+                   </property>
+                   <layout class="QVBoxLayout" name="vlXPlot"/>
+                  </widget>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QGroupBox" name="groupBox_11">
+               <property name="title">
+                <string>NEURONS DISPLAY SETTINGS</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_15">
+                <item row="0" column="3">
+                 <widget class="QSpinBox" name="sbEndRangeNeuronDisplay">
+                  <property name="maximumSize">
+                   <size>
+                    <width>75</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="maximum">
+                   <number>500000</number>
+                  </property>
+                  <property name="value">
+                   <number>50</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QSpinBox" name="sbStartRangeNeuronDisplay">
+                  <property name="maximumSize">
+                   <size>
+                    <width>75</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="maximum">
+                   <number>500000</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="2">
+                 <widget class="QLabel" name="laEndRangeNeuronDisplay">
+                  <property name="maximumSize">
+                   <size>
+                    <width>75</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>End range :</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="laStartNeuronDisplay">
+                  <property name="maximumSize">
+                   <size>
+                    <width>75</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Start range :</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="5">
+                 <widget class="QCheckBox" name="cbSelectRandomNeurons">
+                  <property name="text">
+                   <string>Select random neurons</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="7">
+                 <widget class="QSpinBox" name="sbNbRandomNeurons">
+                  <property name="maximum">
+                   <number>1000</number>
+                  </property>
+                  <property name="value">
+                   <number>1</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="4">
+                 <widget class="Line" name="line_19">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="6">
+                 <widget class="QLabel" name="label_6">
+                  <property name="text">
+                   <string>Number  :</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="tab_3">
+            <attribute name="title">
+             <string>Input</string>
+            </attribute>
+           </widget>
+           <widget class="QWidget" name="tab_2">
+            <attribute name="title">
+             <string>Output</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_3">
+             <item>
+              <widget class="QGroupBox" name="groupBox_3">
+               <property name="title">
+                <string>PLOT</string>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_4">
+                <item>
+                 <widget class="QScrollArea" name="scrollAreaPlotOutput">
+                  <property name="widgetResizable">
+                   <bool>false</bool>
+                  </property>
+                  <widget class="QWidget" name="scrollAreaOutputWidgetContents">
+                   <property name="geometry">
+                    <rect>
+                     <x>0</x>
+                     <y>0</y>
+                     <width>512</width>
+                     <height>642</height>
+                    </rect>
+                   </property>
+                   <layout class="QVBoxLayout" name="vlOutputPlot"/>
+                  </widget>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -981,109 +1249,12 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1292</width>
+     <width>1184</width>
      <height>21</height>
     </rect>
    </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QDockWidget" name="dwDisplay">
-   <property name="features">
-    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>2</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents">
-    <layout class="QGridLayout" name="gridLayout_8">
-     <item row="0" column="0">
-      <widget class="QGroupBox" name="groupBox_2">
-       <property name="title">
-        <string>DISPLAY</string>
-       </property>
-       <layout class="QGridLayout" name="gridLayout_12">
-        <item row="0" column="0">
-         <widget class="QGroupBox" name="groupBox_10">
-          <property name="title">
-           <string>MATRICE X TOT</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_13" columnstretch="1,5">
-           <item row="0" column="0">
-            <widget class="QGroupBox" name="groupBox_11">
-             <property name="title">
-              <string>SETTINGS</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_15">
-              <item row="0" column="1">
-               <widget class="QPushButton" name="pbUpdateMatriceDisplay">
-                <property name="text">
-                 <string>Update</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QSpinBox" name="sbStartMatrixValue">
-                <property name="maximum">
-                 <number>500000</number>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QSpinBox" name="sbEndMatrixValue">
-                <property name="maximum">
-                 <number>500000</number>
-                </property>
-                <property name="value">
-                 <number>50</number>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QCheckBox" name="cbEnableDisplay">
-                <property name="text">
-                 <string>Enable display</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QGroupBox" name="gbPlot">
-             <property name="title">
-              <string>PLOT</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_16">
-              <item row="0" column="1">
-               <widget class="QScrollArea" name="scrollAreaPlot">
-                <property name="widgetResizable">
-                 <bool>false</bool>
-                </property>
-                <widget class="QWidget" name="scrollAreaWidgetContents">
-                 <property name="geometry">
-                  <rect>
-                   <x>0</x>
-                   <y>0</y>
-                   <width>69</width>
-                   <height>554</height>
-                  </rect>
-                 </property>
-                 <layout class="QVBoxLayout" name="vlPlot"/>
-                </widget>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-  </widget>
  </widget>
  <resources/>
  <connections/>

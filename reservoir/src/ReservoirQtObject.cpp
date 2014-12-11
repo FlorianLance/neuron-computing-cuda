@@ -140,6 +140,331 @@ void ReservoirQt::generateWIn(cuint dimInput)
     emit sendLogInfo(QString::fromStdString(displayTime("END : generate WIn ", m_oTime, false, m_verbose)));
 }
 
+void ReservoirQt::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher, cv::Mat &sentencesOutputTrain, cv::Mat &xTot)
+{
+    // update progress bar
+        int l_steps = 0;
+        emit sendComputingState(0, meaningInputTrain.size[0]*2, QString("Build X"));
+
+    // init time
+        m_oTime = clock();
+
+    emit sendLogInfo(QString::fromStdString(displayTime("START : train ", m_oTime, false, m_verbose)));
+
+    // generate matrices
+        generateMatrixW();
+        generateWIn(meaningInputTrain.size[2]);
+
+    emit sendLogInfo(QString::fromStdString(displayTime("START : sub train ", m_oTime, false, m_verbose)));
+
+    // init x tot
+        int l_sizeTot[3] = {meaningInputTrain.size[0], 1 + meaningInputTrain.size[2] + m_nbNeurons,  meaningInputTrain.size[1]};
+        xTot = cv::Mat (3,l_sizeTot, CV_32FC1, cv::Scalar(0.f)); //  will contain the internal states of the reservoir for all sentences and all timesteps
+
+    // init x
+        cv::Mat l_X2Copy = cv::Mat::zeros(1 + meaningInputTrain.size[2] + m_nbNeurons, meaningInputTrain.size[1], CV_32FC1);
+
+    // init x prev
+        int l_size[1] = {m_w.rows};
+        cv::Mat l_xPrev2Copy(1,l_size, CV_32FC1, cv::Scalar(0.f));
+
+    float l_invLeakRate = 1.f - m_leakRate;
+
+    // mutex for openmp threads
+        QMutex l_lockerMainThread;
+
+    // info for generating the real time plot
+        int l_numberCurve = 10; // TODO  : parameterize
+        emit sendInfoPlot(l_numberCurve, meaningInputTrain.size[0], meaningInputTrain.size[1], QString("train"));
+
+        #pragma omp parallel for num_threads(m_numThread)
+            for(int ii = 0; ii < meaningInputTrain.size[0]; ++ii)
+            {
+                cv::Mat l_X = l_X2Copy.clone();
+                cv::Mat l_xPrev, l_x;
+                cv::Mat l_subMean(meaningInputTrain.size[1], meaningInputTrain.size[2], CV_32FC1, meaningInputTrain.data + meaningInputTrain.step[0] *ii);
+
+                for(int jj = 0; jj < meaningInputTrain.size[1]; ++jj)
+                {
+                    // X will contain all the internal states of the reservoir for all timesteps
+                    if(jj == 0)
+                    {
+                        l_xPrev = l_xPrev2Copy;
+                    }
+                    else
+                    {
+                        l_xPrev = l_x;
+                    }
+
+                    cv::Mat l_u = l_subMean.row(jj);
+                    cv::Mat l_temp(l_subMean.cols+1, 1, CV_32FC1);
+                    l_temp.at<float>(0) = 1.f;
+
+                    for(int kk = 0; kk < l_subMean.cols; ++kk)
+                    {
+                        l_temp.at<float>(kk+1) = l_u.at<float>(kk);
+                    }
+
+                    cv::Mat l_xTemp = (m_wIn * l_temp)+ (m_w * l_xPrev);
+
+                    cv::MatIterator_<float> it = l_xTemp.begin<float>(), it_end = l_xTemp.end<float>();
+                    for(;it != it_end; ++it)
+                    {
+                        (*it) = tanh(*it);
+                    }
+
+                    l_x = (l_xPrev * l_invLeakRate) + (l_xTemp * m_leakRate);
+
+
+                    cv::Mat display(l_X.rows, l_X.cols, CV_8UC3);
+                    for(int oo = 0; oo < display.rows * display.cols; ++oo)
+                    {
+                        float l_val = l_X.at<float>(oo);
+                        if(l_val < 0)
+                        {
+                            int l_val2 = static_cast<int>(255*l_val);
+                            if(l_val2 > 255)
+                            {
+                                l_val = 255;
+                            }
+
+                            display.at<cv::Vec3b>(oo) = cv::Vec3b(l_val2,0,122);
+                        }
+                        else
+                        {
+                            int l_val2 =  -static_cast<int>(255*l_val);
+                            if(l_val2 > 255)
+                            {
+                                l_val = 255;
+                            }
+                            display.at<cv::Vec3b>(oo) = cv::Vec3b(0,l_val2,122);
+                        }
+                    }
+
+                    cv::Mat l_temp2(l_temp.rows + l_x.rows, 1, CV_32FC1);
+
+                    for(int kk = 0; kk < l_temp.rows + l_x.rows; ++kk)
+                    {
+                        if(kk < l_temp.rows)
+                        {
+                            l_temp2.at<float>(kk) = l_temp.at<float>(kk);
+                        }
+                        else
+                        {
+                            l_temp2.at<float>(kk) = l_x.at<float>(kk - l_temp.rows);
+                        }
+                    }
+
+                    l_temp2.copyTo( l_X.col(jj));
+                }
+
+                for(int jj = 0; jj < l_X.rows; ++jj)
+                {
+                    for(int kk = 0; kk < l_X.cols; ++kk)
+                    {
+                        xTot.at<float>(ii,jj,kk) = l_X.at<float>(jj,kk);
+                    }
+                }
+
+
+                l_lockerMainThread.lock();
+                    emit sendComputingState(++l_steps, meaningInputTrain.size[0]*2, QString("Build X"));
+                l_lockerMainThread.unlock();
+
+                // send data only if the multi thread is disabled
+                if(m_sendMatrices)
+                {
+                    if(m_numThread == 1)
+                    {
+                        cv::Mat l_rgb2Display(100,l_X.cols, CV_8UC3);
+                        int l_currentCol = 0;
+                        QVector<QVector<double> > l_values;
+
+                        for(int jj = 100; jj < 200; ++jj) // l_X.rows
+                        {
+                            QVector<double> l_line;
+                            for(int kk = 0; kk < l_X.cols; ++kk)
+                            {
+                                l_rgb2Display.at<cv::Vec3b>(l_currentCol,kk) = cv::Vec3b(255*l_X.at<float>(jj,kk), 255*l_X.at<float>(jj,kk),255*l_X.at<float>(jj,kk));
+                                l_line.push_back(l_X.at<float>(jj,kk));
+                            }
+                            ++l_currentCol;
+
+                            l_values.push_back(l_line);
+                        }
+
+                        QImage l_image2Send = mat2QImage(l_rgb2Display);
+
+                        l_image2Send = l_image2Send.scaled(500, 500,Qt::KeepAspectRatio);
+
+                        emit sendMatriceImage2Display(l_image2Send);
+                        emit sendMatriceData(l_values);
+                    }
+                }
+            }
+        // end pragma
+
+        // clean inused matrices
+            l_X2Copy.release();
+            l_xPrev2Copy.release();
+
+        emit sendLogInfo(QString::fromStdString(displayTime("END : sub train ", m_oTime, false, m_verbose)));
+
+        emit sendComputingState(50, 100, QString("Tychonov-start"));
+        tikhonovRegularization(xTot, teacher, meaningInputTrain.size[2]);
+        emit sendComputingState(95, 100, QString("Tychonov-end"));
+
+        sentencesOutputTrain = teacher.clone();
+        sentencesOutputTrain.setTo(0.f);
+
+
+        #pragma omp parallel for
+            for(int ii = 0; ii < xTot.size[0]; ++ii)
+            {
+                cv::Mat l_X = cv::Mat::zeros(xTot.size[1], xTot.size[2], CV_32FC1);
+
+                for(int jj = 0; jj < l_X.rows; ++jj)
+                {
+                    for(int kk = 0; kk < l_X.cols; ++kk)
+                    {
+                        l_X.at<float>(jj,kk) = xTot.at<float>(ii,jj,kk);
+                    }
+                }
+
+                cv::Mat res;
+
+                res = (m_wOut * l_X).t();
+
+                for(int jj = 0; jj < sentencesOutputTrain.size[1]; ++jj)
+                {
+                    for(int kk = 0; kk < sentencesOutputTrain.size[2]; ++kk)
+                    {
+                        sentencesOutputTrain.at<float>(ii,jj,kk) = res.at<float>(jj,kk);
+                    }
+                }
+            }
+        // end pragma
+
+//    cv::Mat *l_outputClone = new cv::Mat; // TODO :
+//    (*l_outputClone) = sentencesOutputTrain.clone();
+    emit sendLogInfo(QString::fromStdString(displayTime("END : train ", m_oTime, false, m_verbose)));
+    emit sendComputingState(100, 100, QString("End training"));
+    emit sendOutputMatrix(sentencesOutputTrain);
+}
+
+
+void ReservoirQt::test(const cv::Mat &meaningInputTest, cv::Mat &sentencesOutputTest, cv::Mat &xTot)
+{
+    // update progress bar
+        int l_steps = 0;
+        emit sendComputingState(0, meaningInputTest.size[0], QString("Build X"));
+
+    // init time
+        m_oTime = clock();
+
+    // mutex for openmp threads
+        QMutex l_lockerMainThread;
+
+    emit sendLogInfo(QString::fromStdString(displayTime("START : test", m_oTime, false, m_verbose)));
+
+    // init x tot
+        int l_sizeTot[3] = {meaningInputTest.size[0], 1 + meaningInputTest.size[2] + m_nbNeurons,  meaningInputTest.size[1]};
+        xTot = cv::Mat (3,l_sizeTot, CV_32FC1); //  will contain the internal states of the reservoir for all sentences and all timesteps
+
+    // init sentences output
+        int l_sizeOut[3] = {l_sizeTot[0], l_sizeTot[2], m_wOut.rows};
+        sentencesOutputTest = cv::Mat(3, l_sizeOut, CV_32FC1);
+
+    float l_invLeakRate = 1.f - m_leakRate;
+
+    #pragma omp parallel for
+        for(int ii = 0; ii < meaningInputTest.size[0]; ++ii)
+        {
+            cv::Mat l_X = cv::Mat::zeros(1 + meaningInputTest.size[2] + m_nbNeurons, meaningInputTest.size[1],CV_32FC1);
+            cv::Mat l_xPrev, l_x;
+            cv::Mat l_subMean(meaningInputTest.size[1], meaningInputTest.size[2], CV_32FC1, meaningInputTest.data + meaningInputTest.step[0] *ii);
+
+            for(int jj = 0; jj < meaningInputTest.size[1]; ++jj)
+            {
+                // X will contain all the internal states of the reservoir for all timesteps
+                if(jj == 0)
+                {
+                    int l_size[1] = {m_w.rows};
+                    l_xPrev = cv::Mat(1,l_size, CV_32FC1, cv::Scalar(0.f));
+                }
+                else
+                {
+                    l_xPrev = l_x;
+                }
+
+                cv::Mat l_u = l_subMean.row(jj);
+                cv::Mat l_temp(l_subMean.cols+1, 1, CV_32FC1);
+                l_temp.at<float>(0) = 1.f;
+                for(int kk = 0; kk < l_subMean.cols; ++kk)
+                {
+                    l_temp.at<float>(kk+1) = l_u.at<float>(kk);
+                }
+
+                cv::Mat l_xTemp = (m_wIn * l_temp) + (m_w * l_xPrev);
+
+                cv::MatIterator_<float> it = l_xTemp.begin<float>(), it_end = l_xTemp.end<float>();
+                for(;it != it_end; ++it)
+                {
+                    (*it) = tanh(*it);
+                }
+
+                l_x = (l_xPrev * l_invLeakRate) + (l_xTemp * m_leakRate);
+
+                cv::Mat l_temp2(l_temp.rows + l_x.rows, 1, CV_32FC1);
+                for(int kk = 0; kk < l_temp.rows + l_x.rows; ++kk)
+                {
+                    if(kk < l_temp.rows)
+                    {
+                        l_temp2.at<float>(kk) = l_temp.at<float>(kk);
+                    }
+                    else
+                    {
+                        l_temp2.at<float>(kk) = l_x.at<float>(kk - l_temp.rows);
+                    }
+                }
+
+                l_temp2.copyTo( l_X.col(jj));
+
+                cv::Mat l_temp3(l_x.rows + l_subMean.cols+1, 1, CV_32FC1);
+                l_temp3.at<float>(0) = 1.f;
+                for(int kk = 0; kk < l_subMean.cols; ++kk)
+                {
+                    l_temp3.at<float>(kk+1) = l_u.at<float>(kk);
+                }
+                for(int kk = 0; kk < l_x.rows; ++kk)
+                {
+                    l_temp3.at<float>(kk+l_subMean.cols+1) = l_x.at<float>(kk);
+                }
+
+                cv::Mat l_y = m_wOut * l_temp3;
+                for(int kk = 0; kk < sentencesOutputTest.size[2]; ++kk)
+                {
+                    sentencesOutputTest.at<float>(ii,jj,kk) = l_y.at<float>(kk);
+                }
+            }
+            for(int jj = 0; jj < l_X.rows; ++jj)
+            {
+                for(int kk = 0; kk < l_X.cols; ++kk)
+                {
+                    xTot.at<float>(ii,jj,kk) = l_X.at<float>(jj,kk);
+                }
+            }
+
+            l_lockerMainThread.lock();
+                emit sendComputingState(++l_steps, meaningInputTest.size[0], QString("Build X"));
+            l_lockerMainThread.unlock();
+
+        }
+    // end omp parallel
+
+    emit sendLogInfo(QString::fromStdString(displayTime("END : test", m_oTime, false, m_verbose)));
+    emit sendComputingState(100, 100, QString("End test"));
+}
 
 void ReservoirQt::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTeacher, cuint dimInput)
 {
@@ -310,331 +635,6 @@ void ReservoirQt::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTe
     }
 
     emit sendLogInfo(QString::fromStdString(displayTime("END : tikhonovRegularization ", m_oTime, false, m_verbose)));
-}
-
-
-void ReservoirQt::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher, cv::Mat &sentencesOutputTrain, cv::Mat &xTot)
-{
-    // update progress bar
-        int l_steps = 0;
-        emit sendComputingState(0, meaningInputTrain.size[0]*2, QString("Build X"));
-
-    // init time
-        m_oTime = clock();
-
-    emit sendLogInfo(QString::fromStdString(displayTime("START : train ", m_oTime, false, m_verbose)));
-
-    // generate matrices
-        generateMatrixW();
-        generateWIn(meaningInputTrain.size[2]);
-
-    emit sendLogInfo(QString::fromStdString(displayTime("START : sub train ", m_oTime, false, m_verbose)));
-
-    // init x tot
-        int l_sizeTot[3] = {meaningInputTrain.size[0], 1 + meaningInputTrain.size[2] + m_nbNeurons,  meaningInputTrain.size[1]};
-        xTot = cv::Mat (3,l_sizeTot, CV_32FC1, cv::Scalar(0.f)); //  will contain the internal states of the reservoir for all sentences and all timesteps
-
-    // init x
-        cv::Mat l_X2Copy = cv::Mat::zeros(1 + meaningInputTrain.size[2] + m_nbNeurons, meaningInputTrain.size[1], CV_32FC1);
-
-    // init x prev
-        int l_size[1] = {m_w.rows};
-        cv::Mat l_xPrev2Copy(1,l_size, CV_32FC1, cv::Scalar(0.f));
-
-    float l_invLeakRate = 1.f - m_leakRate;
-
-    // mutex for openmp threads
-        QMutex l_lockerMainThread;
-
-    // info for generating the real time plot
-        int l_numberCurve = 10; // TODO  : parameterize
-        int l_lengthCurve = meaningInputTrain.size[0] * meaningInputTrain.size[1];
-        emit sendInfoPlot(l_numberCurve, l_lengthCurve, QString("train"));
-
-        #pragma omp parallel for num_threads(m_numThread)
-            for(int ii = 0; ii < meaningInputTrain.size[0]; ++ii)
-            {
-                cv::Mat l_X = l_X2Copy.clone();
-                cv::Mat l_xPrev, l_x;
-                cv::Mat l_subMean(meaningInputTrain.size[1], meaningInputTrain.size[2], CV_32FC1, meaningInputTrain.data + meaningInputTrain.step[0] *ii);
-
-                for(int jj = 0; jj < meaningInputTrain.size[1]; ++jj)
-                {
-                    // X will contain all the internal states of the reservoir for all timesteps
-                    if(jj == 0)
-                    {
-                        l_xPrev = l_xPrev2Copy;
-                    }
-                    else
-                    {
-                        l_xPrev = l_x;
-                    }
-
-                    cv::Mat l_u = l_subMean.row(jj);
-                    cv::Mat l_temp(l_subMean.cols+1, 1, CV_32FC1);
-                    l_temp.at<float>(0) = 1.f;
-
-                    for(int kk = 0; kk < l_subMean.cols; ++kk)
-                    {
-                        l_temp.at<float>(kk+1) = l_u.at<float>(kk);
-                    }
-
-                    cv::Mat l_xTemp = (m_wIn * l_temp)+ (m_w * l_xPrev);
-
-                    cv::MatIterator_<float> it = l_xTemp.begin<float>(), it_end = l_xTemp.end<float>();
-                    for(;it != it_end; ++it)
-                    {
-                        (*it) = tanh(*it);
-                    }
-
-                    l_x = (l_xPrev * l_invLeakRate) + (l_xTemp * m_leakRate);
-
-
-                    cv::Mat display(l_X.rows, l_X.cols, CV_8UC3);
-                    for(int oo = 0; oo < display.rows * display.cols; ++oo)
-                    {
-                        float l_val = l_X.at<float>(oo);
-                        if(l_val < 0)
-                        {
-                            int l_val2 = static_cast<int>(255*l_val);
-                            if(l_val2 > 255)
-                            {
-                                l_val = 255;
-                            }
-
-                            display.at<cv::Vec3b>(oo) = cv::Vec3b(l_val2,0,122);
-                        }
-                        else
-                        {
-                            int l_val2 =  -static_cast<int>(255*l_val);
-                            if(l_val2 > 255)
-                            {
-                                l_val = 255;
-                            }
-                            display.at<cv::Vec3b>(oo) = cv::Vec3b(0,l_val2,122);
-                        }
-                    }
-
-                    cv::Mat l_temp2(l_temp.rows + l_x.rows, 1, CV_32FC1);
-
-                    for(int kk = 0; kk < l_temp.rows + l_x.rows; ++kk)
-                    {
-                        if(kk < l_temp.rows)
-                        {
-                            l_temp2.at<float>(kk) = l_temp.at<float>(kk);
-                        }
-                        else
-                        {
-                            l_temp2.at<float>(kk) = l_x.at<float>(kk - l_temp.rows);
-                        }
-                    }
-
-                    l_temp2.copyTo( l_X.col(jj));
-                }
-
-                for(int jj = 0; jj < l_X.rows; ++jj)
-                {
-                    for(int kk = 0; kk < l_X.cols; ++kk)
-                    {
-                        xTot.at<float>(ii,jj,kk) = l_X.at<float>(jj,kk);
-                    }
-                }
-
-
-                l_lockerMainThread.lock();
-                    emit sendComputingState(++l_steps, meaningInputTrain.size[0]*2, QString("Build X"));
-                l_lockerMainThread.unlock();
-
-                // send data only if the multi thread is disabled
-                if(m_sendMatrices)
-                {
-                    if(m_numThread == 1)
-                    {
-                        cv::Mat l_rgb2Display(100,l_X.cols, CV_8UC3);
-                        int l_currentCol = 0;
-                        QVector<QVector<double> > l_values;
-
-                        for(int jj = 100; jj < 200; ++jj) // l_X.rows
-                        {
-                            QVector<double> l_line;
-                            for(int kk = 0; kk < l_X.cols; ++kk)
-                            {
-                                l_rgb2Display.at<cv::Vec3b>(l_currentCol,kk) = cv::Vec3b(255*l_X.at<float>(jj,kk), 255*l_X.at<float>(jj,kk),255*l_X.at<float>(jj,kk));
-                                l_line.push_back(l_X.at<float>(jj,kk));
-                            }
-                            ++l_currentCol;
-
-                            l_values.push_back(l_line);
-                        }
-
-                        QImage l_image2Send = mat2QImage(l_rgb2Display);
-
-                        l_image2Send = l_image2Send.scaled(500, 500,Qt::KeepAspectRatio);
-
-                        emit sendMatriceImage2Display(l_image2Send);
-                        emit sendMatriceData(l_values);
-                    }
-                }
-            }
-        // end pragma
-
-        // clean inused matrices
-            l_X2Copy.release();
-            l_xPrev2Copy.release();
-
-        emit sendLogInfo(QString::fromStdString(displayTime("END : sub train ", m_oTime, false, m_verbose)));
-
-        emit sendComputingState(50, 100, QString("Tychonov-start"));
-        tikhonovRegularization(xTot, teacher, meaningInputTrain.size[2]);
-        emit sendComputingState(95, 100, QString("Tychonov-end"));
-
-        sentencesOutputTrain = teacher.clone();
-        sentencesOutputTrain.setTo(0.f);
-
-
-        #pragma omp parallel for
-            for(int ii = 0; ii < xTot.size[0]; ++ii)
-            {
-                cv::Mat l_X = cv::Mat::zeros(xTot.size[1], xTot.size[2], CV_32FC1);
-
-                for(int jj = 0; jj < l_X.rows; ++jj)
-                {
-                    for(int kk = 0; kk < l_X.cols; ++kk)
-                    {
-                        l_X.at<float>(jj,kk) = xTot.at<float>(ii,jj,kk);
-                    }
-                }
-
-                cv::Mat res;
-
-                res = (m_wOut * l_X).t();
-
-                for(int jj = 0; jj < sentencesOutputTrain.size[1]; ++jj)
-                {
-                    for(int kk = 0; kk < sentencesOutputTrain.size[2]; ++kk)
-                    {
-                        sentencesOutputTrain.at<float>(ii,jj,kk) = res.at<float>(jj,kk);
-                    }
-                }
-            }
-        // end pragma
-
-    emit sendLogInfo(QString::fromStdString(displayTime("END : train ", m_oTime, false, m_verbose)));
-    emit sendComputingState(100, 100, QString("End training"));
-}
-
-
-void ReservoirQt::test(const cv::Mat &meaningInputTest, cv::Mat &sentencesOutputTest, cv::Mat &xTot)
-{
-    // update progress bar
-        int l_steps = 0;
-        emit sendComputingState(0, meaningInputTest.size[0], QString("Build X"));
-
-    // init time
-        m_oTime = clock();
-
-    // mutex for openmp threads
-        QMutex l_lockerMainThread;
-
-    emit sendLogInfo(QString::fromStdString(displayTime("START : test", m_oTime, false, m_verbose)));
-
-    // init x tot
-        int l_sizeTot[3] = {meaningInputTest.size[0], 1 + meaningInputTest.size[2] + m_nbNeurons,  meaningInputTest.size[1]};
-        xTot = cv::Mat (3,l_sizeTot, CV_32FC1); //  will contain the internal states of the reservoir for all sentences and all timesteps
-
-    // init sentences output
-        int l_sizeOut[3] = {l_sizeTot[0], l_sizeTot[2], m_wOut.rows};
-        sentencesOutputTest = cv::Mat(3, l_sizeOut, CV_32FC1);
-
-    float l_invLeakRate = 1.f - m_leakRate;
-
-    #pragma omp parallel for
-        for(int ii = 0; ii < meaningInputTest.size[0]; ++ii)
-        {
-            cv::Mat l_X = cv::Mat::zeros(1 + meaningInputTest.size[2] + m_nbNeurons, meaningInputTest.size[1],CV_32FC1);
-            cv::Mat l_xPrev, l_x;
-            cv::Mat l_subMean(meaningInputTest.size[1], meaningInputTest.size[2], CV_32FC1, meaningInputTest.data + meaningInputTest.step[0] *ii);
-
-            for(int jj = 0; jj < meaningInputTest.size[1]; ++jj)
-            {
-                // X will contain all the internal states of the reservoir for all timesteps
-                if(jj == 0)
-                {
-                    int l_size[1] = {m_w.rows};
-                    l_xPrev = cv::Mat(1,l_size, CV_32FC1, cv::Scalar(0.f));
-                }
-                else
-                {
-                    l_xPrev = l_x;
-                }
-
-                cv::Mat l_u = l_subMean.row(jj);
-                cv::Mat l_temp(l_subMean.cols+1, 1, CV_32FC1);
-                l_temp.at<float>(0) = 1.f;
-                for(int kk = 0; kk < l_subMean.cols; ++kk)
-                {
-                    l_temp.at<float>(kk+1) = l_u.at<float>(kk);
-                }
-
-                cv::Mat l_xTemp = (m_wIn * l_temp) + (m_w * l_xPrev);
-
-                cv::MatIterator_<float> it = l_xTemp.begin<float>(), it_end = l_xTemp.end<float>();
-                for(;it != it_end; ++it)
-                {
-                    (*it) = tanh(*it);
-                }
-
-                l_x = (l_xPrev * l_invLeakRate) + (l_xTemp * m_leakRate);
-
-                cv::Mat l_temp2(l_temp.rows + l_x.rows, 1, CV_32FC1);
-                for(int kk = 0; kk < l_temp.rows + l_x.rows; ++kk)
-                {
-                    if(kk < l_temp.rows)
-                    {
-                        l_temp2.at<float>(kk) = l_temp.at<float>(kk);
-                    }
-                    else
-                    {
-                        l_temp2.at<float>(kk) = l_x.at<float>(kk - l_temp.rows);
-                    }
-                }
-
-                l_temp2.copyTo( l_X.col(jj));
-
-                cv::Mat l_temp3(l_x.rows + l_subMean.cols+1, 1, CV_32FC1);
-                l_temp3.at<float>(0) = 1.f;
-                for(int kk = 0; kk < l_subMean.cols; ++kk)
-                {
-                    l_temp3.at<float>(kk+1) = l_u.at<float>(kk);
-                }
-                for(int kk = 0; kk < l_x.rows; ++kk)
-                {
-                    l_temp3.at<float>(kk+l_subMean.cols+1) = l_x.at<float>(kk);
-                }
-
-                cv::Mat l_y = m_wOut * l_temp3;
-                for(int kk = 0; kk < sentencesOutputTest.size[2]; ++kk)
-                {
-                    sentencesOutputTest.at<float>(ii,jj,kk) = l_y.at<float>(kk);
-                }
-            }
-            for(int jj = 0; jj < l_X.rows; ++jj)
-            {
-                for(int kk = 0; kk < l_X.cols; ++kk)
-                {
-                    xTot.at<float>(ii,jj,kk) = l_X.at<float>(jj,kk);
-                }
-            }
-
-            l_lockerMainThread.lock();
-                emit sendComputingState(++l_steps, meaningInputTest.size[0], QString("Build X"));
-            l_lockerMainThread.unlock();
-
-        }
-    // end omp parallel
-
-    emit sendLogInfo(QString::fromStdString(displayTime("END : test", m_oTime, false, m_verbose)));
-    emit sendComputingState(100, 100, QString("End test"));
 }
 
 void ReservoirQt::saveTraining(const string &path)

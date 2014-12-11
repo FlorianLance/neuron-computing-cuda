@@ -61,9 +61,9 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         m_pWInterface = new InterfaceWorker();
 
     // init widgets
-        m_uiInterface->scrollAreaPlot->setWidgetResizable(true);
+        m_uiInterface->scrollAreaPlotX->setWidgetResizable(true);
+        m_uiInterface->scrollAreaPlotOutput->setWidgetResizable(true);
         m_uiInterface->pbStop->setVisible(false);
-
 
     // init connections
         QObject::connect(this, SIGNAL(leaveProgram()), parent, SLOT(quit()));
@@ -151,8 +151,9 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(m_uiInterface->cbEnableDisplay, SIGNAL(clicked(bool)), l_model->reservoir(), SLOT(enableDisplay(bool)));
 //        QObject::connect(l_model->reservoir(), SIGNAL(sendMatriceImage2Display(QImage)), m_imageDisplay, SLOT(refreshDisplay(QImage)));
         QObject::connect(l_model->reservoir(), SIGNAL(sendMatriceData(QVector<QVector<double> >)), this, SLOT(plotData(QVector<QVector<double> >)));
-        QObject::connect(l_model->reservoir(), SIGNAL(sendInfoPlot(int,int,QString)), this, SLOT(initPlot(int,int,QString)));
+        QObject::connect(l_model->reservoir(), SIGNAL(sendInfoPlot(int,int,int,QString)), this, SLOT(initPlot(int,int,int,QString)));
         QObject::connect(l_model->reservoir(), SIGNAL(sendLogInfo(QString)), this, SLOT(displayLogInfo(QString)));
+        QObject::connect(l_model->reservoir(), SIGNAL(sendOutputMatrix(cv::Mat)), this, SLOT(displayOutputMatrix(cv::Mat)));
 
     // interface setting
         m_uiInterface->pbComputing->setRange(0,100);
@@ -166,7 +167,6 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         updateReservoirParameters();
         updateLanguageParameters();
 }
-
 
 Interface::~Interface()
 {
@@ -560,36 +560,63 @@ void Interface::plotData(QVector<QVector<double> > values)
 
     for(int ii = 0; ii < m_allValuesPlot[0].size(); ++ii)
     {
-        l_xValues.push_back(ii);
+        l_xValues.push_back(ii/static_cast<double>(m_sizeDim2Meaning));
     }
 
-    for(int ii = 0; ii < m_plotList.size(); ++ii)
+    for(int ii = 0; ii < m_plotListX.size(); ++ii)
     {
-        m_plotList[ii]->graph(0)->setPen(QPen(Qt::blue));
-        m_plotList[ii]->graph(0)->setData(l_xValues, m_allValuesPlot[ii]);
-        m_plotList[ii]->replot();
+        m_plotListX[ii]->graph(0)->setPen(QPen(Qt::blue));
+        m_plotListX[ii]->graph(0)->setData(l_xValues, m_allValuesPlot[ii]);
+        m_plotListX[ii]->replot();
     }
 }
 
-void Interface::initPlot(int nbCurves, int lenghtCurves, QString name)
+void Interface::initPlot(int nbCurves, int sizeDim1Meaning, int sizeDim2Meaning, QString name)
 {
-    qDeleteAll(m_plotList.begin(), m_plotList.end());
-    m_plotList.clear();
+    qDeleteAll(m_plotListX.begin(), m_plotListX.end());
+    m_plotListX.clear();
     m_allValuesPlot.clear();
+
+    m_sizeDim1Meaning = sizeDim1Meaning;
+    m_sizeDim2Meaning = sizeDim2Meaning;
+
+    QVector<QString> l_labelsX;
+
+    for(int ii = 0; ii < m_sizeDim1Meaning; ++ii)
+    {
+        l_labelsX << "S" + QString::number(ii+1);
+    }
+
+    QVector<QString> l_labelsY;
+    l_labelsY << "-1" << "0" << "1";
 
     for(int ii = 0; ii < nbCurves; ++ii)
     {
         QCustomPlot *l_plotDisplay = new QCustomPlot(this);
 
         l_plotDisplay->setFixedHeight(100);
-        m_plotList.push_back(l_plotDisplay);
-        m_uiInterface->vlPlot->addWidget(m_plotList.back());
-        m_plotList.back()->addGraph();
+        l_plotDisplay->setFixedWidth(sizeDim1Meaning*60);
+        m_plotListX.push_back(l_plotDisplay);
+        m_uiInterface->vlXPlot->addWidget(m_plotListX.back());
+        m_plotListX.back()->addGraph();
 
-        m_plotList.back()->xAxis->setLabel("x");
-        m_plotList.back()->yAxis->setLabel("y");
-        m_plotList.back()->xAxis->setRange(0, lenghtCurves);
-        m_plotList.back()->yAxis->setRange(-1, 1);
+        m_plotListX.back()->xAxis->setLabel("x");
+        m_plotListX.back()->xAxis->setRange(0, sizeDim1Meaning);
+
+        m_plotListX.back()->xAxis->setAutoTickStep(false);
+        m_plotListX.back()->xAxis->setAutoTickLabels(false);
+        m_plotListX.back()->xAxis->setTickVectorLabels(l_labelsX);
+        m_plotListX.back()->xAxis->setTickStep(1);
+        m_plotListX.back()->xAxis->setLabel("Sentences");
+
+
+        m_plotListX.back()->yAxis->setLabel("y");
+        m_plotListX.back()->yAxis->setRange(-1, 1);
+        m_plotListX.back()->yAxis->setAutoTickStep(false);
+        m_plotListX.back()->yAxis->setAutoTickLabels(false);
+        m_plotListX.back()->yAxis->setTickVectorLabels(l_labelsY);
+        m_plotListX.back()->yAxis->setTickStep(1.0);
+        m_plotListX.back()->yAxis->setLabel("Neuron value");
     }
 }
 
@@ -610,6 +637,104 @@ void Interface::displayLogInfo(QString info)
     m_uiInterface->tbInfos->verticalScrollBar()->setValue(m_uiInterface->tbInfos->verticalScrollBar()->maximum());
 }
 
+void Interface::displayOutputMatrix(cv::Mat output)
+{
+    qDeleteAll(m_plotListOutput.begin(), m_plotListOutput.end());
+    m_plotListOutput.clear();
+
+    QVector<QVector<QVector<double> > > l_sentences; // dim 1 -> sentences / dim 2 -> grammar / dim 3 -> values
+    QVector<QPen> l_pens;
+    QVector<double> l_xValues;
+    for(int ii = 0; ii < output.size[1]; ++ii)
+    {
+        l_xValues << ii;
+    }
+
+    for(int ii = 0; ii < output.size[0]; ++ii)
+    {
+        QVector<QVector<double> > l_grammars;
+
+        for(int jj = 0; jj  < output.size[2]; ++jj)
+        {
+            QVector<double> l_values;
+
+            for(int kk = 0; kk < output.size[1]; ++kk)
+            {
+                l_values << static_cast<double>(output.at<float>(ii,kk,jj));
+            }
+            l_grammars << l_values;
+
+
+            l_pens << QPen(QColor(rand()%255,rand()%255,rand()%255));
+        }
+        l_sentences << l_grammars;
+    }
+
+    qDebug() << l_sentences.size() << " " << l_sentences[0].size() << " " << l_sentences[0][0].size();
+
+//    QVector<QString> l_labelsX;
+
+//    for(int ii = 0; ii < m_sizeDim1Meaning; ++ii)
+//    {
+//        l_labelsX << "S" + QString::number(ii+1);
+//    }
+
+//    QVector<QString> l_labelsY;
+//    l_labelsY << "-1" << "0" << "1";
+
+
+    QVector<QString> l_labelsY;
+    l_labelsY << "-0.2" << "0.4" << "1.0" << "1.6" << "2.2";
+
+    for(int ii = 0; ii < l_sentences.size(); ++ii)
+    {
+        QCustomPlot *l_plotDisplay = new QCustomPlot(this);
+        l_plotDisplay->setFixedHeight(150);
+        l_plotDisplay->setFixedWidth(output.size[2]*100);
+        m_plotListOutput.push_back(l_plotDisplay);
+        m_uiInterface->vlOutputPlot->addWidget(m_plotListOutput.back());
+
+        for(int jj = 0; jj < l_sentences[0].size(); ++jj)
+        {
+            m_plotListOutput.back()->addGraph();
+            m_plotListOutput[ii]->graph(jj)->setPen(l_pens[jj]);
+            m_plotListOutput[ii]->graph(jj)->setData(l_xValues, l_sentences[ii][jj]);
+
+        }
+
+//        m_plotListOutput.back()->xAxis->setTickStep(1);
+        m_plotListOutput.back()->xAxis->setRange(0, output.size[1]);
+
+        m_plotListOutput.back()->yAxis->setAutoTickStep(false);
+        m_plotListOutput.back()->yAxis->setAutoTickLabels(false);
+        m_plotListOutput.back()->yAxis->setRange(-0.2, 2.2);
+        m_plotListOutput.back()->yAxis->setTickStep(0.6);
+        m_plotListOutput.back()->yAxis->setTickVectorLabels(l_labelsY);
+        m_plotListOutput.back()->replot();
+
+//        m_plotListX.back()->addGraph();
+
+//        m_plotListX.back()->xAxis->setLabel("x");
+//        m_plotListX.back()->xAxis->setRange(0, sizeDim1Meaning);
+
+//        m_plotListX.back()->xAxis->setAutoTickStep(false);
+//        m_plotListX.back()->xAxis->setAutoTickLabels(false);
+//        m_plotListX.back()->xAxis->setTickVectorLabels(l_labelsX);
+//        m_plotListX.back()->xAxis->setTickStep(1);
+//        m_plotListX.back()->xAxis->setLabel("Sentences");
+
+
+//        m_plotListX.back()->yAxis->setLabel("y");
+//        m_plotListX.back()->yAxis->setRange(-1, 1);
+//        m_plotListX.back()->yAxis->setAutoTickStep(false);
+//        m_plotListX.back()->yAxis->setAutoTickLabels(false);
+//        m_plotListX.back()->yAxis->setTickVectorLabels(l_labelsY);
+//        m_plotListX.back()->yAxis->setTickStep(1.0);
+//        m_plotListX.back()->yAxis->setLabel("Neuron value");
+    }
+
+}
+
 InterfaceWorker::InterfaceWorker() : m_gridSearch(new GridSearchQt(m_model)), m_nbOfCorpus(0)
 {
     qRegisterMetaType<ReservoirParameters>("ReservoirParameters");
@@ -617,6 +742,7 @@ InterfaceWorker::InterfaceWorker() : m_gridSearch(new GridSearchQt(m_model)), m_
     qRegisterMetaType<ModelParametersQt>("ModelParametersQt");
     qRegisterMetaType<ResultsDisplayReservoir>("ResultsDisplayReservoir");
     qRegisterMetaType<QVector<QVector<double> > >("QVector<QVector<double> >");
+    qRegisterMetaType<cv::Mat>("cv::Mat");
 }
 
 InterfaceWorker::~InterfaceWorker()

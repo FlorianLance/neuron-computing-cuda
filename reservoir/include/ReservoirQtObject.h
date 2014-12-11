@@ -155,12 +155,17 @@ class ReservoirQt  : public QObject
         /**
          * @brief sendInfoPlot
          */
-        void sendInfoPlot(int, int, QString);
+        void sendInfoPlot(int, int, int, QString);
 
         /**
          * @brief sendLogInfo
          */
         void sendLogInfo(QString);
+
+        /**
+         * @brief sendOutputMatrix
+         */
+        void sendOutputMatrix(cv::Mat);
 
     private :
 

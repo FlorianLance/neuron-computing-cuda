@@ -599,8 +599,8 @@ set terminal png size 2000,2000
 #set multiplot layout 2, 1 title "Analyse random meaning/sentences influence (corpus 120 - 3000 neurons)"
 set multiplot layout 2, 1 title "Analyse random meaning/sentences influence (corpus jap - 500 neurons)"
 
-set xrange [-1:11]
-set xtics 0,1,10;
+set xrange [-1:6]
+set xtics 0,1,5;
 #set xrange [-1:9]
 #set xtics 0,1,8;
 
@@ -610,17 +610,17 @@ set ytics 0,10,100;
 
 set key left bottom
 
-title1 = "Corpus 0 -> jap : 24-no_random"
-title7 = "Corpus 1 -> jap : 24-5r_meaning"
-title8 = "Corpus 2 -> jap : 24-10r_meaning"
-title9 = "Corpus 3 -> jap : 24-15r_meaning"
-title10 = "Corpus 4 -> jap : 24-20r_meaning"
-title11 = "Corpus 5 -> jap : 24-24r_meaning"
-title2 = "Corpus 6 -> jap : 24-5r_sentence"
-title3 = "Corpus 7 -> jap : 24-10r_sentence"
-title4 = "Corpus 8 -> jap : 24-15r_sentence"
-title5 = "Corpus 9 -> jap : 24-20r_sentence"
-title6 = "Corpus 10 -> jap : 24-24r_sentence"
+#title1 = "Corpus 0 -> jap : 24-no_random"
+#title7 = "Corpus 1 -> jap : 24-5r_meaning"
+#title8 = "Corpus 2 -> jap : 24-10r_meaning"
+#title9 = "Corpus 3 -> jap : 24-15r_meaning"
+#title10 = "Corpus 4 -> jap : 24-20r_meaning"
+#title11 = "Corpus 5 -> jap : 24-24r_meaning"
+#title2 = "Corpus 6 -> jap : 24-5r_sentence"
+#title3 = "Corpus 7 -> jap : 24-10r_sentence"
+#title4 = "Corpus 8 -> jap : 24-15r_sentence"
+#title5 = "Corpus 9 -> jap : 24-20r_sentence"
+#title6 = "Corpus 10 -> jap : 24-24r_sentence"
 
 #title1 = "Corpus 0 -> 120 : 120-no_random"
 #title2 = "Corpus 1 -> 120 : 120-30r_meaning"
@@ -633,21 +633,37 @@ title6 = "Corpus 10 -> jap : 24-24r_sentence"
 #title9 = "Corpus 8 -> 120 : 120-120r_sentence"
 
 
+title1 = "Corpus 0 -> jap : 24-no_random"
+title2 = "Corpus 1 -> jap : 24-5r_info"
+title3 = "Corpus 2 -> jap : 24-10r_info"
+title4 = "Corpus 3 -> jap : 24-15r_info"
+title5 = "Corpus 4 -> jap : 24-20r_info"
+title6 = "Corpus 5 -> jap : 24-24r_info"
+
 
 set xlabel "corpus id"
 set ylabel "grammar absolute correct position %"
+
 
 plot file u ($1==0?$1:1/0):@res1_id:(0.1) t title1 w boxplot, \
      file u ($1==1?$1:1/0):@res1_id:(0.1) t title2 w boxplot, \
      file u ($1==2?$1:1/0):@res1_id:(0.1) t title3 w boxplot, \
      file u ($1==3?$1:1/0):@res1_id:(0.1) t title4 w boxplot, \
      file u ($1==4?$1:1/0):@res1_id:(0.1) t title5 w boxplot, \
-     file u ($1==5?$1:1/0):@res1_id:(0.1) t title6 w boxplot, \
-     file u ($1==6?$1:1/0):@res1_id:(0.1) t title7 w boxplot, \
-     file u ($1==7?$1:1/0):@res1_id:(0.1) t title8 w boxplot, \
-     file u ($1==8?$1:1/0):@res1_id:(0.1) t title9 w boxplot, \
-     file u ($1==9?$1:1/0):@res1_id:(0.1) t title10 w boxplot,\
-     file u ($1==10?$1:1/0):@res1_id:(0.1) t title11 w boxplot
+     file u ($1==5?$1:1/0):@res1_id:(0.1) t title6 w boxplot
+
+
+#plot file u ($1==0?$1:1/0):@res1_id:(0.1) t title1 w boxplot, \
+#     file u ($1==1?$1:1/0):@res1_id:(0.1) t title2 w boxplot, \
+#     file u ($1==2?$1:1/0):@res1_id:(0.1) t title3 w boxplot, \
+#     file u ($1==3?$1:1/0):@res1_id:(0.1) t title4 w boxplot, \
+#     file u ($1==4?$1:1/0):@res1_id:(0.1) t title5 w boxplot, \
+#     file u ($1==5?$1:1/0):@res1_id:(0.1) t title6 w boxplot, \
+#     file u ($1==6?$1:1/0):@res1_id:(0.1) t title7 w boxplot, \
+#     file u ($1==7?$1:1/0):@res1_id:(0.1) t title8 w boxplot, \
+#     file u ($1==8?$1:1/0):@res1_id:(0.1) t title9 w boxplot, \
+#     file u ($1==9?$1:1/0):@res1_id:(0.1) t title10 w boxplot,\
+#     file u ($1==10?$1:1/0):@res1_id:(0.1) t title11 w boxplot
 
 #plot file u ($1==0?$1:1/0):@res1_id:(0.1) t title1 w boxplot, \
 #     file u ($1==1?$1:1/0):@res1_id:(0.1) t title2 w boxplot, \
@@ -673,17 +689,24 @@ plot file u ($1==0?$1:1/0):@res1_id:(0.1) t title1 w boxplot, \
 #     file u ($1==10?$1:1/0):@res2_id:(0.1) t title11 w boxplot
 
 set ylabel "all words absolute correct position %"
+#plot file u ($1==0?$1:1/0):@res3_id:(0.1) t title1 w boxplot, \
+#     file u ($1==1?$1:1/0):@res3_id:(0.1) t title2 w boxplot, \
+#     file u ($1==2?$1:1/0):@res3_id:(0.1) t title3 w boxplot, \
+#     file u ($1==3?$1:1/0):@res3_id:(0.1) t title4 w boxplot, \
+#     file u ($1==4?$1:1/0):@res3_id:(0.1) t title5 w boxplot, \
+#     file u ($1==5?$1:1/0):@res3_id:(0.1) t title6 w boxplot, \
+#     file u ($1==6?$1:1/0):@res3_id:(0.1) t title7 w boxplot, \
+#     file u ($1==7?$1:1/0):@res3_id:(0.1) t title8 w boxplot, \
+#     file u ($1==8?$1:1/0):@res3_id:(0.1) t title9 w boxplot, \
+#     file u ($1==9?$1:1/0):@res3_id:(0.1) t title10 w boxplot,\
+#     file u ($1==10?$1:1/0):@res3_id:(0.1) t title11 w boxplot
+
 plot file u ($1==0?$1:1/0):@res3_id:(0.1) t title1 w boxplot, \
      file u ($1==1?$1:1/0):@res3_id:(0.1) t title2 w boxplot, \
      file u ($1==2?$1:1/0):@res3_id:(0.1) t title3 w boxplot, \
      file u ($1==3?$1:1/0):@res3_id:(0.1) t title4 w boxplot, \
      file u ($1==4?$1:1/0):@res3_id:(0.1) t title5 w boxplot, \
-     file u ($1==5?$1:1/0):@res3_id:(0.1) t title6 w boxplot, \
-     file u ($1==6?$1:1/0):@res3_id:(0.1) t title7 w boxplot, \
-     file u ($1==7?$1:1/0):@res3_id:(0.1) t title8 w boxplot, \
-     file u ($1==8?$1:1/0):@res3_id:(0.1) t title9 w boxplot, \
-     file u ($1==9?$1:1/0):@res3_id:(0.1) t title10 w boxplot,\
-     file u ($1==10?$1:1/0):@res3_id:(0.1) t title11 w boxplot
+     file u ($1==5?$1:1/0):@res3_id:(0.1) t title6 w boxplot
 
 #plot file u ($1==0?$1:1/0):@res3_id:(0.1) t title1 w boxplot, \
 #     file u ($1==1?$1:1/0):@res3_id:(0.1) t title2 w boxplot, \
