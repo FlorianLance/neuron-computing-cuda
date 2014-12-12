@@ -14,7 +14,7 @@
    <string>Neurons-Reservoir-Computing-Interface</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0">
+   <layout class="QGridLayout" name="gridLayout_2" columnstretch="0">
     <item row="0" column="0" rowspan="4">
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
@@ -626,6 +626,9 @@
                 </item>
                 <item row="4" column="12">
                  <widget class="QSpinBox" name="sbNbUseNeurons">
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
                   <property name="value">
                    <number>1</number>
                   </property>
@@ -633,6 +636,9 @@
                 </item>
                 <item row="5" column="12">
                  <widget class="QSpinBox" name="sbNbUseLeakRate">
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
                   <property name="value">
                    <number>1</number>
                   </property>
@@ -640,6 +646,9 @@
                 </item>
                 <item row="6" column="12">
                  <widget class="QSpinBox" name="sbNbUseISS">
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
                   <property name="value">
                    <number>1</number>
                   </property>
@@ -647,6 +656,9 @@
                 </item>
                 <item row="7" column="12">
                  <widget class="QSpinBox" name="sbNbUseSpectralRadius">
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
                   <property name="value">
                    <number>1</number>
                   </property>
@@ -654,6 +666,9 @@
                 </item>
                 <item row="8" column="12">
                  <widget class="QSpinBox" name="sbNbUseRidge">
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
                   <property name="value">
                    <number>1</number>
                   </property>
@@ -661,6 +676,9 @@
                 </item>
                 <item row="9" column="12">
                  <widget class="QSpinBox" name="sbNbUseSparcity">
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
                   <property name="value">
                    <number>1</number>
                   </property>
@@ -670,9 +688,9 @@
               </widget>
              </item>
              <item>
-              <widget class="QGroupBox" name="gbGrammarStructure">
+              <widget class="QGroupBox" name="gbCCWStructure">
                <property name="title">
-                <string>GRAMMAR / STRUCTURE</string>
+                <string>CCW / STRUCTURE</string>
                </property>
                <layout class="QGridLayout" name="gridLayout_10">
                 <item row="2" column="0">
@@ -683,9 +701,9 @@
                  </widget>
                 </item>
                 <item row="0" column="0">
-                 <widget class="QLabel" name="label_13">
+                 <widget class="QLabel" name="laCCW">
                   <property name="text">
-                   <string>Grammar to be used :</string>
+                   <string>CCW to be used :</string>
                   </property>
                  </widget>
                 </item>
@@ -697,7 +715,7 @@
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QComboBox" name="cbGrammar">
+                 <widget class="QComboBox" name="cbCCW">
                   <property name="minimumSize">
                    <size>
                     <width>400</width>
@@ -850,16 +868,52 @@
                </layout>
               </widget>
              </item>
+             <item>
+              <widget class="QGroupBox" name="groupBox_2">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>50</height>
+                </size>
+               </property>
+               <property name="title">
+                <string>SYSTEM</string>
+               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout">
+                <item>
+                 <widget class="QCheckBox" name="cbEnableMultiThread">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="text">
+                   <string>Enable mutlithread</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="cbEnableGPU">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="text">
+                   <string>Enable gpu acceleration</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
             </layout>
-            <zorder>gbCorpusList</zorder>
-            <zorder>gbCorpusList</zorder>
-            <zorder>gbReservoirParameters</zorder>
-            <zorder>gbGrammarStructure</zorder>
-            <zorder>gbTrainTest</zorder>
            </widget>
            <widget class="QWidget" name="tabInfos">
             <attribute name="title">
-             <string>INFOS</string>
+             <string>INFOS / RESULTS</string>
             </attribute>
             <layout class="QVBoxLayout" name="verticalLayout_2">
              <item>
@@ -972,7 +1026,7 @@
               </property>
              </widget>
             </item>
-            <item row="1" column="0">
+            <item row="0" column="1">
              <widget class="QPushButton" name="pbStop">
               <property name="enabled">
                <bool>false</bool>
@@ -994,7 +1048,7 @@
               </property>
              </widget>
             </item>
-            <item row="0" column="1" colspan="6">
+            <item row="0" column="2" colspan="5">
              <widget class="QProgressBar" name="pbComputing">
               <property name="enabled">
                <bool>false</bool>
@@ -1023,33 +1077,6 @@
               </property>
              </widget>
             </item>
-            <item row="1" column="2">
-             <widget class="QCheckBox" name="cbDisableMultiThread">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="text">
-               <string>Disable mutlithread</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QCheckBox" name="cbEnableDisplay">
-              <property name="text">
-               <string>Enable display</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="3">
-             <widget class="QCheckBox" name="cbDisableGPU">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="text">
-               <string>Disable gpu acceleration</string>
-              </property>
-             </widget>
-            </item>
            </layout>
           </widget>
          </item>
@@ -1065,7 +1092,7 @@
          <item row="0" column="0">
           <widget class="QTabWidget" name="tabPlots">
            <property name="currentIndex">
-            <number>2</number>
+            <number>1</number>
            </property>
            <widget class="QWidget" name="tab">
             <attribute name="title">
@@ -1105,7 +1132,7 @@
                 <string>NEURONS DISPLAY SETTINGS</string>
                </property>
                <layout class="QGridLayout" name="gridLayout_15">
-                <item row="0" column="3">
+                <item row="1" column="3">
                  <widget class="QSpinBox" name="sbEndRangeNeuronDisplay">
                   <property name="maximumSize">
                    <size>
@@ -1121,7 +1148,7 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="1">
+                <item row="1" column="1">
                  <widget class="QSpinBox" name="sbStartRangeNeuronDisplay">
                   <property name="maximumSize">
                    <size>
@@ -1134,7 +1161,7 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="2">
+                <item row="1" column="2">
                  <widget class="QLabel" name="laEndRangeNeuronDisplay">
                   <property name="maximumSize">
                    <size>
@@ -1147,7 +1174,7 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="0">
+                <item row="1" column="0">
                  <widget class="QLabel" name="laStartNeuronDisplay">
                   <property name="maximumSize">
                    <size>
@@ -1160,14 +1187,14 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="5">
+                <item row="1" column="5">
                  <widget class="QCheckBox" name="cbSelectRandomNeurons">
                   <property name="text">
                    <string>Select random neurons</string>
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="7">
+                <item row="1" column="7">
                  <widget class="QSpinBox" name="sbNbRandomNeurons">
                   <property name="maximum">
                    <number>1000</number>
@@ -1177,17 +1204,30 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="4">
+                <item row="1" column="4">
                  <widget class="Line" name="line_19">
                   <property name="orientation">
                    <enum>Qt::Vertical</enum>
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="6">
+                <item row="1" column="6">
                  <widget class="QLabel" name="label_6">
                   <property name="text">
                    <string>Number  :</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QCheckBox" name="cbEnableDisplay">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="text">
+                   <string>Enable display</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
                   </property>
                  </widget>
                 </item>
@@ -1200,6 +1240,35 @@
             <attribute name="title">
              <string>Input</string>
             </attribute>
+            <layout class="QGridLayout" name="gridLayout_8">
+             <item row="0" column="0">
+              <widget class="QGroupBox" name="groupBox_5">
+               <property name="title">
+                <string>PLOT</string>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_5">
+                <item>
+                 <widget class="QScrollArea" name="scrollAreaPlotInput">
+                  <property name="widgetResizable">
+                   <bool>false</bool>
+                  </property>
+                  <widget class="QWidget" name="scrollAreaInputWidgetContents">
+                   <property name="geometry">
+                    <rect>
+                     <x>0</x>
+                     <y>0</y>
+                     <width>513</width>
+                     <height>642</height>
+                    </rect>
+                   </property>
+                   <layout class="QVBoxLayout" name="vlInputPlot"/>
+                  </widget>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
            </widget>
            <widget class="QWidget" name="tab_2">
             <attribute name="title">
@@ -1212,6 +1281,9 @@
                 <string>PLOT</string>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_4">
+                <item>
+                 <layout class="QHBoxLayout" name="hlLabelsPlot"/>
+                </item>
                 <item>
                  <widget class="QScrollArea" name="scrollAreaPlotOutput">
                   <property name="widgetResizable">

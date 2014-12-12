@@ -56,9 +56,9 @@ void ModelQt::resetModelParameters(const ModelParametersQt &newParameters, cbool
         m_reservoir->setCudaProperties(m_parameters.m_useCudaInv, m_parameters.m_useCudaMult);
 }
 
-void ModelQt::setGrammar(const Sentence &grammar, const Sentence &structure)
+void ModelQt::setCCWAndStructure(const Sentence &CCW, const Sentence &structure)
 {
-    m_grammar   = grammar;
+    m_CCW   = CCW;
     m_structure = structure;
 }
 
@@ -233,9 +233,9 @@ void ModelQt::computeResultsData(cbool trainResults, const std::string &pathSave
             {
                 bool l_addWord = false;
 
-                for(int jj = 0; jj < m_grammar.size(); ++jj)
+                for(int jj = 0; jj < m_CCW.size(); ++jj)
                 {
-                    if(l_currentGoal[ii] == m_grammar[jj])
+                    if(l_currentGoal[ii] == m_CCW[jj])
                     {
                         l_addWord = true;
                         break;
@@ -260,9 +260,9 @@ void ModelQt::computeResultsData(cbool trainResults, const std::string &pathSave
             {
                 bool l_addWord = false;
 
-                for(int jj = 0; jj < m_grammar.size(); ++jj)
+                for(int jj = 0; jj < m_CCW.size(); ++jj)
                 {
-                    if(l_currentRes[ii] == m_grammar[jj])
+                    if(l_currentRes[ii] == m_CCW[jj])
                     {
                         l_addWord = true;
                         break;
@@ -443,9 +443,9 @@ void ModelQt::launchTraining()
 
     // generate close class word arrays
         m_closedClassWords.clear();
-        if(m_grammar.size() > 0)
+        if(m_CCW.size() > 0)
         {
-            m_closedClassWords = m_grammar;
+            m_closedClassWords = m_CCW;
             m_closedClassWords.push_back("X");
         }
         else
@@ -487,16 +487,18 @@ void ModelQt::launchTraining()
 
     // init matrices
         cv::Mat l_3DMatStimMeanTrain, l_3DMatStimSentTrain, l_internalStatesTrain;
-        std::vector<cv::Mat> l_3DVMatStimMeanTrain, l_3DVMatStimSentTrain, l_internalStatesTrainV; // TEST
-
+//        std::vector<cv::Mat> l_3DVMatStimMeanTrain, l_3DVMatStimSentTrain, l_internalStatesTrainV; // TEST
 
     // load input matrices created in the python script)
         load3DMatrixFromNpPythonSaveTextF(QString("../data/input/stim_mean_train.txt"), l_3DMatStimMeanTrain);
         load3DMatrixFromNpPythonSaveTextF(QString("../data/input/stim_sent_train.txt"), l_3DMatStimSentTrain);
-        load3DMatrixFromNpPythonSaveTextF(QString("../data/input/stim_mean_train.txt"), l_3DVMatStimMeanTrain);
-        load3DMatrixFromNpPythonSaveTextF(QString("../data/input/stim_sent_train.txt"), l_3DVMatStimSentTrain);
+//        load3DMatrixFromNpPythonSaveTextF(QString("../data/input/stim_mean_train.txt"), l_3DVMatStimMeanTrain);
+//        load3DMatrixFromNpPythonSaveTextF(QString("../data/input/stim_sent_train.txt"), l_3DVMatStimSentTrain);
 
-    // train reservoir
+    // send train input matrices to be displayed
+        sendTrainInputMatrix(l_3DMatStimMeanTrain,l_3DMatStimSentTrain);
+
+    // train reservoir        
         displayTime("Start reservoir training ", l_trainingTime, false, m_verbose);
             m_reservoir->train(l_3DMatStimMeanTrain, l_3DMatStimSentTrain, m_3DMatSentencesOutputTrain, l_internalStatesTrain);
         displayTime("End reservoir training ", l_trainingTime, true, m_verbose);
@@ -633,9 +635,9 @@ bool ModelQt::launchTests(const std::string &corpusTestFilePath)
 
     // generate close class word arrays
         m_closedClassWords.clear();
-        if(m_grammar.size() > 0)
+        if(m_CCW.size() > 0)
         {
-            m_closedClassWords = m_grammar;
+            m_closedClassWords = m_CCW;
             m_closedClassWords.push_back("X");
         }
         else

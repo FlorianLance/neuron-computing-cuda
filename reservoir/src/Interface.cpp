@@ -36,11 +36,11 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
     m_uiInterface->setupUi(this);
     this->setWindowTitle(QString("Reservoir - cuda"));
 
-    // init gramar / structure (TEMP)
-        QStringList l_listGrammar, l_listStructure;
-        l_listGrammar << "and s of the to . -ed -ing -s by it that was did , from";
-        l_listGrammar << "-ga -ni -wo -yotte -o -to sore";
-        m_uiInterface->cbGrammar->addItems(l_listGrammar);
+    // init CCW / structure (TEMP)
+        QStringList l_listCCW, l_listStructure;
+        l_listCCW << "and s of the to . -ed -ing -s by it that was did , from";
+        l_listCCW << "-ga -ni -wo -yotte -o -to sore";
+        m_uiInterface->cbCCW->addItems(l_listCCW);
         l_listStructure << "P0 A1 O2 R3";
         l_listStructure << "P0 A1 O2 R3 Q0";
         m_uiInterface->cbStructure->addItems(l_listStructure);
@@ -63,6 +63,7 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
     // init widgets
         m_uiInterface->scrollAreaPlotX->setWidgetResizable(true);
         m_uiInterface->scrollAreaPlotOutput->setWidgetResizable(true);
+        m_uiInterface->scrollAreaPlotInput->setWidgetResizable(true);
         m_uiInterface->pbStop->setVisible(false);
 
     // init connections
@@ -111,6 +112,7 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(m_uiInterface->cbSparcity,             SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
         QObject::connect(m_uiInterface->cbTrainingFile,         SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
         QObject::connect(m_uiInterface->cbOnlyStartValue,       SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
+        QObject::connect(m_uiInterface->cbEnableGPU,            SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
 
         // lineedit
         QObject::connect(m_uiInterface->leNeuronsOperation,         SIGNAL(editingFinished()), SLOT(updateReservoirParameters()));
@@ -123,8 +125,8 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         // combobox
         QObject::connect(m_uiInterface->cbStructure,    SIGNAL(currentIndexChanged(int)), SLOT(updateLanguageParameters(int)));
         QObject::connect(m_uiInterface->cbStructure,    SIGNAL(editTextChanged(QString)), SLOT(updateLanguageParameters(QString)));
-        QObject::connect(m_uiInterface->cbGrammar,      SIGNAL(currentIndexChanged(int)), SLOT(updateLanguageParameters(int)));
-        QObject::connect(m_uiInterface->cbGrammar,      SIGNAL(editTextChanged(QString)), SLOT(updateLanguageParameters(QString)));        
+        QObject::connect(m_uiInterface->cbCCW,          SIGNAL(currentIndexChanged(int)), SLOT(updateLanguageParameters(int)));
+        QObject::connect(m_uiInterface->cbCCW,          SIGNAL(editTextChanged(QString)), SLOT(updateLanguageParameters(QString)));
 
         // lock
         QObject::connect(m_pWInterface, SIGNAL(lockInterfaceSignal(bool)), this, SLOT(lockInterface(bool)));
@@ -147,13 +149,13 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         // model
         ModelQt *l_model = m_pWInterface->model();
         QObject::connect(l_model->reservoir(), SIGNAL(sendComputingState(int,int,QString)), this, SLOT(updateProgressBar(int, int, QString)));
-        QObject::connect(m_uiInterface->cbEnableDisplay, SIGNAL(clicked(bool)), l_model->reservoir(), SLOT(disableMaxOmpThreadNumber(bool)));
+        QObject::connect(m_uiInterface->cbEnableMultiThread, SIGNAL(toggled(bool)), l_model->reservoir(), SLOT(enableMaxOmpThreadNumber(bool)));
         QObject::connect(m_uiInterface->cbEnableDisplay, SIGNAL(clicked(bool)), l_model->reservoir(), SLOT(enableDisplay(bool)));
-//        QObject::connect(l_model->reservoir(), SIGNAL(sendMatriceImage2Display(QImage)), m_imageDisplay, SLOT(refreshDisplay(QImage)));
         QObject::connect(l_model->reservoir(), SIGNAL(sendMatriceData(QVector<QVector<double> >)), this, SLOT(plotData(QVector<QVector<double> >)));
         QObject::connect(l_model->reservoir(), SIGNAL(sendInfoPlot(int,int,int,QString)), this, SLOT(initPlot(int,int,int,QString)));
         QObject::connect(l_model->reservoir(), SIGNAL(sendLogInfo(QString)), this, SLOT(displayLogInfo(QString)));
         QObject::connect(l_model->reservoir(), SIGNAL(sendOutputMatrix(cv::Mat)), this, SLOT(displayOutputMatrix(cv::Mat)));
+        QObject::connect(l_model, SIGNAL(sendTrainInputMatrix(cv::Mat,cv::Mat)), this, SLOT(displayTrainInputMatrix(cv::Mat,cv::Mat)));
 
     // interface setting
         m_uiInterface->pbComputing->setRange(0,100);
@@ -175,7 +177,6 @@ Interface::~Interface()
 
     delete m_pWInterface;
 }
-
 
 void Interface::closeEvent(QCloseEvent *event)
 {
@@ -279,7 +280,7 @@ void Interface::updateReservoirParameters(QString value)
 void Interface::updateLanguageParameters()
 {
     LanguageParameters l_params;
-    l_params.m_grammar = m_uiInterface->cbGrammar->currentText();
+    l_params.m_CCW = m_uiInterface->cbCCW->currentText();
     l_params.m_structure = m_uiInterface->cbStructure->currentText();
 
     emit sendLanguageParametersSignal(l_params);
@@ -299,6 +300,7 @@ void Interface::updateReservoirParameters()
 {
     ReservoirParameters l_params;
 
+    l_params.m_useCuda                  = m_uiInterface->cbEnableGPU->isChecked();
     l_params.m_useLoadedTraining        = m_uiInterface->cbTrainingFile->isChecked();
     l_params.m_useOnlyStartValue        = m_uiInterface->cbOnlyStartValue->isChecked();
 
@@ -336,6 +338,7 @@ void Interface::updateReservoirParameters()
     l_params.m_spectralRadiusOperation  = m_uiInterface->leSpectralRadiusOperation->text();
     l_params.m_ridgeOperation           = m_uiInterface->leRidgeOperation->text();
     l_params.m_sparcityOperation        = m_uiInterface->leSparcityOperation->text();
+
 
     if(m_uiInterface->rbTrain->isChecked())
     {
@@ -390,7 +393,7 @@ void Interface::lockInterface(bool lock)
     m_uiInterface->leRidgeOperation->setDisabled(lock);
     m_uiInterface->leSparcityOperation->setDisabled(lock);
 
-    m_uiInterface->cbGrammar->setDisabled(lock);
+    m_uiInterface->cbCCW->setDisabled(lock);
     m_uiInterface->cbStructure->setDisabled(lock);
 
     m_uiInterface->pbAddCorpus->setDisabled(lock);
@@ -639,100 +642,338 @@ void Interface::displayLogInfo(QString info)
 
 void Interface::displayOutputMatrix(cv::Mat output)
 {
-    qDeleteAll(m_plotListOutput.begin(), m_plotListOutput.end());
-    m_plotListOutput.clear();
+    QVector<QVector<QVector<double> > > l_sentences; // dim 1 -> sentences / dim 2 -> CCW / dim 3 -> values
 
-    QVector<QVector<QVector<double> > > l_sentences; // dim 1 -> sentences / dim 2 -> grammar / dim 3 -> values
-    QVector<QPen> l_pens;
-    QVector<double> l_xValues;
-    for(int ii = 0; ii < output.size[1]; ++ii)
-    {
-        l_xValues << ii;
-    }
+    // delete previous plots and labels
+        qDeleteAll(m_plotListOutput.begin(), m_plotListOutput.end());
+        qDeleteAll(m_plotLabelListOutput.begin(), m_plotLabelListOutput.end());
+        m_plotListOutput.clear();
+        m_plotLabelListOutput.clear();
 
-    for(int ii = 0; ii < output.size[0]; ++ii)
-    {
-        QVector<QVector<double> > l_grammars;
+        LanguageParameters l_language = m_pWInterface->languageParameters();
+        QStringList l_CCW = l_language.m_CCW.split(' ');
+        l_CCW << "X";
 
-        for(int jj = 0; jj  < output.size[2]; ++jj)
+
+    // create color for each CCW
+        QVector<QColor> l_colors;
+        int l_nbLoop = 0;
+        while(l_colors.size() < l_CCW.size())
         {
-            QVector<double> l_values;
+            ++l_nbLoop;;
+            bool l_addColor = true;
 
-            for(int kk = 0; kk < output.size[1]; ++kk)
+            int l_r = rand()%255;
+            int l_g = rand()%255;
+            int l_b = rand()%205;
+
+            if(l_nbLoop < 500)
             {
-                l_values << static_cast<double>(output.at<float>(ii,kk,jj));
+                for(int ii = 0; ii < l_colors.size(); ++ii)
+                {
+                    int l_diffRed = l_colors[ii].red()-l_r;
+                    if(l_diffRed < 0)
+                    {
+                        l_diffRed = - l_diffRed;
+                    }
+                    int l_diffGreen = l_colors[ii].green()-l_r;
+                    if(l_diffGreen < 0)
+                    {
+                        l_diffGreen = - l_diffGreen;
+                    }
+                    int l_diffBlue = l_colors[ii].blue()-l_r;
+                    if(l_diffBlue < 0)
+                    {
+                        l_diffBlue = - l_diffBlue;
+                    }
+
+                    if(l_diffRed + l_diffGreen + l_diffBlue < 80)
+                    {
+                        l_addColor = false;
+                        break;
+                    }
+                }
             }
-            l_grammars << l_values;
 
+            if(l_addColor)
+            {
+                l_colors << QColor(l_r,l_g,l_b);
+            }
 
-            l_pens << QPen(QColor(rand()%255,rand()%255,rand()%255));
         }
-        l_sentences << l_grammars;
-    }
 
-    qDebug() << l_sentences.size() << " " << l_sentences[0].size() << " " << l_sentences[0][0].size();
+    // create x curves values
+        QVector<double> l_xValues;
+        for(int ii = 0; ii < output.size[1]; ++ii)
+        {
+            l_xValues << ii;
+        }
 
-//    QVector<QString> l_labelsX;
+    // create y curves values
+        for(int ii = 0; ii < output.size[0]; ++ii)
+        {
+            QVector<QVector<double> > l_CCW;
 
-//    for(int ii = 0; ii < m_sizeDim1Meaning; ++ii)
+            for(int jj = 0; jj  < output.size[2]; ++jj)
+            {
+                QVector<double> l_values;
+
+                for(int kk = 0; kk < output.size[1]; ++kk)
+                {
+                    l_values << static_cast<double>(output.at<float>(ii,kk,jj));
+                }
+                l_CCW << l_values;
+
+            }
+            l_sentences << l_CCW;
+        }
+
+    // set curve legend labels
+        for(int ii = 0; ii < l_CCW.size(); ++ii)
+        {
+            QLabel *l_labelCCW = new QLabel();
+            QPalette l_palette = l_labelCCW->palette();
+            l_palette.setColor(l_labelCCW->foregroundRole(), l_colors[ii]);
+            l_palette.setColor(l_labelCCW->backgroundRole(), Qt::white);
+            l_labelCCW->setAutoFillBackground (true);
+            l_labelCCW->setPalette(l_palette);
+            l_labelCCW->setText(l_CCW[ii]);
+            l_labelCCW->setAlignment(Qt::AlignCenter);
+            m_plotLabelListOutput.push_back(l_labelCCW);
+            m_uiInterface->hlLabelsPlot->addWidget(m_plotLabelListOutput.back());
+        }
+
+    // create the plots
+        for(int ii = 0; ii < l_sentences.size(); ++ii)
+        {
+            QCustomPlot *l_plotDisplay = new QCustomPlot(this);
+            l_plotDisplay->setFixedHeight(150);
+            l_plotDisplay->setFixedWidth(output.size[2]*35);
+
+            QCPItemText *l_textLabelSentence = new QCPItemText(l_plotDisplay);
+            l_plotDisplay->addItem(l_textLabelSentence);
+            l_textLabelSentence->setPositionAlignment(Qt::AlignTop|Qt::AlignHCenter);
+            l_textLabelSentence->position->setType(QCPItemPosition::ptAxisRectRatio);
+            l_textLabelSentence->position->setCoords(0.5, 0); // place position at center/top of axis rect
+            l_textLabelSentence->setText("Sentence " + QString::number(ii+1));
+            l_textLabelSentence->setFont(QFont(font().family(), 8)); // make font a bit larger
+
+
+            m_plotListOutput.push_back(l_plotDisplay);
+            m_uiInterface->vlOutputPlot->addWidget(m_plotListOutput.back());
+
+            double l_maxY = DBL_MIN;
+            double l_minY = DBL_MAX;
+
+            for(int jj = 0; jj < l_sentences[0].size(); ++jj)
+            {
+                m_plotListOutput.back()->addGraph();
+                m_plotListOutput[ii]->graph(jj)->setPen(QPen(l_colors[jj]));
+                m_plotListOutput[ii]->graph(jj)->setData(l_xValues, l_sentences[ii][jj]);
+
+//                m_plotListOutput[ii]->set
+
+                for(QVector<double>::iterator it = l_sentences[ii][jj].begin(); it != l_sentences[ii][jj].end(); ++it)
+                {
+                    if((*it) > l_maxY)
+                    {
+                        l_maxY = (*it);
+                    }
+                    if((*it) < l_minY)
+                    {
+                        l_minY = (*it);
+                    }
+                }
+
+            }
+
+            m_plotListOutput.back()->xAxis->setRange(0, output.size[1]);
+            m_plotListOutput.back()->yAxis->setRange(l_minY,l_maxY);
+            m_plotListOutput.back()->replot();
+        }
+}
+
+void Interface::displayTrainInputMatrix(cv::Mat trainMeaning, cv::Mat trainSentence)
+{
+    QVector<QVector<QVector<double> > > l_meaning; // dim 1 -> sentences / dim 2 -> CCW / dim 3 -> values
+    QVector<QVector<QVector<double> > > l_sentences; // dim 1 -> sentences / dim 2 -> CCW / dim 3 -> values
+
+    // delete previous plots and labels
+        qDeleteAll(m_plotListTrainInput.begin(), m_plotListTrainInput.end());
+        m_plotListTrainInput.clear();
+
+        LanguageParameters l_language = m_pWInterface->languageParameters();
+        QStringList l_CCW = l_language.m_CCW.split(' ');
+        l_CCW << "X";
+
+    // create y curves values for sentences
+//    for(int ii = 0; ii < trainMeaning.size[0]; ++ii)
 //    {
-//        l_labelsX << "S" + QString::number(ii+1);
+//        QVector<QVector<double> > l_CCW;
+
+//        for(int jj = 0; jj  < trainMeaning.size[2]; ++jj)
+//        {
+//            QVector<double> l_values;
+
+//            for(int kk = 0; kk < trainMeaning.size[1]; ++kk)
+//            {
+//                l_values << static_cast<double>(trainMeaning.at<float>(ii,kk,jj));
+//            }
+//            l_CCW << l_values;
+
+//        }
+//        l_sentences << l_CCW;
 //    }
 
-//    QVector<QString> l_labelsY;
-//    l_labelsY << "-1" << "0" << "1";
+
+    // create color for each CCW
+//        QVector<QColor> l_colors;
+//        int l_nbLoop = 0;
+//        while(l_colors.size() < l_CCW.size())
+//        {
+//            ++l_nbLoop;;
+//            bool l_addColor = true;
+
+//            int l_r = rand()%255;
+//            int l_g = rand()%255;
+//            int l_b = rand()%205;
+
+//            if(l_nbLoop < 500)
+//            {
+//                for(int ii = 0; ii < l_colors.size(); ++ii)
+//                {
+//                    int l_diffRed = l_colors[ii].red()-l_r;
+//                    if(l_diffRed < 0)
+//                    {
+//                        l_diffRed = - l_diffRed;
+//                    }
+//                    int l_diffGreen = l_colors[ii].green()-l_r;
+//                    if(l_diffGreen < 0)
+//                    {
+//                        l_diffGreen = - l_diffGreen;
+//                    }
+//                    int l_diffBlue = l_colors[ii].blue()-l_r;
+//                    if(l_diffBlue < 0)
+//                    {
+//                        l_diffBlue = - l_diffBlue;
+//                    }
+
+//                    if(l_diffRed + l_diffGreen + l_diffBlue < 80)
+//                    {
+//                        l_addColor = false;
+//                        break;
+//                    }
+//                }
+//            }
+
+//            if(l_addColor)
+//            {
+//                l_colors << QColor(l_r,l_g,l_b);
+//            }
+
+//        }
+
+    // create x curves values
+//        QVector<double> l_xValues;
+//        for(int ii = 0; ii < trainSentence.size[1]; ++ii)
+//        {
+//            l_xValues << ii;
+//        }
 
 
-    QVector<QString> l_labelsY;
-    l_labelsY << "-0.2" << "0.4" << "1.0" << "1.6" << "2.2";
+//    // set curve legend labels
+//        for(int ii = 0; ii < l_CCW.size(); ++ii)
+//        {
+//            QLabel *l_labelCCW = new QLabel();
+//            QPalette l_palette = l_labelCCW->palette();
+//            l_palette.setColor(l_labelCCW->foregroundRole(), l_colors[ii]);
+//            l_palette.setColor(l_labelCCW->backgroundRole(), Qt::white);
+//            l_labelCCW->setAutoFillBackground (true);
+//            l_labelCCW->setPalette(l_palette);
+//            l_labelCCW->setText(l_CCW[ii]);
+//            l_labelCCW->setAlignment(Qt::AlignCenter);
+//            m_plotLabelListOutput.push_back(l_labelCCW);
+//            m_uiInterface->hlLabelsPlot->addWidget(m_plotLabelListOutput.back());
+//        }
 
-    for(int ii = 0; ii < l_sentences.size(); ++ii)
-    {
-        QCustomPlot *l_plotDisplay = new QCustomPlot(this);
-        l_plotDisplay->setFixedHeight(150);
-        l_plotDisplay->setFixedWidth(output.size[2]*100);
-        m_plotListOutput.push_back(l_plotDisplay);
-        m_uiInterface->vlOutputPlot->addWidget(m_plotListOutput.back());
-
-        for(int jj = 0; jj < l_sentences[0].size(); ++jj)
+    // create the plots
+        for(int ii = 0; ii < trainSentence.size[0]; ++ii)
         {
-            m_plotListOutput.back()->addGraph();
-            m_plotListOutput[ii]->graph(jj)->setPen(l_pens[jj]);
-            m_plotListOutput[ii]->graph(jj)->setData(l_xValues, l_sentences[ii][jj]);
+            QCustomPlot *l_plotDisplay = new QCustomPlot(this);
+            l_plotDisplay->setFixedHeight(trainSentence.size[2]*10);
+            l_plotDisplay->setFixedWidth(trainSentence.size[1]*2);
 
+
+            m_plotListTrainInput.push_back(l_plotDisplay);
+            m_uiInterface->vlInputPlot->addWidget(m_plotListTrainInput.back());
+
+            QCPColorMap *l_colorMap = new QCPColorMap(l_plotDisplay->xAxis, l_plotDisplay->yAxis);
+            l_plotDisplay->addPlottable(l_colorMap);
+            l_colorMap->data()->setSize(trainSentence.size[1], trainSentence.size[2]);
+//            l_colorMap->data()->setRange(QCPRange(0, 10), QCPRange(0, 10));
+
+            double x,y,z;
+            for(int jj = 0; jj < trainSentence.size[1]; ++jj)
+            {
+                for(int kk = 0; kk < trainSentence.size[2]; ++kk)
+                {
+                    z = static_cast<double>(trainSentence.at<float>(ii,jj,kk));
+                    l_colorMap->data()->setCell(jj, kk, z);
+                }
+            }
+            // add a color scale:
+            QCPColorScale *colorScale = new QCPColorScale(l_plotDisplay);
+            l_plotDisplay->plotLayout()->addElement(0, 1, colorScale); // add it to the right of the main axis rect
+            colorScale->setType(QCPAxis::atRight); // scale shall be vertical bar with tick/axis labels right (actually atRight is already the default)
+            l_colorMap->setColorScale(colorScale); // associate the color map with the color scale
+
+            l_colorMap->setGradient(QCPColorGradient::gpPolar);
+            l_colorMap->rescaleDataRange(true);
+            l_plotDisplay->rescaleAxes();
+            colorScale->axis()->setLabel("Magnetic Field Strength");
+
+
+//            QCPItemText *l_textLabelSentence = new QCPItemText(l_plotDisplay);
+//            l_plotDisplay->addItem(l_textLabelSentence);
+//            l_textLabelSentence->setPositionAlignment(Qt::AlignTop|Qt::AlignHCenter);
+//            l_textLabelSentence->position->setType(QCPItemPosition::ptAxisRectRatio);
+//            l_textLabelSentence->position->setCoords(0.5, 0); // place position at center/top of axis rect
+//            l_textLabelSentence->setText("Sentence " + QString::number(ii+1));
+//            l_textLabelSentence->setFont(QFont(font().family(), 8)); // make font a bit larger
+
+
+//            m_plotListTrainInput.push_back(l_plotDisplay);
+//            m_uiInterface->vlInputPlot->addWidget(m_plotListTrainInput.back());
+
+            double l_maxY = DBL_MIN;
+            double l_minY = DBL_MAX;
+
+//            for(int jj = 0; jj < l_sentences[0].size(); ++jj)
+//            {
+////                m_plotListTrainInput.back()->addGraph();
+////                m_plotListTrainInput[ii]->graph(jj)->setPen(QPen(l_colors[jj]));
+////                m_plotListTrainInput[ii]->graph(jj)->setData(l_xValues, l_sentences[ii][jj]);
+
+////                m_plotListOutput[ii]->set
+
+//                for(QVector<double>::iterator it = l_sentences[ii][jj].begin(); it != l_sentences[ii][jj].end(); ++it)
+//                {
+//                    if((*it) > l_maxY)
+//                    {
+//                        l_maxY = (*it);
+//                    }
+//                    if((*it) < l_minY)
+//                    {
+//                        l_minY = (*it);
+//                    }
+//                }
+
+//            }
+
+//            m_plotListTrainInput.back()->xAxis->setRange(0, trainSentence.size[1]);
+//            m_plotListTrainInput.back()->yAxis->setRange(0, trainSentence.size[2]);
+            m_plotListTrainInput.back()->replot();
         }
-
-//        m_plotListOutput.back()->xAxis->setTickStep(1);
-        m_plotListOutput.back()->xAxis->setRange(0, output.size[1]);
-
-        m_plotListOutput.back()->yAxis->setAutoTickStep(false);
-        m_plotListOutput.back()->yAxis->setAutoTickLabels(false);
-        m_plotListOutput.back()->yAxis->setRange(-0.2, 2.2);
-        m_plotListOutput.back()->yAxis->setTickStep(0.6);
-        m_plotListOutput.back()->yAxis->setTickVectorLabels(l_labelsY);
-        m_plotListOutput.back()->replot();
-
-//        m_plotListX.back()->addGraph();
-
-//        m_plotListX.back()->xAxis->setLabel("x");
-//        m_plotListX.back()->xAxis->setRange(0, sizeDim1Meaning);
-
-//        m_plotListX.back()->xAxis->setAutoTickStep(false);
-//        m_plotListX.back()->xAxis->setAutoTickLabels(false);
-//        m_plotListX.back()->xAxis->setTickVectorLabels(l_labelsX);
-//        m_plotListX.back()->xAxis->setTickStep(1);
-//        m_plotListX.back()->xAxis->setLabel("Sentences");
-
-
-//        m_plotListX.back()->yAxis->setLabel("y");
-//        m_plotListX.back()->yAxis->setRange(-1, 1);
-//        m_plotListX.back()->yAxis->setAutoTickStep(false);
-//        m_plotListX.back()->yAxis->setAutoTickLabels(false);
-//        m_plotListX.back()->yAxis->setTickVectorLabels(l_labelsY);
-//        m_plotListX.back()->yAxis->setTickStep(1.0);
-//        m_plotListX.back()->yAxis->setLabel("Neuron value");
-    }
-
 }
 
 InterfaceWorker::InterfaceWorker() : m_gridSearch(new GridSearchQt(m_model)), m_nbOfCorpus(0)
@@ -758,6 +999,11 @@ GridSearchQt *InterfaceWorker::gridSearch() const
 ModelQt *InterfaceWorker::model()
 {
     return &m_model;
+}
+
+LanguageParameters InterfaceWorker::languageParameters() const
+{
+    return m_languageParameters;
 }
 
 void InterfaceWorker::addCorpus(QString corpusPath)
@@ -816,11 +1062,11 @@ void InterfaceWorker::start()
     emit startInitDisplaySignal();
 
     // define language parameters
-        Sentence l_grammar, l_structure;
-        QStringList l_grammarList = m_languageParameters.m_grammar.split(" ");
-        for(int ii = 0; ii < l_grammarList.size(); ++ii)
+        Sentence l_CCW, l_structure;
+        QStringList l_CCWList = m_languageParameters.m_CCW.split(" ");
+        for(int ii = 0; ii < l_CCWList.size(); ++ii)
         {
-            l_grammar.push_back(l_grammarList[ii].toStdString());
+            l_CCW.push_back(l_CCWList[ii].toStdString());
         }
         QStringList l_structureList = m_languageParameters.m_structure.split(" ");
         for(int ii = 0; ii < l_structureList.size(); ++ii)
@@ -828,12 +1074,11 @@ void InterfaceWorker::start()
             l_structure.push_back(l_structureList[ii].toStdString());
         }
 
-        m_model.setGrammar(l_grammar, l_structure);
+        m_model.setCCWAndStructure(l_CCW, l_structure);
 
     // define all grid search parameters
         m_gridSearch->deleteParameterValues();
-        m_gridSearch->setCudaParameters(true, true);
-
+        m_gridSearch->setCudaParameters(m_reservoirParameters.m_useCuda, m_reservoirParameters.m_useCuda);
 
         bool l_operationValid;
         int l_OperationInvalid = 0;

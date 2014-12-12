@@ -49,7 +49,7 @@ ReservoirQt::ReservoirQt()
 
     m_useCudaInversion      = true;
     m_useCudaMultiplication = false;
-    m_sendMatrices = false;
+    m_sendMatrices = true;
 }
 
 void ReservoirQt::setCudaProperties(cbool cudaInv, cbool cudaMult)
@@ -66,7 +66,7 @@ ReservoirQt::ReservoirQt(cuint nbNeurons, cfloat spectralRadius, cfloat inputSca
 {
 
     m_numThread = omp_get_max_threads( );
-    m_sendMatrices = false;
+    m_sendMatrices = true;
 
     if(sparcity > 0.f)
     {
@@ -269,38 +269,37 @@ void ReservoirQt::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher
 
                 l_lockerMainThread.lock();
                     emit sendComputingState(++l_steps, meaningInputTrain.size[0]*2, QString("Build X"));
-                l_lockerMainThread.unlock();
+
 
                 // send data only if the multi thread is disabled
                 if(m_sendMatrices)
                 {
-                    if(m_numThread == 1)
+                    cv::Mat l_rgb2Display(100,l_X.cols, CV_8UC3);
+                    int l_currentCol = 0;
+                    QVector<QVector<double> > l_values;
+
+                    for(int jj = 100; jj < 200; ++jj) // l_X.rows
                     {
-                        cv::Mat l_rgb2Display(100,l_X.cols, CV_8UC3);
-                        int l_currentCol = 0;
-                        QVector<QVector<double> > l_values;
-
-                        for(int jj = 100; jj < 200; ++jj) // l_X.rows
+                        QVector<double> l_line;
+                        for(int kk = 0; kk < l_X.cols; ++kk)
                         {
-                            QVector<double> l_line;
-                            for(int kk = 0; kk < l_X.cols; ++kk)
-                            {
-                                l_rgb2Display.at<cv::Vec3b>(l_currentCol,kk) = cv::Vec3b(255*l_X.at<float>(jj,kk), 255*l_X.at<float>(jj,kk),255*l_X.at<float>(jj,kk));
-                                l_line.push_back(l_X.at<float>(jj,kk));
-                            }
-                            ++l_currentCol;
-
-                            l_values.push_back(l_line);
+                            l_rgb2Display.at<cv::Vec3b>(l_currentCol,kk) = cv::Vec3b(255*l_X.at<float>(jj,kk), 255*l_X.at<float>(jj,kk),255*l_X.at<float>(jj,kk));
+                            l_line << l_X.at<float>(jj,kk);
                         }
+                        ++l_currentCol;
 
-                        QImage l_image2Send = mat2QImage(l_rgb2Display);
-
-                        l_image2Send = l_image2Send.scaled(500, 500,Qt::KeepAspectRatio);
-
-                        emit sendMatriceImage2Display(l_image2Send);
-                        emit sendMatriceData(l_values);
+                        l_values << l_line;
                     }
+
+                    QImage l_image2Send = mat2QImage(l_rgb2Display);
+
+                    l_image2Send = l_image2Send.scaled(500, 500,Qt::KeepAspectRatio);
+
+                    emit sendMatriceImage2Display(l_image2Send);
+                    emit sendMatriceData(l_values);
                 }
+
+                l_lockerMainThread.unlock();
             }
         // end pragma
 
@@ -667,9 +666,9 @@ void ReservoirQt::updateMatricesWithLoadedTraining()
     }
 }
 
-void ReservoirQt::disableMaxOmpThreadNumber(bool disable)
+void ReservoirQt::enableMaxOmpThreadNumber(bool enable)
 {
-    if(!disable)
+    if(enable)
     {
         m_numThread = omp_get_max_threads( );
     }

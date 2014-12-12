@@ -45,13 +45,15 @@ enum ActionToDo
 struct LanguageParameters
 {
     QString m_structure;
-    QString m_grammar;
+    QString m_CCW;
 };
 
 struct ReservoirParameters
 {
+    bool m_useCuda;
+
     bool m_useLoadedTraining;
-    bool m_useOnlyStartValue;
+    bool m_useOnlyStartValue;    
 
     ActionToDo m_action;
 
@@ -232,6 +234,11 @@ class Interface : public QMainWindow
          */
         void displayOutputMatrix(cv::Mat output);
 
+        /**
+         * @brief displayTrainInputMatrix
+         */
+        void displayTrainInputMatrix(cv::Mat trainMeaning, cv::Mat trainSentence);
+
 
     signals:
 
@@ -282,6 +289,8 @@ class Interface : public QMainWindow
         DisplayImageWidget *m_imageDisplay;
         QVector<QCustomPlot*> m_plotListX;
         QVector<QCustomPlot*> m_plotListOutput;
+        QVector<QCustomPlot*> m_plotListTrainInput;
+        QVector<QLabel*> m_plotLabelListOutput;
 
 
         QVector<QVector<double> > m_allValuesPlot;
@@ -329,6 +338,11 @@ class InterfaceWorker : public QObject
          */
         ModelQt *model();
 
+        /**
+         * @brief languageParameters
+         * @return
+         */
+        LanguageParameters languageParameters() const;
 
     public slots:
 

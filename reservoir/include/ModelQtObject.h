@@ -132,11 +132,11 @@ class ModelQt : public QObject
         void resetModelParameters(const ModelParametersQt &newParameters, cbool verbose);
 
         /**
-         * @brief setGrammar
-         * @param [in] grammar   : gramar to be used
+         * @brief setCCWAndStructure
+         * @param [in] CCW       : CCW to be used
          * @param [in] structure : structure to be used
          */
-        void setGrammar(const Sentence &grammar, const Sentence &structure);
+        void setCCWAndStructure(const Sentence &CCW, const Sentence &structure);
 
         /**
          * @brief launchTraining
@@ -235,13 +235,21 @@ class ModelQt : public QObject
         Sentences m_recoveredSentencesTest;     /**< ... */
         Sentences m_testSentence;               /**< corpus test sentence */
 
+
+    signals :
+
+        /**
+         * @brief sendTrainInputMatrix
+         */
+        void sendTrainInputMatrix(cv::Mat, cv::Mat);
+
     private :
 
         // states
         bool m_verbose;                         /**< display infos during the processing */
         bool m_trainingSuccess;                 /**< is the training successful */
 
-        Sentence m_grammar;                     /**< grammar used in the corpus */
+        Sentence m_CCW;                         /**< CCW used in the corpus */
         Sentence m_structure;                   /**< structure used in the corpus */
         Sentence m_closedClassWords;            /**< closed class words */
 

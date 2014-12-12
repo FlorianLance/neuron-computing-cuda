@@ -124,10 +124,10 @@ class ReservoirQt  : public QObject
     public slots :
 
         /**
-         * @brief disableMaxOmpThreadNumber
-         * @param disable
+         * @brief enableMaxOmpThreadNumber
+         * @param enable
          */
-        void disableMaxOmpThreadNumber(bool disable);
+        void enableMaxOmpThreadNumber(bool enable);
 
         /**
          * @brief enableDisplay
