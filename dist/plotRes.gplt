@@ -261,60 +261,60 @@ title4 = "Corpus 3"
 
 
 ######################################################################## grid search 5
-set output "../dist/data/Results/grid_search_5.png"
-set terminal png size 6000,6000
-set multiplot layout 6, 3 title "Reservoir Grid-search (cuda mult) 5 : neurons_id - sparcity -> 3 corpus(10,20,50)"
-file = file5
+#set output "../dist/data/Results/grid_search_5.png"
+#set terminal png size 6000,6000
+#set multiplot layout 6, 3 title "Reservoir Grid-search (cuda mult) 5 : neurons_id - sparcity -> 3 corpus(10,20,50)"
+#file = file5
 
-set yrange [0.000001:1]
-set ytics scale 10
+#set yrange [0.000001:1]
+#set ytics scale 10
 
-####################################### corpus 0
-eval(display1)
-eval(neuron_sparcity_res1)
-splot file index 0 u @neurons_id:@sparcity_id:@res1_id t title1 w p ls 1
-eval(neuron_sparcity_res2)
-splot file index 0 u @neurons_id:@sparcity_id:@res2_id t title1 w p ls 1
-eval(neuron_sparcity_res3)
-splot file index 0 u @neurons_id:@sparcity_id:@res3_id t title1 w p ls 1
-eval(display2)
-eval(neuron_sparcity_res1)
-splot file index 0 u @neurons_id:@sparcity_id:@res1_id t title1 w boxes ls 1
-eval(neuron_sparcity_res2)
-splot file index 0 u @neurons_id:@sparcity_id:@res2_id t title1 w boxes ls 1
-eval(neuron_sparcity_res3)
-splot file index 0 u @neurons_id:@sparcity_id:@res3_id t title1 w boxes ls 1
-####################################### corpus 1
-eval(display1)
-eval(neuron_sparcity_res1)
-splot file index 1 u @neurons_id:@sparcity_id:@res1_id t title2 w p ls 1
-eval(neuron_sparcity_res2)
-splot file index 1 u @neurons_id:@sparcity_id:@res2_id t title2 w p ls 1
-eval(neuron_sparcity_res3)
-splot file index 1 u @neurons_id:@sparcity_id:@res3_id t title2 w p ls 1
-eval(display2)
-eval(neuron_sparcity_res1)
-splot file index 1 u @neurons_id:@sparcity_id:@res1_id t title2 w boxes ls 1
-eval(neuron_sparcity_res2)
-splot file index 1 u @neurons_id:@sparcity_id:@res2_id t title2 w boxes ls 1
-eval(neuron_sparcity_res3)
-splot file index 1 u @neurons_id:@sparcity_id:@res3_id t title2 w boxes ls 1
-####################################### corpus 2
-eval(display1)
-eval(neuron_sparcity_res1)
-splot file index 2 u @neurons_id:@sparcity_id:@res1_id t title3 w p ls 1
-eval(neuron_sparcity_res2)
-splot file index 2 u @neurons_id:@sparcity_id:@res2_id t title3 w p ls 1
-eval(neuron_sparcity_res3)
-splot file index 2 u @neurons_id:@sparcity_id:@res3_id t title3 w p ls 1
-eval(display2)
-eval(neuron_sparcity_res1)
-splot file index 2 u @neurons_id:@sparcity_id:@res1_id t title3 w boxes ls 1
-eval(neuron_sparcity_res2)
-splot file index 2 u @neurons_id:@sparcity_id:@res2_id t title3 w boxes ls 1
-eval(neuron_sparcity_res3)
-splot file index 2 u @neurons_id:@sparcity_id:@res3_id t title3 w boxes ls 1
-unset multiplot
+######################################## corpus 0
+#eval(display1)
+#eval(neuron_sparcity_res1)
+#splot file index 0 u @neurons_id:@sparcity_id:@res1_id t title1 w p ls 1
+#eval(neuron_sparcity_res2)
+#splot file index 0 u @neurons_id:@sparcity_id:@res2_id t title1 w p ls 1
+#eval(neuron_sparcity_res3)
+#splot file index 0 u @neurons_id:@sparcity_id:@res3_id t title1 w p ls 1
+#eval(display2)
+#eval(neuron_sparcity_res1)
+#splot file index 0 u @neurons_id:@sparcity_id:@res1_id t title1 w boxes ls 1
+#eval(neuron_sparcity_res2)
+#splot file index 0 u @neurons_id:@sparcity_id:@res2_id t title1 w boxes ls 1
+#eval(neuron_sparcity_res3)
+#splot file index 0 u @neurons_id:@sparcity_id:@res3_id t title1 w boxes ls 1
+######################################## corpus 1
+#eval(display1)
+#eval(neuron_sparcity_res1)
+#splot file index 1 u @neurons_id:@sparcity_id:@res1_id t title2 w p ls 1
+#eval(neuron_sparcity_res2)
+#splot file index 1 u @neurons_id:@sparcity_id:@res2_id t title2 w p ls 1
+#eval(neuron_sparcity_res3)
+#splot file index 1 u @neurons_id:@sparcity_id:@res3_id t title2 w p ls 1
+#eval(display2)
+#eval(neuron_sparcity_res1)
+#splot file index 1 u @neurons_id:@sparcity_id:@res1_id t title2 w boxes ls 1
+#eval(neuron_sparcity_res2)
+#splot file index 1 u @neurons_id:@sparcity_id:@res2_id t title2 w boxes ls 1
+#eval(neuron_sparcity_res3)
+#splot file index 1 u @neurons_id:@sparcity_id:@res3_id t title2 w boxes ls 1
+######################################## corpus 2
+#eval(display1)
+#eval(neuron_sparcity_res1)
+#splot file index 2 u @neurons_id:@sparcity_id:@res1_id t title3 w p ls 1
+#eval(neuron_sparcity_res2)
+#splot file index 2 u @neurons_id:@sparcity_id:@res2_id t title3 w p ls 1
+#eval(neuron_sparcity_res3)
+#splot file index 2 u @neurons_id:@sparcity_id:@res3_id t title3 w p ls 1
+#eval(display2)
+#eval(neuron_sparcity_res1)
+#splot file index 2 u @neurons_id:@sparcity_id:@res1_id t title3 w boxes ls 1
+#eval(neuron_sparcity_res2)
+#splot file index 2 u @neurons_id:@sparcity_id:@res2_id t title3 w boxes ls 1
+#eval(neuron_sparcity_res3)
+#splot file index 2 u @neurons_id:@sparcity_id:@res3_id t title3 w boxes ls 1
+#unset multiplot
 
 
 ######################################################################### grid search 4
@@ -343,27 +343,27 @@ unset multiplot
 #unset multiplot
 
 ######################################################################## grid search 5  # ,120-30s,120-60s,120-90s,120-120s,120-30m,120-60m,120-90m,120-120m)"
-set output "../dist/data/Results/grid_search_6.png"
-set terminal png size 4000,5000
-set multiplot layout 3, 2 title "Reservoir Grid-search 6 : neurons - sepctral raduis - iss  -> 3 corpus(120)"
-file = file7
-#set yrange [0.000001:1]
-#set ytics scale 10
+#set output "../dist/data/Results/grid_search_6.png"
+#set terminal png size 4000,5000
+#set multiplot layout 3, 2 title "Reservoir Grid-search 6 : neurons - sepctral raduis - iss  -> 3 corpus(120)"
+#file = file7
+##set yrange [0.000001:1]
+##set ytics scale 10
 
-####################################### corpus 0
-eval(display1)
-eval(neuron_iss_res1)
-splot file index 0 u @neurons_id:@input_scaling_id:@res1_id t title1 w p ls 1
-eval(neuron_iss_res2)
-splot file index 0 u @neurons_id:@input_scaling_id:@res2_id t title1 w p ls 1
-eval(neuron_iss_res3)
-splot file index 0 u @neurons_id:@input_scaling_id:@res3_id t title1 w p ls 1
-eval(display2)
-eval(neuron_sparcity_res1)
-splot file index 0 u @neurons_id:@input_scaling_id:@res1_id t title1 w boxes ls 1
-eval(neuron_sparcity_res2)
-splot file index 0 u @neurons_id:@input_scaling_id:@res2_id t title1 w boxes ls 1
-eval(neuron_sparcity_res3)
-splot file index 0 u @neurons_id:@input_scaling_id:@res3_id t title1 w boxes ls 1
+######################################## corpus 0
+#eval(display1)
+#eval(neuron_iss_res1)
+#splot file index 0 u @neurons_id:@input_scaling_id:@res1_id t title1 w p ls 1
+#eval(neuron_iss_res2)
+#splot file index 0 u @neurons_id:@input_scaling_id:@res2_id t title1 w p ls 1
+#eval(neuron_iss_res3)
+#splot file index 0 u @neurons_id:@input_scaling_id:@res3_id t title1 w p ls 1
+#eval(display2)
+#eval(neuron_sparcity_res1)
+#splot file index 0 u @neurons_id:@input_scaling_id:@res1_id t title1 w boxes ls 1
+#eval(neuron_sparcity_res2)
+#splot file index 0 u @neurons_id:@input_scaling_id:@res2_id t title1 w boxes ls 1
+#eval(neuron_sparcity_res3)
+#splot file index 0 u @neurons_id:@input_scaling_id:@res3_id t title1 w boxes ls 1
 
-unset multiplot
+#unset multiplot

@@ -203,10 +203,13 @@ class Interface : public QMainWindow
         void updateProgressBar(int currentValue, int valueMax, QString text);
 
         /**
-         * @brief plotData
+         * @brief displayXMatrix
          * @param values
+         * @param currentSentenceId
+         * @param nbSentences
          */
-        void plotData(QVector<QVector<double> > values);
+        void displayXMatrix(QVector<QVector<double> > *values, int currentSentenceId, int nbSentences);
+
 
         /**
          * @brief initPlot
@@ -277,6 +280,12 @@ class Interface : public QMainWindow
          */
         void leaveProgram();
 
+
+        /**
+         * @brief sendMatrixXDisplayParameters
+         */
+        void sendMatrixXDisplayParameters(bool enabled, bool randomSentence, int nbRandomNeurons, int startIdNeurons, int endIdNeurons);
+
     private :
 
         int m_sizeDim1Meaning;
@@ -289,11 +298,15 @@ class Interface : public QMainWindow
         DisplayImageWidget *m_imageDisplay;
         QVector<QCustomPlot*> m_plotListX;
         QVector<QCustomPlot*> m_plotListOutput;
-        QVector<QCustomPlot*> m_plotListTrainInput;
+        QVector<QCustomPlot*> m_plotListTrainSentenceInput;
+        QVector<QCustomPlot*> m_plotListTrainMeaningInput;
         QVector<QLabel*> m_plotLabelListOutput;
+        QVector<QLabel*> m_plotLabelListTrainSentenceInput;
+
 
 
         QVector<QVector<double> > m_allValuesPlot;
+        QVector<double> m_allXPlot;
 //        QVBoxLayout *m_plotLayout;
 
 //        QCustomPlot *m_plotDisplay;
@@ -302,6 +315,12 @@ class Interface : public QMainWindow
         // threads & workers
         InterfaceWorker  *m_pWInterface;    /**< viewer worker */
         QThread         m_TInterface;    /**< viewer thread */
+
+
+        int m_nbMaxNeuronsSentenceDisplayed;
+        int m_nbSentencesDisplayed;
+        QTime m_timerDisplayNeurons;
+        QMutex m_neuronDisplayMutex;
 
 };
 

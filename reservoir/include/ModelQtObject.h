@@ -266,6 +266,7 @@ class ModelQt : public QObject
         // results of the reservoir
         cv::Mat m_3DMatSentencesOutputTrain;                /**< ... */
         cv::Mat m_3DMatSentencesOutputTest;                 /**< ... */
+        cv::Mat m_internalStatesTrain;                      /**< ... */
         std::vector<cv::Mat> m_3DVMatSentencesOutputTrain;  /**< ... */
         std::vector<cv::Mat> m_3DVMatSentencesOutputTest;   /**< ... */
 

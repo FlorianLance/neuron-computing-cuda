@@ -171,11 +171,59 @@ void ReservoirQt::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher
     float l_invLeakRate = 1.f - m_leakRate;
 
     // mutex for openmp threads
-        QMutex l_lockerMainThread;
+//        QMutex l_lockerMainThread;
+
+    // retrieve infos for displaying neurons activities
+//        bool l_displayEnabled   = m_displayEnabled;
+//        bool l_randomNeurons   = m_randomNeurons;
+//        int l_nbRandomNeurons   = m_nbRandomNeurons;
+//        int l_startIdNeurons    = m_startIdNeurons;
+//        int l_endIdNeurons      = m_endIdNeurons;
+//        if(l_endIdNeurons > m_nbNeurons)
+//        {
+//            l_endIdNeurons = m_nbNeurons;
+//        }
+
+    // create id of the neurons activities to be displayed
+//        QVector<int> l_idNeurons;
+//        if(l_randomNeurons)
+//        {
+//            while(l_idNeurons.size() < l_nbRandomNeurons)
+//            {
+//                bool l_addId = true;
+//                int l_idNeuron = rand()%m_nbNeurons;
+
+//                for(int ii = 0; ii < l_idNeurons.size(); ++ii)
+//                {
+//                    if(l_idNeuron == l_idNeurons[ii])
+//                    {
+//                        l_addId = false;
+//                        break;
+//                    }
+//                }
+
+//                if(l_addId)
+//                {
+//                    l_idNeurons << l_idNeuron;
+//                }
+//            }
+//        }
+//        else
+//        {
+//            if(l_endIdNeurons < l_startIdNeurons)
+//            {
+//                l_endIdNeurons = l_startIdNeurons;
+//            }
+
+//            for(int ii = l_startIdNeurons; ii <= l_endIdNeurons; ++ii)
+//            {
+//                l_idNeurons << ii;
+//            }
+//        }
+
 
     // info for generating the real time plot
-        int l_numberCurve = 10; // TODO  : parameterize
-        emit sendInfoPlot(l_numberCurve, meaningInputTrain.size[0], meaningInputTrain.size[1], QString("train"));
+//        emit sendInfoPlot(l_idNeurons.size(), meaningInputTrain.size[0], meaningInputTrain.size[1], QString("train"));
 
         #pragma omp parallel for num_threads(m_numThread)
             for(int ii = 0; ii < meaningInputTrain.size[0]; ++ii)
@@ -266,40 +314,32 @@ void ReservoirQt::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher
                     }
                 }
 
+                emit sendComputingState(++l_steps, meaningInputTrain.size[0]*2, QString("Build X"));
 
-                l_lockerMainThread.lock();
-                    emit sendComputingState(++l_steps, meaningInputTrain.size[0]*2, QString("Build X"));
+                // send neurons activities to be displayed
+//                l_lockerMainThread.lock();
 
+//                if(l_displayEnabled)
+//                {
+//                    QVector<QVector<double> > *l_values = new QVector<QVector<double> >;
 
-                // send data only if the multi thread is disabled
-                if(m_sendMatrices)
-                {
-                    cv::Mat l_rgb2Display(100,l_X.cols, CV_8UC3);
-                    int l_currentCol = 0;
-                    QVector<QVector<double> > l_values;
+//                    for(int jj = 0; jj < l_idNeurons.size(); ++jj)
+//                    {
+//                        QVector<double> l_line;
 
-                    for(int jj = 100; jj < 200; ++jj) // l_X.rows
-                    {
-                        QVector<double> l_line;
-                        for(int kk = 0; kk < l_X.cols; ++kk)
-                        {
-                            l_rgb2Display.at<cv::Vec3b>(l_currentCol,kk) = cv::Vec3b(255*l_X.at<float>(jj,kk), 255*l_X.at<float>(jj,kk),255*l_X.at<float>(jj,kk));
-                            l_line << l_X.at<float>(jj,kk);
-                        }
-                        ++l_currentCol;
+//                        int l_idNeuron = l_idNeurons[jj] + 1 + meaningInputTrain.size[2];
 
-                        l_values << l_line;
-                    }
+//                        for(int kk = 0; kk < l_X.cols; ++kk)
+//                        {
+//                            l_line << static_cast<double>(l_X.at<float>(l_idNeuron,kk));
+//                        }
 
-                    QImage l_image2Send = mat2QImage(l_rgb2Display);
+//                        (*l_values) << l_line;
+//                    }
 
-                    l_image2Send = l_image2Send.scaled(500, 500,Qt::KeepAspectRatio);
-
-                    emit sendMatriceImage2Display(l_image2Send);
-                    emit sendMatriceData(l_values);
-                }
-
-                l_lockerMainThread.unlock();
+//                    emit sendXMatriceData(l_values, ii, meaningInputTrain.size[0]);
+//                }
+//                l_lockerMainThread.unlock();
             }
         // end pragma
 
@@ -681,6 +721,17 @@ void ReservoirQt::enableMaxOmpThreadNumber(bool enable)
 void ReservoirQt::enableDisplay(bool enable)
 {
     m_sendMatrices = enable;
+}
+
+void ReservoirQt::updateMatrixXDisplayParameters(bool enabled, bool randomNeurons, int nbRandomNeurons, int startIdNeurons, int endIdNeurons)
+{
+    m_displayEnabled    = enabled;
+    m_randomNeurons    = randomNeurons;
+    m_nbRandomNeurons   = nbRandomNeurons;
+    m_startIdNeurons    = startIdNeurons;
+    m_endIdNeurons      = endIdNeurons;
+
+    qDebug() << "display params : " << m_displayEnabled << " " << m_randomNeurons << " " << m_nbRandomNeurons << " " << m_startIdNeurons << " " << m_endIdNeurons;
 }
 
 

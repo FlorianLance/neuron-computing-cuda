@@ -422,7 +422,9 @@ void ModelQt::computeResultsData(cbool trainResults, const std::string &pathSave
 void ModelQt::saveTraining(const std::string &pathDirectory)
 {
     m_reservoir->saveTraining(pathDirectory);
+//    save3DMatrixToTextStd(pathDirectory + "/xTot.txt", m_internalStatesTrain);
 }
+
 
 void ModelQt::loadTraining(const std::string &pathDirectory)
 {
@@ -440,6 +442,7 @@ void ModelQt::launchTraining()
         clock_t l_trainingTime = clock();
         m_trainingSuccess = false;
         m_3DMatSentencesOutputTrain = cv::Mat();
+        m_internalStatesTrain = cv::Mat();
 
     // generate close class word arrays
         m_closedClassWords.clear();
@@ -486,7 +489,7 @@ void ModelQt::launchTraining()
 
 
     // init matrices
-        cv::Mat l_3DMatStimMeanTrain, l_3DMatStimSentTrain, l_internalStatesTrain;
+        cv::Mat l_3DMatStimMeanTrain, l_3DMatStimSentTrain;
 //        std::vector<cv::Mat> l_3DVMatStimMeanTrain, l_3DVMatStimSentTrain, l_internalStatesTrainV; // TEST
 
     // load input matrices created in the python script)
@@ -500,7 +503,7 @@ void ModelQt::launchTraining()
 
     // train reservoir        
         displayTime("Start reservoir training ", l_trainingTime, false, m_verbose);
-            m_reservoir->train(l_3DMatStimMeanTrain, l_3DMatStimSentTrain, m_3DMatSentencesOutputTrain, l_internalStatesTrain);
+            m_reservoir->train(l_3DMatStimMeanTrain, l_3DMatStimSentTrain, m_3DMatSentencesOutputTrain,m_internalStatesTrain);
         displayTime("End reservoir training ", l_trainingTime, true, m_verbose);
 
     // save matrices

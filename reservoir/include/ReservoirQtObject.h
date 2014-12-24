@@ -135,6 +135,16 @@ class ReservoirQt  : public QObject
          */
         void enableDisplay(bool enable);
 
+        /**
+         * @brief updateMatrixXDisplayParameters
+         * @param enabled
+         * @param randomSentence
+         * @param nbRandomNeurons
+         * @param startIdNeurons
+         * @param endIdNeurons
+         */
+        void updateMatrixXDisplayParameters(bool enabled, bool randomNeurons, int nbRandomNeurons, int startIdNeurons, int endIdNeurons);
+
     signals :
 
         /**
@@ -148,9 +158,12 @@ class ReservoirQt  : public QObject
         void sendMatriceImage2Display(QImage);
 
         /**
-         * @brief sendMatriceData
+         * @brief sendXMatriceData
+         * @param data
+         * @param currentSentenceId
+         * @param nbSentence
          */
-        void sendMatriceData(QVector<QVector<double> >);
+        void sendXMatriceData(QVector<QVector<double> >*data, int currentSentenceId,int nbSentence);
 
         /**
          * @brief sendInfoPlot
@@ -194,6 +207,14 @@ class ReservoirQt  : public QObject
 
         int m_numThread;                /**< number of threads to be used by openmp */
         bool m_sendMatrices;            /**< send matrices to be displayed in the interface */
+
+
+        // TEMP
+        bool m_displayEnabled;
+        bool m_randomNeurons;
+        int m_nbRandomNeurons;
+        int m_startIdNeurons;
+        int m_endIdNeurons;
 };
 
 
