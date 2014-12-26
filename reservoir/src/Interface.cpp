@@ -32,18 +32,12 @@ int main(int argc, char* argv[])
 
 Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
 {
+    // set absolute path
+    m_absolutePath = QDir::currentPath() + "/";
+
     // init main widget
     m_uiInterface->setupUi(this);
     this->setWindowTitle(QString("Reservoir - cuda"));
-
-    // init CCW / structure (TEMP)
-        QStringList l_listCCW, l_listStructure;
-        l_listCCW << "and s of the to . -ed -ing -s by it that was did , from";
-        l_listCCW << "-ga -ni -wo -yotte -o -to sore";
-        m_uiInterface->cbCCW->addItems(l_listCCW);
-        l_listStructure << "P0 A1 O2 R3";
-        l_listStructure << "P0 A1 O2 R3 Q0";
-        m_uiInterface->cbStructure->addItems(l_listStructure);
 
     // create log file
         QDateTime l_dateTime;
@@ -66,6 +60,7 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         m_uiInterface->scrollAreaPlotInput->setWidgetResizable(true);
         m_uiInterface->pbStop->setVisible(false);
 
+
     // init connections
         QObject::connect(this, SIGNAL(leaveProgram()), parent, SLOT(quit()));
 
@@ -76,6 +71,10 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(m_uiInterface->pbRemoveCorpus, SIGNAL(clicked()), this, SLOT(removeCorpus()));
         QObject::connect(m_uiInterface->pbSaveLastTrainingFile, SIGNAL(clicked()), this, SLOT(saveTraining()));
         QObject::connect(m_uiInterface->pbClearResults, SIGNAL(clicked()), this, SLOT(cleanResultsDisplay()));
+        QObject::connect(m_uiInterface->pbLoadTrainingFile, SIGNAL(clicked()), this, SLOT(loadTraining()));
+        QObject::connect(m_uiInterface->pbOpenSelectedCorpus, SIGNAL(clicked()), this, SLOT(openCorpus()));
+        QObject::connect(m_uiInterface->pbReloadSelectedCorpus, SIGNAL(clicked()), this, SLOT(reloadCorpus()));
+        QObject::connect(m_uiInterface->pbLoadSettings, SIGNAL(clicked()), this, SLOT(loadSettings()));
 
         // radio button
         QObject::connect(m_uiInterface->rbTrain,    SIGNAL(clicked()), SLOT(updateReservoirParameters()));
@@ -127,13 +126,8 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(m_uiInterface->leSpectralRadiusOperation,  SIGNAL(editingFinished()), SLOT(updateReservoirParameters()));
         QObject::connect(m_uiInterface->leRidgeOperation,           SIGNAL(editingFinished()), SLOT(updateReservoirParameters()));
         QObject::connect(m_uiInterface->leSparcityOperation,        SIGNAL(editingFinished()), SLOT(updateReservoirParameters()));
-
-        // combobox
-        QObject::connect(m_uiInterface->cbStructure,    SIGNAL(currentIndexChanged(int)), SLOT(updateLanguageParameters(int)));
-        QObject::connect(m_uiInterface->cbStructure,    SIGNAL(editTextChanged(QString)), SLOT(updateLanguageParameters(QString)));
-        QObject::connect(m_uiInterface->cbCCW,          SIGNAL(currentIndexChanged(int)), SLOT(updateLanguageParameters(int)));
-        QObject::connect(m_uiInterface->cbCCW,          SIGNAL(editTextChanged(QString)), SLOT(updateLanguageParameters(QString)));
-
+        QObject::connect(m_uiInterface->leDisplayCCW,               SIGNAL(editingFinished()), SLOT(updateSettings()));
+        QObject::connect(m_uiInterface->leDisplayStructure,         SIGNAL(editingFinished()), SLOT(updateSettings()));
 
         // lock
         QObject::connect(m_pWInterface, SIGNAL(lockInterfaceSignal(bool)), this, SLOT(lockInterface(bool)));
@@ -176,7 +170,6 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
 
     // update worker parameters with defaults values
         updateReservoirParameters();
-        updateLanguageParameters();
 }
 
 Interface::~Interface()
@@ -199,16 +192,28 @@ void Interface::closeEvent(QCloseEvent *event)
 }
 
 void Interface::addCorpus()
-{
-
-    QString l_sPathCorpus = QFileDialog::getOpenFileName(this, "Load corpus file", "../data/input/Corpus", "Corpus file (*.txt)");
+{        
+    QString l_sPathCorpus = QFileDialog::getOpenFileName(this, "Load corpus file", m_absolutePath + "../data/input/Corpus", "Corpus file (*.txt)");
 
     if(l_sPathCorpus.size() > 0)
     {        
         m_uiInterface->lwCorpus->addItem(l_sPathCorpus);
 
         // send item
-        emit addCorpusSignal(l_sPathCorpus);
+            emit addCorpusSignal(l_sPathCorpus);
+
+        // unlock ui
+            m_uiInterface->pbRemoveCorpus->setEnabled(true);
+            m_uiInterface->pbOpenSelectedCorpus->setEnabled(true);
+            m_uiInterface->pbReloadSelectedCorpus->setEnabled(true);
+
+        m_uiInterface->lwCorpus->setCurrentRow(m_uiInterface->lwCorpus->count()-1);
+
+        // unlock start
+        if(m_uiInterface->leDisplayCCW->text().size() > 0)
+        {
+            m_uiInterface->pbStart->setEnabled(true);
+        }
     }
 }
 
@@ -222,12 +227,22 @@ void Interface::removeCorpus()
     }
 
     // remove item
-    emit removeCorpusSignal(l_currentIndex);
+        emit removeCorpusSignal(l_currentIndex);
+
+
+    if(m_uiInterface->lwCorpus->count() == 0)
+    {
+        // lock ui
+            m_uiInterface->pbRemoveCorpus->setEnabled(false);
+            m_uiInterface->pbOpenSelectedCorpus->setEnabled(false);
+            m_uiInterface->pbReloadSelectedCorpus->setEnabled(false);
+            m_uiInterface->pbStart->setEnabled(false);
+    }
 }
 
 void Interface::saveTraining()
 {
-    QString l_sPathTrainingFile = QFileDialog::getExistingDirectory(this, "Select directory", "../data/training");
+    QString l_sPathTrainingFile = QFileDialog::getExistingDirectory(this, "Select directory", m_absolutePath + "../data/training");
 
     if(l_sPathTrainingFile.size() == 0)
     {
@@ -240,7 +255,7 @@ void Interface::saveTraining()
 
 void Interface::loadTraining()
 {
-    QString l_sPathTrainingFile = QFileDialog::getExistingDirectory(this, "Select directory", "../data/training");
+    QString l_sPathTrainingFile = QFileDialog::getExistingDirectory(this, "Select directory", m_absolutePath + "../data/training");
 
     if(l_sPathTrainingFile.size() == 0 )
     {
@@ -286,24 +301,6 @@ void Interface::updateReservoirParameters(QString value)
     updateReservoirParameters();
 }
 
-void Interface::updateLanguageParameters()
-{
-    LanguageParameters l_params;
-    l_params.m_CCW = m_uiInterface->cbCCW->currentText();
-    l_params.m_structure = m_uiInterface->cbStructure->currentText();
-
-    emit sendLanguageParametersSignal(l_params);
-}
-
-void Interface::updateLanguageParameters(int value)
-{
-    updateLanguageParameters();
-}
-
-void Interface::updateLanguageParameters(QString value)
-{
-    updateLanguageParameters();
-}
 
 void Interface::updateReservoirParameters()
 {
@@ -373,54 +370,8 @@ void Interface::updateReservoirParameters()
 
 void Interface::lockInterface(bool lock)
 {
-    m_uiInterface->sbStartNeurons->setDisabled(lock);
-    m_uiInterface->sbStartLeakRate->setDisabled(lock);
-    m_uiInterface->sbStartIS->setDisabled(lock);
-    m_uiInterface->sbStartSpectralRadius->setDisabled(lock);
-    m_uiInterface->sbStartRidge->setDisabled(lock);
-    m_uiInterface->sbStartSparcity->setDisabled(lock);
-
-    m_uiInterface->sbEndNeurons->setDisabled(lock);
-    m_uiInterface->sbEndLeakRate->setDisabled(lock);
-    m_uiInterface->sbEndIS->setDisabled(lock);
-    m_uiInterface->sbEndSpectralRadius->setDisabled(lock);
-    m_uiInterface->sbEndRidge->setDisabled(lock);
-    m_uiInterface->sbEndSparcity->setDisabled(lock);
-
-    m_uiInterface->sbNbUseNeurons->setDisabled(lock);
-    m_uiInterface->sbNbUseLeakRate->setDisabled(lock);
-    m_uiInterface->sbNbUseISS->setDisabled(lock);
-    m_uiInterface->sbNbUseSpectralRadius->setDisabled(lock);
-    m_uiInterface->sbNbUseRidge->setDisabled(lock);
-    m_uiInterface->sbNbUseSparcity->setDisabled(lock);
-
-    m_uiInterface->cbNeurons->setDisabled(lock);
-    m_uiInterface->cbLeakRate->setDisabled(lock);
-    m_uiInterface->cbIS->setDisabled(lock);
-    m_uiInterface->cbSpectralRadius->setDisabled(lock);
-    m_uiInterface->cbRidge->setDisabled(lock);
-    m_uiInterface->cbSparcity->setDisabled(lock);
-
-    m_uiInterface->leNeuronsOperation->setDisabled(lock);
-    m_uiInterface->leLeakRateOperation->setDisabled(lock);
-    m_uiInterface->leISOperation->setDisabled(lock);
-    m_uiInterface->leSpectralRadiusOperation->setDisabled(lock);
-    m_uiInterface->leRidgeOperation->setDisabled(lock);
-    m_uiInterface->leSparcityOperation->setDisabled(lock);
-
-    m_uiInterface->cbCCW->setDisabled(lock);
-    m_uiInterface->cbStructure->setDisabled(lock);
-
-    m_uiInterface->pbAddCorpus->setDisabled(lock);
-    m_uiInterface->pbRemoveCorpus->setDisabled(lock);
-    m_uiInterface->pbClearResults->setDisabled(lock);
-
-    m_uiInterface->pbStart->setDisabled(lock);
-    m_uiInterface->pbLoadTrainingFile->setDisabled(lock);
-    m_uiInterface->pbStop->setDisabled(!lock);
-
+    m_uiInterface->tabSettings->setDisabled(lock);
 }
-
 
 void Interface::displayValidityOperation(bool operationValid, int indexParameter)
 {
@@ -1088,6 +1039,96 @@ void Interface::displayTrainInputMatrix(cv::Mat trainMeaning, cv::Mat trainSente
                 m_plotListTrainMeaningInput.back()->replot();
         }
 }
+
+void Interface::openCorpus()
+{
+    int l_currentIndex = m_uiInterface->lwCorpus->currentRow();
+
+    if(l_currentIndex >= 0)
+    {
+        QDesktopServices::openUrl(QUrl("file:///" + m_uiInterface->lwCorpus->currentItem()->text()));
+        m_uiInterface->lwCorpus->currentItem()->setTextColor(QColor(255,0,0));
+    }
+}
+
+void Interface::reloadCorpus()
+{
+    int l_currentIndex2Reload = m_uiInterface->lwCorpus->currentRow();
+
+    if(l_currentIndex2Reload >= 0)
+    {
+        QString l_pathCorpus2Reload = m_uiInterface->lwCorpus->currentItem()->text();
+
+        // remove item
+            delete m_uiInterface->lwCorpus->takeItem(l_currentIndex2Reload);
+            emit removeCorpusSignal(l_currentIndex2Reload);
+
+        // wait
+            QTime l_oDieTime = QTime::currentTime().addMSecs(10);
+            while( QTime::currentTime() < l_oDieTime)
+            {
+                QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+            }
+
+        // send item
+            m_uiInterface->lwCorpus->addItem(l_pathCorpus2Reload);
+            emit addCorpusSignal(l_pathCorpus2Reload);
+
+        m_uiInterface->lwCorpus->setCurrentRow(m_uiInterface->lwCorpus->count()-1);
+        m_uiInterface->lwCorpus->currentItem()->setTextColor(QColor(0,255,0));
+    }
+}
+
+
+void Interface::loadSettings()
+{
+    QString l_sPathSettings = QFileDialog::getOpenFileName(this, "Load settings file", m_absolutePath + "../data/input/Settings", "Corpus file (*.txt)");
+
+    if(l_sPathSettings.size() > 0)
+    {
+        QStringList l_CCW, l_structure;
+        extractDataFromSettingFile(l_sPathSettings,l_CCW, l_structure);
+
+        m_uiInterface->leSettingFile->setText(l_sPathSettings);
+        m_uiInterface->leDisplayCCW->setText(l_CCW.join(" "));
+        m_uiInterface->leDisplayStructure->setText(l_structure.join(" "));
+
+        LanguageParameters l_params;
+        l_params.m_CCW = l_CCW.join(" ");
+        l_params.m_structure = l_structure.join(" ");
+
+        emit sendLanguageParametersSignal(l_params);
+
+        // unlock start
+        if(m_uiInterface->lwCorpus->count() > 0)
+        {
+            m_uiInterface->pbStart->setEnabled(true);
+        }
+    }
+}
+
+void Interface::updateSettings()
+{
+    LanguageParameters l_params;
+    l_params.m_CCW = m_uiInterface->leDisplayCCW->text();
+    l_params.m_structure = m_uiInterface->leDisplayStructure->text();
+
+    if(l_params.m_CCW.size() > 0 && l_params.m_structure.size() > 0)
+    {
+        emit sendLanguageParametersSignal(l_params);
+
+        // unlock start
+        if(m_uiInterface->lwCorpus->count() > 0)
+        {
+            m_uiInterface->pbStart->setEnabled(true);
+        }
+    }
+    else
+    {
+        m_uiInterface->pbStart->setEnabled(false);
+    }
+}
+
 
 InterfaceWorker::InterfaceWorker() : m_gridSearch(new GridSearchQt(m_model)), m_nbOfCorpus(0)
 {

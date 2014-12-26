@@ -45,7 +45,7 @@
                 <string>CORPUS LIST</string>
                </property>
                <layout class="QGridLayout" name="gridLayout_5">
-                <item row="0" column="0" rowspan="2" colspan="2">
+                <item row="0" column="0" rowspan="3" colspan="2">
                  <widget class="QListWidget" name="lwCorpus">
                   <property name="maximumSize">
                    <size>
@@ -55,21 +55,24 @@
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="2">
-                 <widget class="QPushButton" name="pbRemoveCorpus">
+                <item row="0" column="3">
+                 <widget class="QPushButton" name="pbAddCorpus">
                   <property name="maximumSize">
                    <size>
-                    <width>150</width>
+                    <width>75</width>
                     <height>16777215</height>
                    </size>
                   </property>
                   <property name="text">
-                   <string>Remove corpus</string>
+                   <string>Add</string>
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="2">
-                 <widget class="QPushButton" name="pbAddCorpus">
+                <item row="2" column="3">
+                 <widget class="QPushButton" name="pbOpenSelectedCorpus">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="maximumSize">
                    <size>
                     <width>100</width>
@@ -77,7 +80,98 @@
                    </size>
                   </property>
                   <property name="text">
-                   <string>Add corpus</string>
+                   <string>Open</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="4">
+                 <widget class="QPushButton" name="pbReloadSelectedCorpus">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="text">
+                   <string>Reload</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="4">
+                 <widget class="QPushButton" name="pbRemoveCorpus">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>75</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Remove</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="3" colspan="2">
+                 <widget class="Line" name="line_20">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="gbCCWStructure">
+               <property name="title">
+                <string>CORPUS SETTINGS</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_10">
+                <item row="3" column="0">
+                 <widget class="QLabel" name="label_14">
+                  <property name="text">
+                   <string>Structure to be used :</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="laCCW">
+                  <property name="text">
+                   <string>CCW to be used :</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0" colspan="3">
+                 <widget class="Line" name="line_13">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QPushButton" name="pbLoadSettings">
+                  <property name="text">
+                   <string>Set</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QLineEdit" name="leDisplayCCW">
+                  <property name="readOnly">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="1">
+                 <widget class="QLineEdit" name="leDisplayStructure">
+                  <property name="readOnly">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QLineEdit" name="leSettingFile">
+                  <property name="readOnly">
+                   <bool>true</bool>
                   </property>
                  </widget>
                 </item>
@@ -688,56 +782,6 @@
               </widget>
              </item>
              <item>
-              <widget class="QGroupBox" name="gbCCWStructure">
-               <property name="title">
-                <string>CCW / STRUCTURE</string>
-               </property>
-               <layout class="QGridLayout" name="gridLayout_10">
-                <item row="2" column="0">
-                 <widget class="QLabel" name="label_14">
-                  <property name="text">
-                   <string>Structure to be used :</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="laCCW">
-                  <property name="text">
-                   <string>CCW to be used :</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0" colspan="2">
-                 <widget class="Line" name="line_13">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QComboBox" name="cbCCW">
-                  <property name="minimumSize">
-                   <size>
-                    <width>400</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="editable">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QComboBox" name="cbStructure">
-                  <property name="editable">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
-             </item>
-             <item>
               <widget class="QGroupBox" name="gbTrainTest">
                <property name="title">
                 <string>TRAIN / TEST</string>
@@ -1069,6 +1113,9 @@
             </item>
             <item row="0" column="0">
              <widget class="QPushButton" name="pbStart">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="minimumSize">
                <size>
                 <width>0</width>

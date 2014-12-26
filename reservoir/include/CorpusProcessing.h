@@ -76,6 +76,33 @@ static void generateCorpus(const QString pathFileNewCorpus, const QVector<QStrin
     }
 }
 
+
+/**
+ * @brief extractDataFromSettingFile
+ * @param pathFileSettings
+ * @param CCW
+ * @param structure
+ */
+static void extractDataFromSettingFile(const QString pathFileSettings, QStringList &CCW, QStringList &structure)
+{
+    QFile l_file(pathFileSettings);
+
+    if(l_file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QTextStream in(&l_file), inLine;
+
+        QString l_CCW       = in.readLine();
+        QString l_Structure = in.readLine();
+
+        CCW       = l_CCW.split(" ");
+        structure = l_Structure.split(" ");
+    }
+    else
+    {
+        std::cerr << "Can not open settings file. " << std::endl;
+    }
+}
+
 /**
  * @brief extractAllDataFromCorpusFile
  * @param pathFileCorpus

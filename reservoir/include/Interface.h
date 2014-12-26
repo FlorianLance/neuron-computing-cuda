@@ -162,15 +162,6 @@ class Interface : public QMainWindow
         void updateReservoirParameters(QString value);
 
         /**
-         * @brief updateLanguageParameters
-         */
-        void updateLanguageParameters();
-
-        void updateLanguageParameters(int value);
-
-        void updateLanguageParameters(QString value);
-
-        /**
          * @brief lockInterface
          * @param lock
          */
@@ -242,6 +233,25 @@ class Interface : public QMainWindow
          */
         void displayTrainInputMatrix(cv::Mat trainMeaning, cv::Mat trainSentence);
 
+        /**
+         * @brief openCorpus
+         */
+        void openCorpus();
+
+        /**
+         * @brief reloadCorpus
+         */
+        void reloadCorpus();
+
+        /**
+         * @brief loadSettings
+         */
+        void loadSettings();
+
+        /**
+         * @brief updateSettings
+         */
+        void updateSettings();
 
     signals:
 
@@ -293,6 +303,8 @@ class Interface : public QMainWindow
 
 
         QFile m_logFile;
+
+        QString m_absolutePath;
 
         // widgets & ui
         DisplayImageWidget *m_imageDisplay;
