@@ -10,11 +10,11 @@
 #include "Interface.h"
 #include "../moc/moc_Interface.cpp"
 
+#include <QDateTime>
 #include <QCheckBox>
+
 #include <time.h>
 
-
-#include <QDateTime>
 
 int main(int argc, char* argv[])
 {
@@ -31,20 +31,36 @@ int main(int argc, char* argv[])
 
 
 Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
-{
+{    
     // set absolute path
-    m_absolutePath = QDir::currentPath() + "/";
+        m_absolutePath = QDir::currentPath() + "/";
+
+    // create folders
+        QVector<QDir> l_dirs;
+        l_dirs.push_back(QDir(m_absolutePath     + "../data/input/Corpus"));
+        l_dirs.push_back(QDir(m_absolutePath     + "../data/input/Settings"));
+        l_dirs.push_back(QDir(m_absolutePath     + "../data/Results/raw"));
+        l_dirs.push_back(QDir(m_absolutePath     + "../data/training"));
+        l_dirs.push_back(QDir(m_absolutePath     + "../log"));
+
+        for(int ii = 0; ii < l_dirs.size(); ++ii)
+        {
+            if(!l_dirs[ii].exists())
+            {
+                l_dirs[ii].mkpath(".");
+            }
+        }
 
     // init main widget
-    m_uiInterface->setupUi(this);
-    this->setWindowTitle(QString("Reservoir - cuda"));
+        m_uiInterface->setupUi(this);
+        this->setWindowTitle(QString("Reservoir - cuda"));
 
     // create log file
         QDateTime l_dateTime;
         l_dateTime = l_dateTime.currentDateTime();
         QDate l_date = l_dateTime.date();
         QTime l_time = QTime::currentTime();
-        QString l_nameLogFile = "../log/logs_reservoir_interface_" + l_date.toString("dd_MM_yyyy") + "_" +  QString::number(l_time.hour()) + "h" + QString::number(l_time.minute()) + "m" + QString::number(l_time.second()) + "s.txt";
+        QString l_nameLogFile = m_absolutePath + "../log/logs_reservoir_interface_" + l_date.toString("dd_MM_yyyy") + "_" +  QString::number(l_time.hour()) + "h" + QString::number(l_time.minute()) + "m" + QString::number(l_time.second()) + "s.txt";
         m_logFile.setFileName(l_nameLogFile);
         if (!m_logFile.open(QIODevice::WriteOnly | QIODevice::Text))
         {
@@ -60,9 +76,11 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         m_uiInterface->scrollAreaPlotInput->setWidgetResizable(true);
         m_uiInterface->pbStop->setVisible(false);
 
-
     // init connections
         QObject::connect(this, SIGNAL(leaveProgram()), parent, SLOT(quit()));
+
+        // listwidgets
+        QObject::connect(m_uiInterface->lwCorpus,  SIGNAL(doubleClicked(QModelIndex)), this, SLOT(openCorpus(QModelIndex)));
 
         // push button
         QObject::connect(m_uiInterface->pbStart,        SIGNAL(clicked()), m_pWInterface, SLOT(start()));
@@ -155,10 +173,13 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(l_model->reservoir(), SIGNAL(sendXMatriceData(QVector<QVector<double> >*, int, int )), this, SLOT(displayXMatrix(QVector<QVector<double> >*, int, int)));
 
         QObject::connect(l_model->reservoir(), SIGNAL(sendInfoPlot(int,int,int,QString)), this, SLOT(initPlot(int,int,int,QString)));
-        QObject::connect(l_model->reservoir(), SIGNAL(sendLogInfo(QString)), this, SLOT(displayLogInfo(QString)));
+        QObject::connect(l_model->reservoir(), SIGNAL(sendLogInfo(QString, QColor)), this, SLOT(displayLogInfo(QString, QColor)));
+        QObject::connect(l_model, SIGNAL(sendLogInfo(QString, QColor)), this, SLOT(displayLogInfo(QString, QColor)));
+        QObject::connect(m_pWInterface,         SIGNAL(sendLogInfo(QString, QColor)), this, SLOT(displayLogInfo(QString, QColor)));
         QObject::connect(l_model->reservoir(), SIGNAL(sendOutputMatrix(cv::Mat)), this, SLOT(displayOutputMatrix(cv::Mat)));
         QObject::connect(l_model, SIGNAL(sendTrainInputMatrix(cv::Mat,cv::Mat)), this, SLOT(displayTrainInputMatrix(cv::Mat,cv::Mat)));
         QObject::connect(this,                 SIGNAL(sendMatrixXDisplayParameters(bool,bool,int,int,int)), l_model->reservoir(), SLOT(updateMatrixXDisplayParameters(bool,bool,int,int,int)));
+        QObject::connect(l_model->reservoir(), SIGNAL(sendLoadedParameters(QStringList)), m_pWInterface, SLOT(setLoadedParameters(QStringList)));
 
     // interface setting
         m_uiInterface->pbComputing->setRange(0,100);
@@ -429,67 +450,97 @@ void Interface::displayCurrentResults(ResultsDisplayReservoir results)
     m_uiInterface->tbResults->setFont(l_font);
     int l_numberCharLine = 2*l_widthTb / pixelsWide;
 
-    QString l_display = m_uiInterface->tbResults->toPlainText();
+    QString l_display;
 
-    if(results.m_trainResults.size() > 0)
+    if(results.m_action == TRAINING_RES || results.m_action == BOTH_RES)
     {
-        l_display += "##################### TRAINING :\n";
-    }
-
-    for(int ii = 0; ii < results.m_trainSentences.size(); ++ii)
-    {
-        l_display += "Corpus sentence     : ";
-
-        for(int jj = 0; jj < results.m_trainSentences[ii].size(); ++jj)
+        if(results.m_trainResults.size() > 0)
         {
-            l_display+= QString::fromStdString(results.m_trainSentences[ii][jj]) + " ";
-        }
-        l_display += "\nSentence retrieved : ";
-
-        for(int jj = 0; jj < results.m_trainResults[ii].size(); ++jj)
-        {
-            l_display+= QString::fromStdString(results.m_trainResults[ii][jj]) + " ";
-        }
-        l_display += "\nResults computed    : ";
-
-        if(results.m_absoluteCCW.size() == results.m_trainSentences.size())
-        {
-            l_display += "CCW : "  + QString::number(results.m_absoluteCCW[ii]) + " ALL : " +  QString::number(results.m_absoluteAll[ii]) + "\n";
+            m_uiInterface->tbResults->setTextColor(QColor(Qt::blue));
+            m_uiInterface->tbResults->insertPlainText("[TRAINING]\n");
+            m_uiInterface->tbResults->setTextColor(QColor(Qt::black));
         }
 
-        for(int jj = 0; jj < l_numberCharLine; ++jj)
+        for(int ii = 0; ii < results.m_trainSentences.size(); ++ii)
         {
-            l_display += "-";
-        }
+            m_uiInterface->tbResults->insertPlainText("Corpus sentence     : ");
 
-        l_display += "\n";
-    }
-
-    if(results.m_testResults.size() > 0)
-    {
-        l_display += "\n##################### TEST :\n";
-
-        for(int ii = 0; ii < results.m_testResults.size(); ++ii)
-        {
-            l_display += "Sentence retrieved : ";
-
-            for(int jj = 0; jj < results.m_testResults[ii].size(); ++jj)
+            l_display = "";
+            for(int jj = 0; jj < results.m_trainSentences[ii].size(); ++jj)
             {
-                l_display+= QString::fromStdString(results.m_testResults[ii][jj]) + " ";
+                l_display+= QString::fromStdString(results.m_trainSentences[ii][jj]) + " ";
+            }
+            m_uiInterface->tbResults->insertPlainText(l_display);
+            m_uiInterface->tbResults->insertPlainText("\nSentence retrieved : ");
+
+            l_display = "";
+            for(int jj = 0; jj < results.m_trainResults[ii].size(); ++jj)
+            {
+                l_display+= QString::fromStdString(results.m_trainResults[ii][jj]) + " ";
+            }
+            m_uiInterface->tbResults->insertPlainText(l_display);
+            m_uiInterface->tbResults->insertPlainText("\nResults computed    : ");
+
+            if(results.m_absoluteCCW.size() == results.m_trainSentences.size())
+            {
+                int l_nbCCW = results.m_absoluteCCW[ii];
+                int l_nbAll = results.m_absoluteAll[ii];
+
+                if(l_nbCCW != 100 && l_nbAll != 100)
+                {
+                    m_uiInterface->tbResults->setTextColor(QColor(Qt::red));
+                }
+                else
+                {
+                    m_uiInterface->tbResults->setTextColor(QColor(Qt::green));
+                }
+
+                m_uiInterface->tbResults->insertPlainText("CCW : "  + QString::number(l_nbCCW) + " ALL : " +  QString::number(l_nbAll) + "\n");
+                m_uiInterface->tbResults->setTextColor(QColor(Qt::black));
             }
 
-            l_display += "\n";
-
+            l_display = "";
             for(int jj = 0; jj < l_numberCharLine; ++jj)
             {
                 l_display += "-";
             }
 
             l_display += "\n";
+            m_uiInterface->tbResults->insertPlainText(l_display);
         }
     }
 
-    m_uiInterface->tbResults->setPlainText(l_display);
+    if(results.m_action == TEST_RES || results.m_action == BOTH_RES)
+    {
+        if(results.m_testResults.size() > 0)
+        {
+            m_uiInterface->tbResults->setTextColor(QColor(Qt::blue));
+            m_uiInterface->tbResults->insertPlainText("[TEST]\n");
+            m_uiInterface->tbResults->setTextColor(QColor(Qt::black));
+
+            for(int ii = 0; ii < results.m_testResults.size(); ++ii)
+            {
+                m_uiInterface->tbResults->insertPlainText("Sentence retrieved : ");
+
+                l_display = "";
+                for(int jj = 0; jj < results.m_testResults[ii].size(); ++jj)
+                {
+                    l_display+= QString::fromStdString(results.m_testResults[ii][jj]) + " ";
+                }
+
+                l_display += "\n";
+
+                for(int jj = 0; jj < l_numberCharLine; ++jj)
+                {
+                    l_display += "-";
+                }
+
+                l_display += "\n";
+                m_uiInterface->tbResults->insertPlainText(l_display);
+            }
+        }
+    }
+
     m_uiInterface->tbResults->verticalScrollBar()->setValue(m_uiInterface->tbResults->verticalScrollBar()->maximum());
 }
 
@@ -664,7 +715,7 @@ void Interface::cleanResultsDisplay()
     m_uiInterface->tbResults->clear();
 }
 
-void Interface::displayLogInfo(QString info)
+void Interface::displayLogInfo(QString info, QColor colorText)
 {
     if(m_logFile.isOpen())
     {
@@ -672,7 +723,8 @@ void Interface::displayLogInfo(QString info)
         l_stream << info;
     }
 
-    m_uiInterface->tbInfos->setPlainText(m_uiInterface->tbInfos->toPlainText() + info);
+    m_uiInterface->tbInfos->setTextColor(colorText);
+    m_uiInterface->tbInfos->insertPlainText (info);
     m_uiInterface->tbInfos->verticalScrollBar()->setValue(m_uiInterface->tbInfos->verticalScrollBar()->maximum());
 }
 
@@ -1075,7 +1127,7 @@ void Interface::reloadCorpus()
             emit addCorpusSignal(l_pathCorpus2Reload);
 
         m_uiInterface->lwCorpus->setCurrentRow(m_uiInterface->lwCorpus->count()-1);
-        m_uiInterface->lwCorpus->currentItem()->setTextColor(QColor(0,255,0));
+        m_uiInterface->lwCorpus->currentItem()->setTextColor(QColor(0,0,0));
     }
 }
 
@@ -1126,6 +1178,17 @@ void Interface::updateSettings()
     else
     {
         m_uiInterface->pbStart->setEnabled(false);
+    }
+}
+
+void Interface::openCorpus(QModelIndex index)
+{
+    int l_clickedRow = index.row();
+
+    if(l_clickedRow >= 0)
+    {
+        QDesktopServices::openUrl(QUrl("file:///" + m_uiInterface->lwCorpus->currentItem()->text()));
+        m_uiInterface->lwCorpus->currentItem()->setTextColor(QColor(255,0,0));
     }
 }
 
@@ -1303,6 +1366,7 @@ void InterfaceWorker::start()
 
         if(l_OperationInvalid != 0)
         {
+            sendLogInfo("Cannot start, " + QString::number(l_OperationInvalid) + " operation are invalid. (Displayed in red)\n", QColor(Qt::red));
             std::cerr << "Cannot start, " << l_OperationInvalid << " operation are invalid. (Displayed in red)" << std::endl;
             return;
         }
@@ -1325,9 +1389,30 @@ void InterfaceWorker::start()
             break;
         }
 
+    QDateTime l_dateTime;
+    l_dateTime = l_dateTime.currentDateTime();
+    QDate l_date = l_dateTime.date();
+    QTime l_time = QTime::currentTime();
+    QString l_uniqueName = l_date.toString("dd_MM_yyyy") + "_" +  QString::number(l_time.hour()) + "h" + QString::number(l_time.minute()) + "m" + QString::number(l_time.second()) + "s.txt";
+    QString l_pathRes    =  "../data/Results/res_"  + l_uniqueName;
+    QString l_pathResRaw =  "../data/Results/raw/res_" + l_uniqueName;
+
+    if(m_reservoirParameters.m_useLoadedTraining)
+    {
+        if(m_parametersLoaded.size() > 0)
+        {
+            m_gridSearch->setParameterValues(GridSearchQt::NEURONS_NB,      m_parametersLoaded[0].toInt(),    m_parametersLoaded[0].toInt(),   "+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::SPARCITY,        m_parametersLoaded[1].toDouble(), m_parametersLoaded[1].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::SPECTRAL_RADIUS, m_parametersLoaded[2].toDouble(), m_parametersLoaded[2].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::INPUT_SCALING,   m_parametersLoaded[3].toDouble(), m_parametersLoaded[3].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::LEAK_RATE,       m_parametersLoaded[4].toDouble(), m_parametersLoaded[4].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::RIDGE,           m_parametersLoaded[5].toDouble(), m_parametersLoaded[5].toDouble(),"+0", true, 1);
+        }
+    }
+
     // launch reservoir computing
     lockInterfaceSignal(true);
-        m_gridSearch->launchTrainWithAllParameters("../data/Results/interfacetest.txt", "../data/Results/interfacetest_raw.txt", l_doTrain, l_doTest, m_reservoirParameters.m_useLoadedTraining);
+        m_gridSearch->launchTrainWithAllParameters(l_pathRes.toStdString(), l_pathResRaw.toStdString(), l_doTrain, l_doTest, m_reservoirParameters.m_useLoadedTraining);
     lockInterfaceSignal(false);
 
     emit endTrainingSignal(true);
@@ -1343,7 +1428,7 @@ void InterfaceWorker::saveLastTraining(QString pathDirectory)
     if(pathDirectory.size() > 0)
     {
         m_model.saveTraining(pathDirectory.toStdString());
-        qDebug() << "Training saved in the directory : " << pathDirectory;
+        sendLogInfo("Training saved in the directory : " + pathDirectory + "\n", QColor(0,0,255));
     }
 }
 
@@ -1352,6 +1437,11 @@ void InterfaceWorker::loadTraining(QString pathDirectory)
     if(pathDirectory.size() > 0)
     {
         m_model.loadTraining(pathDirectory.toStdString());
-        qDebug() << "Training loaded in the directory : " << pathDirectory;
+        sendLogInfo("Training loaded in the directory : " + pathDirectory + "\n", QColor(Qt::blue));
     }
+}
+
+void InterfaceWorker::setLoadedParameters(QStringList loadedParams)
+{
+    m_parametersLoaded = loadedParams;
 }

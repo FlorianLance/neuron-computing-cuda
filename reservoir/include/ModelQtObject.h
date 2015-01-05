@@ -243,6 +243,11 @@ class ModelQt : public QObject
          */
         void sendTrainInputMatrix(cv::Mat, cv::Mat);
 
+        /**
+         * @brief sendLogInfo
+         */
+        void sendLogInfo(QString, QColor);
+
     private :
 
         // states
@@ -278,8 +283,6 @@ class ModelQt : public QObject
 
         // reservoir
         ReservoirQt *m_reservoir;                  /**< reservoir structure */
-//        Reservoir2<float> m_res1;
-//        Reservoir2<double> m_res2;
 };
 
 #endif

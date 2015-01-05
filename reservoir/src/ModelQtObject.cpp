@@ -170,6 +170,7 @@ void ModelQt::setResultsTestToCompare(const std::string &resultsTestFilePath)
     else
     {
         std::cerr << "Error loading results test file. " << std::endl;
+        sendLogInfo("Error loading results test file. \n", QColor(Qt::red));
     }
 }
 
@@ -186,6 +187,7 @@ void ModelQt::computeResultsData(cbool trainResults, const std::string &pathSave
     if(m_verbose)
     {
         std::cout << "Start analysing results. " << std::endl;
+        sendLogInfo("Start analysing results. \n", QColor(Qt::black));
     }
 
     Sentences l_goal;
@@ -207,6 +209,7 @@ void ModelQt::computeResultsData(cbool trainResults, const std::string &pathSave
         if(l_goal.size() != m_recoveredSentencesTest.size())
         {
             std::cerr << "Error compare results : not the same number of sentences. " << std::endl;
+            sendLogInfo("Error compare results : not the same number of sentences. \n", QColor(Qt::red));
         }
     }
     else
@@ -315,6 +318,7 @@ void ModelQt::computeResultsData(cbool trainResults, const std::string &pathSave
     if(!l_flowResFile)
     {
         std::cerr << "Error log file. " << std::endl;
+        sendLogInfo("Error log file. \n", QColor(Qt::red));
     }
 
     // compute the stats
@@ -483,127 +487,24 @@ void ModelQt::launchTraining()
     // call python for generating new stim files
         std::string l_pythonCmd("python ../generate_stim.py ");
         std::string l_pythonCall = l_pythonCmd + m_parameters.m_corpusFilePath + " train " + l_CCWPythonArg + " " + l_structurePythonArg;
-        displayTime("Generate stim files with Python ", l_trainingTime, false, m_verbose);
+        sendLogInfo(QString::fromStdString(displayTime("Generate stim files with Python ", l_trainingTime, false, m_verbose)), QColor(Qt::black));
             system(l_pythonCall.c_str());
-        displayTime("End generation ", l_trainingTime, true, m_verbose);
-
+        sendLogInfo(QString::fromStdString(displayTime("End generation ", l_trainingTime, true, m_verbose)), QColor(Qt::black));
 
     // init matrices
         cv::Mat l_3DMatStimMeanTrain, l_3DMatStimSentTrain;
-//        std::vector<cv::Mat> l_3DVMatStimMeanTrain, l_3DVMatStimSentTrain, l_internalStatesTrainV; // TEST
 
     // load input matrices created in the python script)
         load3DMatrixFromNpPythonSaveTextF(QString("../data/input/stim_mean_train.txt"), l_3DMatStimMeanTrain);
         load3DMatrixFromNpPythonSaveTextF(QString("../data/input/stim_sent_train.txt"), l_3DMatStimSentTrain);
-//        load3DMatrixFromNpPythonSaveTextF(QString("../data/input/stim_mean_train.txt"), l_3DVMatStimMeanTrain);
-//        load3DMatrixFromNpPythonSaveTextF(QString("../data/input/stim_sent_train.txt"), l_3DVMatStimSentTrain);
 
     // send train input matrices to be displayed
         sendTrainInputMatrix(l_3DMatStimMeanTrain,l_3DMatStimSentTrain);
 
     // train reservoir        
-        displayTime("Start reservoir training ", l_trainingTime, false, m_verbose);
+        sendLogInfo(QString::fromStdString(displayTime("Start reservoir training ", l_trainingTime, false, m_verbose)), QColor(Qt::black));
             m_reservoir->train(l_3DMatStimMeanTrain, l_3DMatStimSentTrain, m_3DMatSentencesOutputTrain,m_internalStatesTrain);
-        displayTime("End reservoir training ", l_trainingTime, true, m_verbose);
-
-    // save matrices
-        cv::Mat l_subRes(m_3DMatSentencesOutputTrain.size[1], m_3DMatSentencesOutputTrain.size[0]*m_3DMatSentencesOutputTrain.size[2], CV_32FC3);
-
-            for(int ii = 0; ii < m_3DMatSentencesOutputTrain.size[0]; ++ii)
-            {
-                for(int jj = 0; jj < m_3DMatSentencesOutputTrain.size[1]; ++jj)
-                {
-                    for(int kk = 0; kk < m_3DMatSentencesOutputTrain.size[2]; ++kk)
-                    {
-                        cv::Vec3f l_value;
-
-                        if(ii % 3 == 0)
-                        {
-                            l_value = cv::Vec3f(m_3DMatSentencesOutputTrain.at<float>(ii,jj,kk),0,m_3DMatSentencesOutputTrain.at<float>(ii,jj,kk));
-                        }
-                        else if(ii % 3 == 1)
-                        {
-                            l_value = cv::Vec3f(0,m_3DMatSentencesOutputTrain.at<float>(ii,jj,kk),0);
-                        }
-                        else
-                        {
-                            l_value = cv::Vec3f(m_3DMatSentencesOutputTrain.at<float>(ii,jj,kk),0,0);
-                        }
-
-
-                        l_subRes.at<cv::Vec3f>(jj, kk + ii*m_3DMatSentencesOutputTrain.size[2]) = l_value;
-                    }
-                }
-            }
-
-        std::ostringstream l_os1;
-        l_os1 << s_numImage;
-
-
-        double min, max;
-        cv::minMaxLoc(l_subRes, &min, &max);
-        save3Channel2DMatrixToTextStd("../data/Results/mat_out/img_before_" + l_os1.str() + ".txt", l_subRes);
-
-
-        for(int ii = 0; ii < l_subRes.rows * l_subRes.cols; ++ii)
-        {
-//            if(l_subRes.at<cv::Vec3f>(ii) != cv::Vec3f(0,0,0))
-            {
-                l_subRes.at<cv::Vec3f>(ii) += cv::Vec3f(-min,-min,-min);
-            }
-//            else
-            {
-//                l_subRes.at<cv::Vec3f>(ii) = cv::Vec3f(0,0,0);
-            }
-
-            cv::Vec3f l_value = l_subRes.at<cv::Vec3f>(ii);
-            l_value[0] *= 255./max;
-            l_value[1] *= 255./max;
-            l_value[2] *= 255./max;
-
-            l_subRes.at<cv::Vec3f>(ii) = l_value;
-        }
-
-        save3Channel2DMatrixToTextStd("../data/Results/mat_out/img_color_" + l_os1.str() + ".txt", l_subRes);
-
-        cv::imwrite("../data/Results/mat_out/sentence_output_color.png_" + l_os1.str() + ".png", l_subRes);
-        cv::cvtColor(l_subRes, l_subRes, CV_BGR2GRAY );
-        cv::imwrite("../data/Results/mat_out/sentence_output_gray.png_" + l_os1.str() + ".png", l_subRes);
-
-        ++s_numImage;
-
-
-    // save data for creating curves
-        cv::Mat l_curve(m_3DMatSentencesOutputTrain.size[0]*m_3DMatSentencesOutputTrain.size[1], m_3DMatSentencesOutputTrain.size[2]+2, CV_32FC1);
-
-        for(int ii = 0; ii < m_3DMatSentencesOutputTrain.size[0]; ++ii)
-        {
-            for(int jj = 0; jj < m_3DMatSentencesOutputTrain.size[1]; ++jj)
-            {
-                l_curve.at<float>(ii*m_3DMatSentencesOutputTrain.size[1] + jj, 1) = jj;
-
-                for(int kk = 0; kk < m_3DMatSentencesOutputTrain.size[2]; ++kk)
-                {
-                    l_curve.at<float>(ii*m_3DMatSentencesOutputTrain.size[1] + jj,kk+2) = m_3DMatSentencesOutputTrain.at<float>(ii,jj,kk);
-                }
-            }
-        }
-
-        for(int ii = 0; ii < l_curve.rows; ++ii)
-        {
-            l_curve.at<float>(ii,0) = ii / m_3DMatSentencesOutputTrain.size[1];
-        }
-
-        save2DMatrixToTextStd("../data/Results/mat_out/curve_" +  l_os1.str() + ".txt", l_curve);
-
-
-//        cv::imshow("reservoir_display",l_subRes);
-//        cv::waitKey(5000);
-
-
-//        cvtColor( l_subRes, l_subRes, CV_GRAY2RGB);
-//        cv::imshow("reservoir_display",l_subRes);
-//        cv::waitKey(5000);
+        sendLogInfo(QString::fromStdString(displayTime("End reservoir training ", l_trainingTime, true, m_verbose)), QColor(Qt::black));
 
     // retrieve corpus train data
         QVector<QStringList> l_trainMeaning,l_trainInfo,l_trainSentence, l_inused;
@@ -626,6 +527,7 @@ bool ModelQt::launchTests(const std::string &corpusTestFilePath)
         if(!m_trainingSuccess)
         {
             std::cerr << "The training must be done before the tests. " << std::endl;
+            sendLogInfo("The training must be done before the tests. \n", QColor(Qt::red));
             return true;
         }
 
@@ -657,6 +559,7 @@ bool ModelQt::launchTests(const std::string &corpusTestFilePath)
         if(m_testMeaning.size() == 0)
         {
             std::cerr << "Corpus test is empty. " << std::endl;
+            sendLogInfo("Corpus test is empty. \n", QColor(Qt::red));
             return false;
         }
 
@@ -690,9 +593,9 @@ bool ModelQt::launchTests(const std::string &corpusTestFilePath)
         std::string l_pythonCall;
         l_pythonCall = l_pythonCmd + l_corpusFilePath + " test " + l_CCWPythonArg + " " + l_structurePythonArg;
 
-        displayTime("Generate stim files with Python ", l_testTime, false, m_verbose);
+        sendLogInfo(QString::fromStdString(displayTime("Generate stim files with Python ", l_testTime, false, m_verbose)), QColor(Qt::black));
             system(l_pythonCall.c_str());
-        displayTime("End generation ", l_testTime, true, m_verbose);
+        sendLogInfo(QString::fromStdString(displayTime("End generation ", l_testTime, true, m_verbose)), QColor(Qt::black));
 
     // init matrices
         cv::Mat l_3DMatStimMeanTest, l_internalStatesTest;
@@ -701,9 +604,110 @@ bool ModelQt::launchTests(const std::string &corpusTestFilePath)
         load3DMatrixFromNpPythonSaveTextF(QString("../data/input/stim_mean_test.txt"),   l_3DMatStimMeanTest);
 
     // test reservoir
-        displayTime("Start reservoir testing ", l_testTime, false, m_verbose);
+        sendLogInfo(QString::fromStdString(displayTime("Start reservoir testing ", l_testTime, false, m_verbose)), QColor(Qt::black));
             m_reservoir->test(l_3DMatStimMeanTest, m_3DMatSentencesOutputTest, l_internalStatesTest);
-        displayTime("End reservoir testing ", l_testTime, true, m_verbose);
+        sendLogInfo(QString::fromStdString(displayTime("End reservoir testing ", l_testTime, true, m_verbose)), QColor(Qt::black));
 
     return true;
 }
+
+
+
+
+
+//// save matrices
+//    cv::Mat l_subRes(m_3DMatSentencesOutputTrain.size[1], m_3DMatSentencesOutputTrain.size[0]*m_3DMatSentencesOutputTrain.size[2], CV_32FC3);
+
+//        for(int ii = 0; ii < m_3DMatSentencesOutputTrain.size[0]; ++ii)
+//        {
+//            for(int jj = 0; jj < m_3DMatSentencesOutputTrain.size[1]; ++jj)
+//            {
+//                for(int kk = 0; kk < m_3DMatSentencesOutputTrain.size[2]; ++kk)
+//                {
+//                    cv::Vec3f l_value;
+
+//                    if(ii % 3 == 0)
+//                    {
+//                        l_value = cv::Vec3f(m_3DMatSentencesOutputTrain.at<float>(ii,jj,kk),0,m_3DMatSentencesOutputTrain.at<float>(ii,jj,kk));
+//                    }
+//                    else if(ii % 3 == 1)
+//                    {
+//                        l_value = cv::Vec3f(0,m_3DMatSentencesOutputTrain.at<float>(ii,jj,kk),0);
+//                    }
+//                    else
+//                    {
+//                        l_value = cv::Vec3f(m_3DMatSentencesOutputTrain.at<float>(ii,jj,kk),0,0);
+//                    }
+
+
+//                    l_subRes.at<cv::Vec3f>(jj, kk + ii*m_3DMatSentencesOutputTrain.size[2]) = l_value;
+//                }
+//            }
+//        }
+
+//    std::ostringstream l_os1;
+//    l_os1 << s_numImage;
+
+//    double min, max;
+//    cv::minMaxLoc(l_subRes, &min, &max);
+//    save3Channel2DMatrixToTextStd("../data/Results/mat_out/img_before_" + l_os1.str() + ".txt", l_subRes);
+
+//    for(int ii = 0; ii < l_subRes.rows * l_subRes.cols; ++ii)
+//    {
+////            if(l_subRes.at<cv::Vec3f>(ii) != cv::Vec3f(0,0,0))
+//        {
+//            l_subRes.at<cv::Vec3f>(ii) += cv::Vec3f(-min,-min,-min);
+//        }
+////            else
+//        {
+////                l_subRes.at<cv::Vec3f>(ii) = cv::Vec3f(0,0,0);
+//        }
+
+//        cv::Vec3f l_value = l_subRes.at<cv::Vec3f>(ii);
+//        l_value[0] *= 255./max;
+//        l_value[1] *= 255./max;
+//        l_value[2] *= 255./max;
+
+//        l_subRes.at<cv::Vec3f>(ii) = l_value;
+//    }
+
+//    save3Channel2DMatrixToTextStd("../data/Results/mat_out/img_color_" + l_os1.str() + ".txt", l_subRes);
+
+//    cv::imwrite("../data/Results/mat_out/sentence_output_color.png_" + l_os1.str() + ".png", l_subRes);
+//    cv::cvtColor(l_subRes, l_subRes, CV_BGR2GRAY );
+//    cv::imwrite("../data/Results/mat_out/sentence_output_gray.png_" + l_os1.str() + ".png", l_subRes);
+
+//    ++s_numImage;
+
+
+//// save data for creating curves
+//    cv::Mat l_curve(m_3DMatSentencesOutputTrain.size[0]*m_3DMatSentencesOutputTrain.size[1], m_3DMatSentencesOutputTrain.size[2]+2, CV_32FC1);
+
+//    for(int ii = 0; ii < m_3DMatSentencesOutputTrain.size[0]; ++ii)
+//    {
+//        for(int jj = 0; jj < m_3DMatSentencesOutputTrain.size[1]; ++jj)
+//        {
+//            l_curve.at<float>(ii*m_3DMatSentencesOutputTrain.size[1] + jj, 1) = jj;
+
+//            for(int kk = 0; kk < m_3DMatSentencesOutputTrain.size[2]; ++kk)
+//            {
+//                l_curve.at<float>(ii*m_3DMatSentencesOutputTrain.size[1] + jj,kk+2) = m_3DMatSentencesOutputTrain.at<float>(ii,jj,kk);
+//            }
+//        }
+//    }
+
+//    for(int ii = 0; ii < l_curve.rows; ++ii)
+//    {
+//        l_curve.at<float>(ii,0) = ii / m_3DMatSentencesOutputTrain.size[1];
+//    }
+
+//    save2DMatrixToTextStd("../data/Results/mat_out/curve_" +  l_os1.str() + ".txt", l_curve);
+
+
+////        cv::imshow("reservoir_display",l_subRes);
+////        cv::waitKey(5000);
+
+
+////        cvtColor( l_subRes, l_subRes, CV_GRAY2RGB);
+////        cv::imshow("reservoir_display",l_subRes);
+////        cv::waitKey(5000);

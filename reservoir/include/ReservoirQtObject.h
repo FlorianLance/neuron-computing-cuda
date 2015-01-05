@@ -111,7 +111,7 @@ class ReservoirQt  : public QObject
 
         /**
          * @brief loadTraining
-         * @param [in] path : path of directory containg the files m_w.txt, m_wIn.txt, m_wOut.txt
+         * @param [in]  path       : path of directory containg the files m_w.txt, m_wIn.txt, m_wOut.txt
          */
         void loadTraining(const std::string &path);
 
@@ -173,12 +173,17 @@ class ReservoirQt  : public QObject
         /**
          * @brief sendLogInfo
          */
-        void sendLogInfo(QString);
+        void sendLogInfo(QString, QColor);
 
         /**
          * @brief sendOutputMatrix
          */
         void sendOutputMatrix(cv::Mat);
+
+        /**
+         * @brief sendLoadedParameters
+         */
+        void sendLoadedParameters(QStringList);
 
     private :
 

@@ -28,6 +28,11 @@ static void display(std::vector<T> vec)
 
 
 
+enum ActionToDo
+{
+    TRAINING_RES,TEST_RES,BOTH_RES
+};
+
 struct ResultsDisplayReservoir
 {
     std::vector<double> m_absoluteCCW;
@@ -36,6 +41,8 @@ struct ResultsDisplayReservoir
     Sentences m_trainSentences;
     Sentences m_trainResults;
     Sentences m_testResults;
+
+    ActionToDo m_action;
 };
 
 

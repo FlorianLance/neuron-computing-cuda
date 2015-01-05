@@ -37,11 +37,6 @@ namespace Ui {
 class InterfaceWorker;
 
 
-enum ActionToDo
-{
-    TRAINING_RES,TEST_RES,BOTH_RES
-};
-
 struct LanguageParameters
 {
     QString m_structure;
@@ -219,8 +214,9 @@ class Interface : public QMainWindow
         /**
          * @brief displayLogInfo
          * @param info
+         * @param colorText
          */
-        void displayLogInfo(QString info);
+        void displayLogInfo(QString info, QColor colorText);
 
         /**
          * @brief displayOutputMatrix
@@ -252,6 +248,11 @@ class Interface : public QMainWindow
          * @brief updateSettings
          */
         void updateSettings();
+
+        /**
+         * @brief openCorpus
+         */
+        void openCorpus(QModelIndex index);
 
     signals:
 
@@ -301,6 +302,8 @@ class Interface : public QMainWindow
         int m_sizeDim1Meaning;
         int m_sizeDim2Meaning;
 
+//        QVector<
+
 
         QFile m_logFile;
 
@@ -314,7 +317,6 @@ class Interface : public QMainWindow
         QVector<QCustomPlot*> m_plotListTrainMeaningInput;
         QVector<QLabel*> m_plotLabelListOutput;
         QVector<QLabel*> m_plotLabelListTrainSentenceInput;
-
 
 
         QVector<QVector<double> > m_allValuesPlot;
@@ -420,6 +422,12 @@ class InterfaceWorker : public QObject
          */
         void loadTraining(QString pathDirectory);
 
+        /**
+         * @brief setLoadedParameters
+         * @param loadedParams
+         */
+        void setLoadedParameters(QStringList loadedParams);
+
     signals:
 
         /**
@@ -443,12 +451,16 @@ class InterfaceWorker : public QObject
          */
         void startInitDisplaySignal();
 
+        /**
+         * @brief sendLogInfo
+         */
+        void sendLogInfo(QString, QColor);
 
     private :
 
         int m_nbOfCorpus;
 
-
+        QStringList m_parametersLoaded;
 
         ReservoirParameters m_reservoirParameters;
         LanguageParameters m_languageParameters;

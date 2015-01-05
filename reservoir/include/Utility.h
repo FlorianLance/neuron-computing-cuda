@@ -213,7 +213,7 @@ static std::string displayTime(const std::string info, const clock_t time, const
     std::ostringstream l_oss;
     l_oss << ((float)(clock() - time) / CLOCKS_PER_SEC);
 
-    std::string l_string2Display = "  [STEP] " + info +  " : " + l_oss.str() + "s\n";
+    std::string l_string2Display = "  [COMPUTING] " + info +  " : " + l_oss.str() + "s\n";
 
     if(skipNextLine)
     {

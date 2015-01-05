@@ -190,6 +190,20 @@ void GridSearchQt::launchTrainWithAllParameters(const std::string resultsFilePat
                                     m_model->sentences(l_resultsToDisplay.m_trainSentences, l_resultsToDisplay.m_trainResults, l_resultsToDisplay.m_testResults);
                                     l_resultsToDisplay.m_absoluteCCW = l_absoluteCorrectPositionAndWordCCW;
                                     l_resultsToDisplay.m_absoluteAll = l_absoluteCorrectPositionAndWordAll;
+                                    if(doTraining && doTest)
+                                    {
+                                        l_resultsToDisplay.m_action = BOTH_RES;
+                                    }
+                                    else if(doTraining)
+                                    {
+                                        l_resultsToDisplay.m_action = TRAINING_RES;
+                                    }
+                                    else
+                                    {
+                                        l_resultsToDisplay.m_action = TEST_RES;
+                                    }
+
+
                                     emit sendResultsReservoirSignal(l_resultsToDisplay);
 
                                 if(!doTest && !doTraining)
