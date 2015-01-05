@@ -122,6 +122,13 @@ class GridSearchQt : public QObject
          */
         void sendResultsReservoirSignal(ResultsDisplayReservoir);
 
+
+        /**
+         * @brief sendLogInfo
+         */
+        void sendLogInfo(QString, QColor);
+
+
     private :
 
         /**

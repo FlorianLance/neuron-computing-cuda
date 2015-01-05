@@ -680,7 +680,7 @@ void ReservoirQt::saveTraining(const string &path)
 {
     save2DMatrixToTextStd(path + "/wOut.txt", m_wOut);
     save2DMatrixToTextStd(path + "/wIn.txt", m_wIn);
-    save2DMatrixToTextStd(path + "/w.txt", m_w);
+    save2DMatrixToTextStd(path + "/w.txt", m_w);    
 
     QFile l_paramFile(QString::fromStdString(path) + "/param.txt");
     if(l_paramFile.open(QIODevice::WriteOnly | QIODevice::Text))

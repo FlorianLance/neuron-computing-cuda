@@ -11,7 +11,7 @@
 #include "gpuMat/configCuda.h"
 
 
-#include <iostream>
+#include <stdio.h>
 #include <thrust/device_vector.h>
 #include <thrust/copy.h>
 

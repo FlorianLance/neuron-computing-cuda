@@ -426,7 +426,6 @@ void ModelQt::computeResultsData(cbool trainResults, const std::string &pathSave
 void ModelQt::saveTraining(const std::string &pathDirectory)
 {
     m_reservoir->saveTraining(pathDirectory);
-//    save3DMatrixToTextStd(pathDirectory + "/xTot.txt", m_internalStatesTrain);
 }
 
 

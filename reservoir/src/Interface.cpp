@@ -41,6 +41,7 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         l_dirs.push_back(QDir(m_absolutePath     + "../data/input/Settings"));
         l_dirs.push_back(QDir(m_absolutePath     + "../data/Results/raw"));
         l_dirs.push_back(QDir(m_absolutePath     + "../data/training"));
+        l_dirs.push_back(QDir(m_absolutePath     + "../data/replay"));
         l_dirs.push_back(QDir(m_absolutePath     + "../log"));
 
         for(int ii = 0; ii < l_dirs.size(); ++ii)
@@ -176,6 +177,7 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(l_model->reservoir(), SIGNAL(sendLogInfo(QString, QColor)), this, SLOT(displayLogInfo(QString, QColor)));
         QObject::connect(l_model, SIGNAL(sendLogInfo(QString, QColor)), this, SLOT(displayLogInfo(QString, QColor)));
         QObject::connect(m_pWInterface,         SIGNAL(sendLogInfo(QString, QColor)), this, SLOT(displayLogInfo(QString, QColor)));
+        QObject::connect(m_pWInterface->gridSearch(),   SIGNAL(sendLogInfo(QString, QColor)), this, SLOT(displayLogInfo(QString, QColor)));
         QObject::connect(l_model->reservoir(), SIGNAL(sendOutputMatrix(cv::Mat)), this, SLOT(displayOutputMatrix(cv::Mat)));
         QObject::connect(l_model, SIGNAL(sendTrainInputMatrix(cv::Mat,cv::Mat)), this, SLOT(displayTrainInputMatrix(cv::Mat,cv::Mat)));
         QObject::connect(this,                 SIGNAL(sendMatrixXDisplayParameters(bool,bool,int,int,int)), l_model->reservoir(), SLOT(updateMatrixXDisplayParameters(bool,bool,int,int,int)));
@@ -231,10 +233,10 @@ void Interface::addCorpus()
         m_uiInterface->lwCorpus->setCurrentRow(m_uiInterface->lwCorpus->count()-1);
 
         // unlock start
-        if(m_uiInterface->leDisplayCCW->text().size() > 0)
-        {
-            m_uiInterface->pbStart->setEnabled(true);
-        }
+            if(m_uiInterface->leDisplayCCW->text().size() > 0)
+            {
+                m_uiInterface->pbStart->setEnabled(true);
+            }
     }
 }
 
@@ -764,18 +766,18 @@ void Interface::displayOutputMatrix(cv::Mat output)
                     {
                         l_diffRed = -l_diffRed;
                     }
-                    int l_diffGreen = l_colors[ii].green()-l_r;
+                    int l_diffGreen = l_colors[ii].green()-l_g;
                     if(l_diffGreen < 0)
                     {
                         l_diffGreen = - l_diffGreen;
                     }
-                    int l_diffBlue = l_colors[ii].blue()-l_r;
+                    int l_diffBlue = l_colors[ii].blue()-l_b;
                     if(l_diffBlue < 0)
                     {
                         l_diffBlue = - l_diffBlue;
                     }
 
-                    if(l_diffRed + l_diffGreen + l_diffBlue < 120)
+                    if(l_diffRed + l_diffGreen + l_diffBlue < 150)
                     {
                         l_addColor = false;
                         break;
@@ -825,8 +827,15 @@ void Interface::displayOutputMatrix(cv::Mat output)
             l_palette.setColor(l_labelCCW->backgroundRole(), Qt::white);
             l_labelCCW->setAutoFillBackground (true);
             l_labelCCW->setPalette(l_palette);
-            l_labelCCW->setText(l_CCW[ii]);
+//            l_labelCCW->setText(l_CCW[ii].toUpper());
+
+            QString labelText = "<P><b>";
+            labelText .append(l_CCW[ii].toUpper());
+            labelText .append("</b></P>");
+            l_labelCCW->setText(labelText);
+
             l_labelCCW->setAlignment(Qt::AlignCenter);
+
             m_plotLabelListOutput.push_back(l_labelCCW);
             m_uiInterface->hlLabelsOutputPlot->addWidget(m_plotLabelListOutput.back());
         }
@@ -943,7 +952,7 @@ void Interface::displayTrainInputMatrix(cv::Mat trainMeaning, cv::Mat trainSente
             ++l_nbLoop;;
             bool l_addColor = true;
 
-            int l_r = rand()%255;
+            int l_r = rand()%240;
             int l_g = rand()%255;
             int l_b = rand()%205;
 
@@ -956,18 +965,18 @@ void Interface::displayTrainInputMatrix(cv::Mat trainMeaning, cv::Mat trainSente
                     {
                         l_diffRed = - l_diffRed;
                     }
-                    int l_diffGreen = l_colors[ii].green()-l_r;
+                    int l_diffGreen = l_colors[ii].green()-l_g;
                     if(l_diffGreen < 0)
                     {
                         l_diffGreen = - l_diffGreen;
                     }
-                    int l_diffBlue = l_colors[ii].blue()-l_r;
+                    int l_diffBlue = l_colors[ii].blue()-l_b;
                     if(l_diffBlue < 0)
                     {
                         l_diffBlue = - l_diffBlue;
                     }
 
-                    if(l_diffRed + l_diffGreen + l_diffBlue < 80)
+                    if(l_diffRed + l_diffGreen + l_diffBlue < 150)
                     {
                         l_addColor = false;
                         break;
@@ -997,7 +1006,12 @@ void Interface::displayTrainInputMatrix(cv::Mat trainMeaning, cv::Mat trainSente
             l_palette.setColor(l_labelCCW->backgroundRole(), Qt::white);
             l_labelCCW->setAutoFillBackground (true);
             l_labelCCW->setPalette(l_palette);
-            l_labelCCW->setText(l_CCW[ii]);
+
+            QString labelText = "<P><b>";
+            labelText .append(l_CCW[ii].toUpper());
+            labelText .append("</b></P>");
+            l_labelCCW->setText(labelText);
+
             l_labelCCW->setAlignment(Qt::AlignCenter);
             m_plotLabelListTrainSentenceInput.push_back(l_labelCCW);
             m_uiInterface->hlLabelsInputPlot->addWidget(m_plotLabelListTrainSentenceInput.back());
