@@ -176,11 +176,6 @@ class ReservoirQt  : public QObject
         void sendLogInfo(QString, QColor);
 
         /**
-         * @brief sendOutputMatrix
-         */
-        void sendOutputMatrix(cv::Mat);
-
-        /**
          * @brief sendLoadedParameters
          */
         void sendLoadedParameters(QStringList);

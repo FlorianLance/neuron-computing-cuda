@@ -1,4 +1,4 @@
-
+﻿
 
 /**
  * \file Interface.cpp
@@ -29,7 +29,6 @@ int main(int argc, char* argv[])
     return l_oApp.exec();
 }
 
-
 Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
 {    
     // set absolute path
@@ -42,6 +41,7 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         l_dirs.push_back(QDir(m_absolutePath     + "../data/Results/raw"));
         l_dirs.push_back(QDir(m_absolutePath     + "../data/training"));
         l_dirs.push_back(QDir(m_absolutePath     + "../data/replay"));
+        l_dirs.push_back(QDir(m_absolutePath     + "../data/images"));
         l_dirs.push_back(QDir(m_absolutePath     + "../log"));
 
         for(int ii = 0; ii < l_dirs.size(); ++ii)
@@ -52,9 +52,12 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
             }
         }
 
+    // set icon/title
+        this->setWindowTitle(QString("RESERVOIR COMPUTIONG - CUDA"));
+        this->setWindowIcon(QIcon(m_absolutePath + "../data/images/iconeN.png"));
+
     // init main widget
         m_uiInterface->setupUi(this);
-        this->setWindowTitle(QString("Reservoir - cuda"));
 
     // create log file
         QDateTime l_dateTime;
@@ -76,6 +79,13 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         m_uiInterface->scrollAreaPlotOutput->setWidgetResizable(true);
         m_uiInterface->scrollAreaPlotInput->setWidgetResizable(true);
         m_uiInterface->pbStop->setVisible(false);
+        m_uiInterface->twDisplay->setTabEnabled(1, false);
+
+    // init stylesheet
+        m_uiInterface->pbAddCorpus->setStyleSheet("* { font-weight: bold }");
+        m_uiInterface->pbStart->setStyleSheet("* { font-weight: bold }");
+        m_uiInterface->pbLoadSettings->setStyleSheet("* { font-weight: bold }");
+        setStyleSheet("QGroupBox { color: blue; } ");
 
     // init connections
         QObject::connect(this, SIGNAL(leaveProgram()), parent, SLOT(quit()));
@@ -99,6 +109,9 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(m_uiInterface->rbTrain,    SIGNAL(clicked()), SLOT(updateReservoirParameters()));
         QObject::connect(m_uiInterface->rbTest,     SIGNAL(clicked()), SLOT(updateReservoirParameters()));
         QObject::connect(m_uiInterface->rbBoth,     SIGNAL(clicked()), SLOT(updateReservoirParameters()));
+
+        // tab
+        QObject::connect(m_uiInterface->twSettings,  SIGNAL(currentChanged(int)), this , SLOT(setXTabFocus(int)));
 
         // spinbox
         QObject::connect(m_uiInterface->sbStartNeurons,         SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
@@ -136,7 +149,7 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(m_uiInterface->cbOnlyStartValue,       SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
         QObject::connect(m_uiInterface->cbEnableGPU,            SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
         QObject::connect(m_uiInterface->cbEnableDisplay,        SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
-        QObject::connect(m_uiInterface->cbSelectRandomNeurons,  SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
+        QObject::connect(m_uiInterface->cbSelectRandomNeurons,  SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));           
 
         // lineedit
         QObject::connect(m_uiInterface->leNeuronsOperation,         SIGNAL(editingFinished()), SLOT(updateReservoirParameters()));
@@ -178,7 +191,7 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(l_model, SIGNAL(sendLogInfo(QString, QColor)), this, SLOT(displayLogInfo(QString, QColor)));
         QObject::connect(m_pWInterface,         SIGNAL(sendLogInfo(QString, QColor)), this, SLOT(displayLogInfo(QString, QColor)));
         QObject::connect(m_pWInterface->gridSearch(),   SIGNAL(sendLogInfo(QString, QColor)), this, SLOT(displayLogInfo(QString, QColor)));
-        QObject::connect(l_model->reservoir(), SIGNAL(sendOutputMatrix(cv::Mat)), this, SLOT(displayOutputMatrix(cv::Mat)));
+        QObject::connect(l_model, SIGNAL(sendOutputMatrix(cv::Mat, Sentences)), this, SLOT(displayOutputMatrix(cv::Mat, Sentences)));
         QObject::connect(l_model, SIGNAL(sendTrainInputMatrix(cv::Mat,cv::Mat)), this, SLOT(displayTrainInputMatrix(cv::Mat,cv::Mat)));
         QObject::connect(this,                 SIGNAL(sendMatrixXDisplayParameters(bool,bool,int,int,int)), l_model->reservoir(), SLOT(updateMatrixXDisplayParameters(bool,bool,int,int,int)));
         QObject::connect(l_model->reservoir(), SIGNAL(sendLoadedParameters(QStringList)), m_pWInterface, SLOT(setLoadedParameters(QStringList)));
@@ -304,6 +317,7 @@ void Interface::loadTraining()
         l_palette.setColor(QPalette::Text,Qt::red);
         m_uiInterface->leCurrentTrainingFile->setText("Training matrices not found in the directory...");
         std::cerr << "Training matrices not found, loading not done. " << std::endl;
+        displayLogInfo("Training matrices not found, loading not done. \n", QColor(Qt::red));
     }
 
     m_uiInterface->leCurrentTrainingFile->setPalette(l_palette);
@@ -368,6 +382,16 @@ void Interface::updateReservoirParameters()
     l_params.m_ridgeOperation           = m_uiInterface->leRidgeOperation->text();
     l_params.m_sparcityOperation        = m_uiInterface->leSparcityOperation->text();
 
+    // disable parameters interface if a training file is used
+        if(m_uiInterface->cbTrainingFile->isChecked())
+        {
+            m_uiInterface->gbReservoirParameters->setEnabled(false);
+        }
+        else
+        {
+            m_uiInterface->gbReservoirParameters->setEnabled(true);
+        }
+
 
     if(m_uiInterface->rbTrain->isChecked())
     {
@@ -386,9 +410,9 @@ void Interface::updateReservoirParameters()
 
 
     // display neurons activities parameters
-    m_nbMaxNeuronsSentenceDisplayed = m_uiInterface->sbMaxSentencesDisplayed->value();
-    emit sendMatrixXDisplayParameters(m_uiInterface->cbEnableDisplay->isChecked(), m_uiInterface->cbSelectRandomNeurons->isChecked(),
-                                      m_uiInterface->sbNbRandomNeurons->value(), m_uiInterface->sbStartRangeNeuronDisplay->value(), m_uiInterface->sbEndRangeNeuronDisplay->value());
+        m_nbMaxNeuronsSentenceDisplayed = m_uiInterface->sbMaxSentencesDisplayed->value();
+        emit sendMatrixXDisplayParameters(m_uiInterface->cbEnableDisplay->isChecked(), m_uiInterface->cbSelectRandomNeurons->isChecked(),
+                                          m_uiInterface->sbNbRandomNeurons->value(), m_uiInterface->sbStartRangeNeuronDisplay->value(), m_uiInterface->sbEndRangeNeuronDisplay->value());
 }
 
 void Interface::lockInterface(bool lock)
@@ -465,7 +489,7 @@ void Interface::displayCurrentResults(ResultsDisplayReservoir results)
 
         for(int ii = 0; ii < results.m_trainSentences.size(); ++ii)
         {
-            m_uiInterface->tbResults->insertPlainText("Corpus sentence     : ");
+            m_uiInterface->tbResults->insertPlainText("Corpus sentence      : ");
 
             l_display = "";
             for(int jj = 0; jj < results.m_trainSentences[ii].size(); ++jj)
@@ -473,7 +497,7 @@ void Interface::displayCurrentResults(ResultsDisplayReservoir results)
                 l_display+= QString::fromStdString(results.m_trainSentences[ii][jj]) + " ";
             }
             m_uiInterface->tbResults->insertPlainText(l_display);
-            m_uiInterface->tbResults->insertPlainText("\nSentence retrieved : ");
+            m_uiInterface->tbResults->insertPlainText("\nSentence retrieved  : ");
 
             l_display = "";
             for(int jj = 0; jj < results.m_trainResults[ii].size(); ++jj)
@@ -489,6 +513,10 @@ void Interface::displayCurrentResults(ResultsDisplayReservoir results)
                 int l_nbAll = results.m_absoluteAll[ii];
 
                 if(l_nbCCW != 100 && l_nbAll != 100)
+                {
+                    m_uiInterface->tbResults->setTextColor(QColor(Qt::darkRed));
+                }
+                else if(l_nbCCW != 100 || l_nbAll != 100)
                 {
                     m_uiInterface->tbResults->setTextColor(QColor(Qt::red));
                 }
@@ -730,15 +758,17 @@ void Interface::displayLogInfo(QString info, QColor colorText)
     m_uiInterface->tbInfos->verticalScrollBar()->setValue(m_uiInterface->tbInfos->verticalScrollBar()->maximum());
 }
 
-void Interface::displayOutputMatrix(cv::Mat output)
+void Interface::displayOutputMatrix(cv::Mat output, Sentences sentences)
 {
     QVector<QVector<QVector<double> > > l_sentences; // dim 1 -> sentences / dim 2 -> CCW / dim 3 -> values
 
     // delete previous plots and labels
         qDeleteAll(m_plotListOutput.begin(), m_plotListOutput.end());
         qDeleteAll(m_plotLabelListOutput.begin(), m_plotLabelListOutput.end());
+        qDeleteAll(m_sentencesLabel.begin(), m_sentencesLabel.end());
         m_plotListOutput.clear();
         m_plotLabelListOutput.clear();
+        m_sentencesLabel.clear();
 
         LanguageParameters l_language = m_pWInterface->languageParameters();
         QStringList l_CCW = l_language.m_CCW.split(' ');
@@ -844,7 +874,7 @@ void Interface::displayOutputMatrix(cv::Mat output)
         for(int ii = 0; ii < l_sentences.size(); ++ii)
         {
             QCustomPlot *l_plotDisplay = new QCustomPlot(this);
-            l_plotDisplay->setFixedHeight(150);
+            l_plotDisplay->setFixedHeight(175);
             l_plotDisplay->setFixedWidth(output.size[2]*35);
 
             QCPItemText *l_textLabelSentence = new QCPItemText(l_plotDisplay);
@@ -852,11 +882,42 @@ void Interface::displayOutputMatrix(cv::Mat output)
             l_textLabelSentence->setPositionAlignment(Qt::AlignTop|Qt::AlignHCenter);
             l_textLabelSentence->position->setType(QCPItemPosition::ptAxisRectRatio);
             l_textLabelSentence->position->setCoords(0.5, 0); // place position at center/top of axis rect
-            l_textLabelSentence->setText("Sentence " + QString::number(ii+1));
-            l_textLabelSentence->setFont(QFont(font().family(), 8)); // make font a bit larger
 
+            Sentence l_senenteRetrieved = sentences[ii];
+            QString l_text;
+            for(int jj = 0; jj < l_senenteRetrieved.size(); ++jj)
+            {
+                QString l_part = QString::fromStdString(l_senenteRetrieved[jj]);
+
+                bool l_isWordCCW = false;
+                for(int kk = 0; kk < l_CCW.size(); ++kk)
+                {
+                    if(l_part == l_CCW[kk])
+                    {
+                        l_text += "<font color=" + l_colors[kk].name() + ">";
+                        l_isWordCCW = true;
+                        break;
+                    }
+                }
+                if(!l_isWordCCW)
+                {
+                    l_text += "<font color=" + l_colors.back().name() + ">";
+                }
+
+                l_text += QString::fromStdString(l_senenteRetrieved[jj]) + " </font>";
+            }
+
+            l_textLabelSentence->setFont(QFont(font().family(), 8)); // make font a bit larger
+            l_textLabelSentence->setText("");
 
             m_plotListOutput.push_back(l_plotDisplay);
+
+            QLabel *l_sentenceText = new QLabel;
+            l_sentenceText->setText("<P>Sentence " + QString::number(ii+1) + " -> " + l_text + "</P>");
+            m_sentencesLabel.push_back(l_sentenceText);
+
+
+            m_uiInterface->vlOutputPlot->addWidget(m_sentencesLabel.back());
             m_uiInterface->vlOutputPlot->addWidget(m_plotListOutput.back());
 
             double l_maxY = DBL_MIN;
@@ -885,7 +946,7 @@ void Interface::displayOutputMatrix(cv::Mat output)
             }
 
             m_plotListOutput.back()->xAxis->setRange(0, output.size[1]);
-            m_plotListOutput.back()->yAxis->setRange(l_minY,l_maxY);
+            m_plotListOutput.back()->yAxis->setRange(l_minY,l_maxY+0.2);
             m_plotListOutput.back()->replot();
         }
 }
@@ -1206,6 +1267,20 @@ void Interface::openCorpus(QModelIndex index)
     }
 }
 
+void Interface::setXTabFocus(int index)
+{
+    if(index == 1)
+    {
+        m_uiInterface->twDisplay->setTabEnabled(1, true);
+        m_uiInterface->twDisplay->setCurrentIndex(1);
+    }
+    else
+    {
+        m_uiInterface->twDisplay->setTabEnabled(1, false);
+        m_uiInterface->twDisplay->setCurrentIndex(0);
+    }
+}
+
 
 InterfaceWorker::InterfaceWorker() : m_gridSearch(new GridSearchQt(m_model)), m_nbOfCorpus(0)
 {
@@ -1215,6 +1290,7 @@ InterfaceWorker::InterfaceWorker() : m_gridSearch(new GridSearchQt(m_model)), m_
     qRegisterMetaType<ResultsDisplayReservoir>("ResultsDisplayReservoir");
     qRegisterMetaType<QVector<QVector<double> > >("QVector<QVector<double> >");
     qRegisterMetaType<cv::Mat>("cv::Mat");
+    qRegisterMetaType<Sentences >("Sentences");
 }
 
 InterfaceWorker::~InterfaceWorker()
@@ -1286,7 +1362,9 @@ void InterfaceWorker::start()
 {
     if(m_nbOfCorpus <= 0)
     {
-        std::cerr << "Cannot start, no corpus is defined. " << std::endl;
+        QString l_message = "Cannot start, no corpus is defined. \n";
+        emit sendLogInfo(l_message, QColor(Qt::red));
+        std::cerr << l_message.toStdString() << std::endl;
         return;
     }
 
@@ -1380,8 +1458,9 @@ void InterfaceWorker::start()
 
         if(l_OperationInvalid != 0)
         {
-            sendLogInfo("Cannot start, " + QString::number(l_OperationInvalid) + " operation are invalid. (Displayed in red)\n", QColor(Qt::red));
-            std::cerr << "Cannot start, " << l_OperationInvalid << " operation are invalid. (Displayed in red)" << std::endl;
+            QString l_message = "\nCannot start, " + QString::number(l_OperationInvalid) + " operation are invalid. (Displayed in red)\n";
+            sendLogInfo(l_message, QColor(Qt::red));
+            std::cerr << l_message.toStdString() << std::endl;
             return;
         }
 

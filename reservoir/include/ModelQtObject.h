@@ -150,10 +150,6 @@ class ModelQt : public QObject
          */
         bool launchTests(const std::string &corpusTestFilePath = "");
 
-        /**
-         * @brief retrieveTrainSentences
-         */
-        void retrieveTrainSentences();
 
         /**
          * @brief retrieveTestsSentences
@@ -247,6 +243,19 @@ class ModelQt : public QObject
          * @brief sendLogInfo
          */
         void sendLogInfo(QString, QColor);
+
+        /**
+         * @brief sendOutputMatrix
+         */
+        void sendOutputMatrix(cv::Mat, Sentences);
+
+    private :
+
+        /**
+         * @brief retrieveTrainSentences
+         */
+        void retrieveTrainSentences();
+
 
     private :
 

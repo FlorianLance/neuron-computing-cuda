@@ -221,8 +221,9 @@ class Interface : public QMainWindow
         /**
          * @brief displayOutputMatrix
          * @param output
+         * @param sentences
          */
-        void displayOutputMatrix(cv::Mat output);
+        void displayOutputMatrix(cv::Mat output, Sentences sentences);
 
         /**
          * @brief displayTrainInputMatrix
@@ -253,6 +254,13 @@ class Interface : public QMainWindow
          * @brief openCorpus
          */
         void openCorpus(QModelIndex index);
+
+
+        /**
+         * @brief setXTabFocus
+         * @param index
+         */
+        void setXTabFocus(int index);
 
     signals:
 
@@ -317,6 +325,7 @@ class Interface : public QMainWindow
         QVector<QCustomPlot*> m_plotListTrainMeaningInput;
         QVector<QLabel*> m_plotLabelListOutput;
         QVector<QLabel*> m_plotLabelListTrainSentenceInput;
+        QVector<QLabel*> m_sentencesLabel;
 
 
         QVector<QVector<double> > m_allValuesPlot;

@@ -387,8 +387,7 @@ void ReservoirQt::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher
 //    cv::Mat *l_outputClone = new cv::Mat; // TODO :
 //    (*l_outputClone) = sentencesOutputTrain.clone();
     emit sendLogInfo(QString::fromStdString(displayTime("END : train ", m_oTime, false, m_verbose)), QColor(Qt::black));
-    emit sendComputingState(100, 100, QString("End training"));
-    emit sendOutputMatrix(sentencesOutputTrain);
+    emit sendComputingState(100, 100, QString("End training"));    
 }
 
 

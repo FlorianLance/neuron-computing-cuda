@@ -167,7 +167,7 @@ void GridSearchQt::launchTrainWithAllParameters(const std::string resultsFilePat
                                     m_model->launchTraining();
 
                                     double l_time = static_cast<double>((clock() - l_timeTraining)) / CLOCKS_PER_SEC;
-                                    m_model->retrieveTrainSentences();
+
                                     m_model->displayResults(true,false);
 
                                     m_model->computeResultsData(true,"../data/Results/test.txt", l_diffSizeOCW,
@@ -308,6 +308,7 @@ bool GridSearchQt::setParameterValues(const GridSearchQt::ReservoirParameter par
             if(++l_loopStop > 500)
             {
                 std::cerr << "Bad operation for parameter : " << parameterId << std::endl;
+                emit sendLogInfo("Bad operation for parameter : " +  QString::number(parameterId) + " \n", QColor(Qt::red));
                 l_operationValid = false;
                 break;
             }
@@ -333,6 +334,7 @@ bool GridSearchQt::setParameterValues(const GridSearchQt::ReservoirParameter par
             if(++l_loopStop > 500)
             {
                 std::cerr << "Bad operation for parameter : " << parameterId << std::endl;
+                emit sendLogInfo("Bad operation for parameter : " +  QString::number(parameterId) + " \n", QColor(Qt::red));
                 l_operationValid = false;
                 break;
             }

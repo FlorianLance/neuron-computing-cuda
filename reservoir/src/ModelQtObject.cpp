@@ -500,11 +500,6 @@ void ModelQt::launchTraining()
     // send train input matrices to be displayed
         sendTrainInputMatrix(l_3DMatStimMeanTrain,l_3DMatStimSentTrain);
 
-    // train reservoir        
-        sendLogInfo(QString::fromStdString(displayTime("Start reservoir training ", l_trainingTime, false, m_verbose)), QColor(Qt::black));
-            m_reservoir->train(l_3DMatStimMeanTrain, l_3DMatStimSentTrain, m_3DMatSentencesOutputTrain,m_internalStatesTrain);
-        sendLogInfo(QString::fromStdString(displayTime("End reservoir training ", l_trainingTime, true, m_verbose)), QColor(Qt::black));
-
     // retrieve corpus train data
         QVector<QStringList> l_trainMeaning,l_trainInfo,l_trainSentence, l_inused;
         extractAllDataFromCorpusFile(m_parameters.m_corpusFilePath.c_str(), l_trainMeaning,l_trainInfo,l_trainSentence, l_inused,l_inused,l_inused);
@@ -512,7 +507,16 @@ void ModelQt::launchTraining()
         convQt2DString2Std2DString(l_trainInfo, m_trainInfo);
         convQt2DString2Std2DString(l_trainSentence, m_trainSentence);
 
+    // train reservoir        
+        sendLogInfo(QString::fromStdString(displayTime("Start reservoir training ", l_trainingTime, false, m_verbose)), QColor(Qt::black));
+            m_reservoir->train(l_3DMatStimMeanTrain, l_3DMatStimSentTrain, m_3DMatSentencesOutputTrain,m_internalStatesTrain);            
+        sendLogInfo(QString::fromStdString(displayTime("End reservoir training ", l_trainingTime, true, m_verbose)), QColor(Qt::black));
+
+        retrieveTrainSentences();
         m_trainingSuccess = true;
+
+    // send output matrix for displaying CCW in the interface
+        emit sendOutputMatrix(m_3DMatSentencesOutputTrain, m_recoveredSentencesTrain);
 }
 
 
