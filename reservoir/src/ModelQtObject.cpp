@@ -48,6 +48,9 @@ void ModelQt::resetModelParameters(const ModelParametersQt &newParameters, cbool
             m_trainingSuccess = true;
         }
 
+    // matrices custom
+        m_reservoir->setMatricesUse(newParameters.m_useLoadedW, newParameters.m_useLoadedWIn);
+
     // reservoir
         m_reservoir->setParameters(m_parameters.m_nbNeurons, static_cast<float>(m_parameters.m_spectralRadius), static_cast<float>(m_parameters.m_inputScaling)
                               ,static_cast<float>(m_parameters.m_leakRate), static_cast<float>(m_parameters.m_sparcity), static_cast<float>(m_parameters.m_ridge), m_verbose);
@@ -434,6 +437,16 @@ void ModelQt::loadTraining(const std::string &pathDirectory)
     m_reservoir->loadTraining(pathDirectory);
 }
 
+void ModelQt::loadW(const std::string &pathDirectory)
+{
+    m_reservoir->loadW(pathDirectory);
+}
+
+void ModelQt::loadWIn(const std::string &pathDirectory)
+{
+    m_reservoir->loadWIn(pathDirectory);
+}
+
 ReservoirQt *ModelQt::reservoir()
 {
     return m_reservoir;
@@ -497,15 +510,15 @@ void ModelQt::launchTraining()
         load3DMatrixFromNpPythonSaveTextF(QString("../data/input/stim_mean_train.txt"), l_3DMatStimMeanTrain);
         load3DMatrixFromNpPythonSaveTextF(QString("../data/input/stim_sent_train.txt"), l_3DMatStimSentTrain);
 
-    // send train input matrices to be displayed
-        sendTrainInputMatrix(l_3DMatStimMeanTrain,l_3DMatStimSentTrain);
-
     // retrieve corpus train data
         QVector<QStringList> l_trainMeaning,l_trainInfo,l_trainSentence, l_inused;
         extractAllDataFromCorpusFile(m_parameters.m_corpusFilePath.c_str(), l_trainMeaning,l_trainInfo,l_trainSentence, l_inused,l_inused,l_inused);
         convQt2DString2Std2DString(l_trainMeaning, m_trainMeaning);
         convQt2DString2Std2DString(l_trainInfo, m_trainInfo);
         convQt2DString2Std2DString(l_trainSentence, m_trainSentence);
+
+    // send train input matrices to be displayed
+        sendTrainInputMatrix(l_3DMatStimMeanTrain,l_3DMatStimSentTrain,m_trainSentence);
 
     // train reservoir        
         sendLogInfo(QString::fromStdString(displayTime("Start reservoir training ", l_trainingTime, false, m_verbose)), QColor(Qt::black));

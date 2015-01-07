@@ -29,6 +29,7 @@ int main(int argc, char* argv[])
     return l_oApp.exec();
 }
 
+
 Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
 {    
     // set absolute path
@@ -37,6 +38,9 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
     // create folders
         QVector<QDir> l_dirs;
         l_dirs.push_back(QDir(m_absolutePath     + "../data/input/Corpus"));
+        l_dirs.push_back(QDir(m_absolutePath     + "../data/input/Settings"));
+        l_dirs.push_back(QDir(m_absolutePath     + "../data/input/Matrices/W"));
+        l_dirs.push_back(QDir(m_absolutePath     + "../data/input/Matrices/WIn"));
         l_dirs.push_back(QDir(m_absolutePath     + "../data/input/Settings"));
         l_dirs.push_back(QDir(m_absolutePath     + "../data/Results/raw"));
         l_dirs.push_back(QDir(m_absolutePath     + "../data/training"));
@@ -52,12 +56,12 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
             }
         }
 
-    // set icon/title
-        this->setWindowTitle(QString("RESERVOIR COMPUTIONG - CUDA"));
-        this->setWindowIcon(QIcon(m_absolutePath + "../data/images/iconeN.png"));
-
     // init main widget
         m_uiInterface->setupUi(this);
+
+    // set icon/title
+        this->setWindowTitle(QString("RESERVOIR COMPUTING - CUDA"));
+        this->setWindowIcon(QIcon(m_absolutePath + "../data/images/iconeN.png"));
 
     // create log file
         QDateTime l_dateTime;
@@ -68,42 +72,34 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         m_logFile.setFileName(l_nameLogFile);
         if (!m_logFile.open(QIODevice::WriteOnly | QIODevice::Text))
         {
-           qWarning() << "Cannot write log file. Start of the path must be ./dist, and ../log must exist. ";
+            qWarning() << "Cannot write log file. Start of the path must be ./dist, and ../log must exist. ";
         }
 
     // init worker
         m_pWInterface = new InterfaceWorker();
 
-    // init widgets
-        m_uiInterface->scrollAreaPlotX->setWidgetResizable(true);
-        m_uiInterface->scrollAreaPlotOutput->setWidgetResizable(true);
-        m_uiInterface->scrollAreaPlotInput->setWidgetResizable(true);
-        m_uiInterface->pbStop->setVisible(false);
-        m_uiInterface->twDisplay->setTabEnabled(1, false);
-
-    // init stylesheet
-        m_uiInterface->pbAddCorpus->setStyleSheet("* { font-weight: bold }");
-        m_uiInterface->pbStart->setStyleSheet("* { font-weight: bold }");
-        m_uiInterface->pbLoadSettings->setStyleSheet("* { font-weight: bold }");
-        setStyleSheet("QGroupBox { color: blue; } ");
-
     // init connections
+        GridSearchQt *l_gridSearchQt = m_pWInterface->gridSearch();
+        ModelQt *l_model = m_pWInterface->model();
+
         QObject::connect(this, SIGNAL(leaveProgram()), parent, SLOT(quit()));
 
         // listwidgets
         QObject::connect(m_uiInterface->lwCorpus,  SIGNAL(doubleClicked(QModelIndex)), this, SLOT(openCorpus(QModelIndex)));
 
         // push button
-        QObject::connect(m_uiInterface->pbStart,        SIGNAL(clicked()), m_pWInterface, SLOT(start()));
-        QObject::connect(m_uiInterface->pbStop,         SIGNAL(clicked()), m_pWInterface, SLOT(stop()));
-        QObject::connect(m_uiInterface->pbAddCorpus,    SIGNAL(clicked()), this, SLOT(addCorpus()));
-        QObject::connect(m_uiInterface->pbRemoveCorpus, SIGNAL(clicked()), this, SLOT(removeCorpus()));
-        QObject::connect(m_uiInterface->pbSaveLastTrainingFile, SIGNAL(clicked()), this, SLOT(saveTraining()));
-        QObject::connect(m_uiInterface->pbClearResults, SIGNAL(clicked()), this, SLOT(cleanResultsDisplay()));
-        QObject::connect(m_uiInterface->pbLoadTrainingFile, SIGNAL(clicked()), this, SLOT(loadTraining()));
-        QObject::connect(m_uiInterface->pbOpenSelectedCorpus, SIGNAL(clicked()), this, SLOT(openCorpus()));
-        QObject::connect(m_uiInterface->pbReloadSelectedCorpus, SIGNAL(clicked()), this, SLOT(reloadCorpus()));
-        QObject::connect(m_uiInterface->pbLoadSettings, SIGNAL(clicked()), this, SLOT(loadSettings()));
+        QObject::connect(m_uiInterface->pbStart,                SIGNAL(clicked()), m_pWInterface,   SLOT(start()));
+        QObject::connect(m_uiInterface->pbStop,                 SIGNAL(clicked()), m_pWInterface,   SLOT(stop()));
+        QObject::connect(m_uiInterface->pbAddCorpus,            SIGNAL(clicked()), this,            SLOT(addCorpus()));
+        QObject::connect(m_uiInterface->pbRemoveCorpus,         SIGNAL(clicked()), this,            SLOT(removeCorpus()));
+        QObject::connect(m_uiInterface->pbSaveLastTrainingFile, SIGNAL(clicked()), this,            SLOT(saveTraining()));
+        QObject::connect(m_uiInterface->pbClearResults,         SIGNAL(clicked()), this,            SLOT(cleanResultsDisplay()));
+        QObject::connect(m_uiInterface->pbLoadTrainingFile,     SIGNAL(clicked()), this,            SLOT(loadTraining()));
+        QObject::connect(m_uiInterface->pbLoadW,                SIGNAL(clicked()), this,            SLOT(loadWMatrix()));
+        QObject::connect(m_uiInterface->pbLoadWin,              SIGNAL(clicked()), this,            SLOT(loadWInMatrix()));
+        QObject::connect(m_uiInterface->pbOpenSelectedCorpus,   SIGNAL(clicked()), this,            SLOT(openCorpus()));
+        QObject::connect(m_uiInterface->pbReloadSelectedCorpus, SIGNAL(clicked()), this,            SLOT(reloadCorpus()));
+        QObject::connect(m_uiInterface->pbLoadSettings,         SIGNAL(clicked()), this,            SLOT(loadSettings()));
 
         // radio button
         QObject::connect(m_uiInterface->rbTrain,    SIGNAL(clicked()), SLOT(updateReservoirParameters()));
@@ -134,7 +130,7 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(m_uiInterface->sbNbUseRidge,           SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
         QObject::connect(m_uiInterface->sbNbUseSparcity,        SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
         QObject::connect(m_uiInterface->sbMaxSentencesDisplayed,SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
-        QObject::connect(m_uiInterface->sbStartRangeNeuronDisplay,SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
+        QObject::connect(m_uiInterface->sbStartRangeNeuronDisplay,SIGNAL(valueChanged(int)),  SLOT(updateReservoirParameters(int)));
         QObject::connect(m_uiInterface->sbEndRangeNeuronDisplay,SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
         QObject::connect(m_uiInterface->sbNbRandomNeurons,      SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
 
@@ -146,10 +142,17 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(m_uiInterface->cbRidge,                SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
         QObject::connect(m_uiInterface->cbSparcity,             SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
         QObject::connect(m_uiInterface->cbTrainingFile,         SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
+        QObject::connect(m_uiInterface->cbTrainingFile,         SIGNAL(stateChanged(int)), SLOT(disableCustomMatrix(int)));
+        QObject::connect(m_uiInterface->cbW,                    SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
+        QObject::connect(m_uiInterface->cbW,                    SIGNAL(stateChanged(int)), SLOT(disableTraining(int)));
+        QObject::connect(m_uiInterface->cbWIn,                  SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
+        QObject::connect(m_uiInterface->cbWIn,                  SIGNAL(stateChanged(int)), SLOT(disableTraining(int)));
         QObject::connect(m_uiInterface->cbOnlyStartValue,       SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
         QObject::connect(m_uiInterface->cbEnableGPU,            SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
         QObject::connect(m_uiInterface->cbEnableDisplay,        SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
-        QObject::connect(m_uiInterface->cbSelectRandomNeurons,  SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));           
+        QObject::connect(m_uiInterface->cbSelectRandomNeurons,  SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
+        QObject::connect(m_uiInterface->cbEnableMultiThread,    SIGNAL(toggled(bool)), l_model->reservoir(), SLOT(enableMaxOmpThreadNumber(bool)));
+        QObject::connect(m_uiInterface->cbEnableDisplay,        SIGNAL(clicked(bool)), l_model->reservoir(), SLOT(enableDisplay(bool)));
 
         // lineedit
         QObject::connect(m_uiInterface->leNeuronsOperation,         SIGNAL(editingFinished()), SLOT(updateReservoirParameters()));
@@ -164,41 +167,54 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         // lock
         QObject::connect(m_pWInterface, SIGNAL(lockInterfaceSignal(bool)), this, SLOT(lockInterface(bool)));
 
-        // worker
-        QObject::connect(this, SIGNAL(addCorpusSignal(QString)), m_pWInterface, SLOT(addCorpus(QString)));
-        QObject::connect(this, SIGNAL(removeCorpusSignal(int)), m_pWInterface, SLOT(removeCorpus(int)));
-        QObject::connect(this, SIGNAL(sendReservoirParametersSignal(ReservoirParameters)), m_pWInterface, SLOT(updateReservoirParameters(ReservoirParameters)));
-        QObject::connect(this, SIGNAL(sendLanguageParametersSignal(LanguageParameters)), m_pWInterface, SLOT(updateLanguageParameters(LanguageParameters)));
-        QObject::connect(m_pWInterface, SIGNAL(displayValidityOperationSignal(bool, int)), this, SLOT(displayValidityOperation(bool, int)));
-        QObject::connect(m_pWInterface, SIGNAL(endTrainingSignal(bool)), m_uiInterface->pbSaveLastTrainingFile, SLOT(setEnabled(bool)));
-        QObject::connect(this, SIGNAL(saveTrainingSignal(QString)), m_pWInterface, SLOT(saveLastTraining(QString)));
-        QObject::connect(this, SIGNAL(loadTrainingSignal(QString)), m_pWInterface, SLOT(loadTraining(QString)));
+        // this
+        QObject::connect(this, SIGNAL(sendMatrixXDisplayParameters(bool,bool,int,int,int)), l_model->reservoir(),   SLOT(updateMatrixXDisplayParameters(bool,bool,int,int,int)));
+        QObject::connect(this, SIGNAL(addCorpusSignal(QString)),                            m_pWInterface,          SLOT(addCorpus(QString)));
+        QObject::connect(this, SIGNAL(removeCorpusSignal(int)),                             m_pWInterface,          SLOT(removeCorpus(int)));
+        QObject::connect(this, SIGNAL(sendReservoirParametersSignal(ReservoirParameters)),  m_pWInterface,          SLOT(updateReservoirParameters(ReservoirParameters)));
+        QObject::connect(this, SIGNAL(sendLanguageParametersSignal(LanguageParameters)),    m_pWInterface,          SLOT(updateLanguageParameters(LanguageParameters)));
+        QObject::connect(this, SIGNAL(saveTrainingSignal(QString)),                         m_pWInterface,          SLOT(saveLastTraining(QString)));
+        QObject::connect(this, SIGNAL(loadTrainingSignal(QString)),                         m_pWInterface,          SLOT(loadTraining(QString)));
+        QObject::connect(this, SIGNAL(loadWSignal(QString)),                                m_pWInterface,          SLOT(loadW(QString)));
+        QObject::connect(this, SIGNAL(loadWInSignal(QString)),                              m_pWInterface,          SLOT(loadWIn(QString)));
 
         // gridsearch
-        GridSearchQt *l_gridSearchQt = m_pWInterface->gridSearch();
-        QObject::connect(l_gridSearchQt, SIGNAL(sendCurrentParametersSignal(ModelParametersQt)), this, SLOT(displayCurrentParameters(ModelParametersQt)));
+        QObject::connect(l_gridSearchQt, SIGNAL(sendCurrentParametersSignal(ModelParametersQt)),      this, SLOT(displayCurrentParameters(ModelParametersQt)));
         QObject::connect(l_gridSearchQt, SIGNAL(sendResultsReservoirSignal(ResultsDisplayReservoir)), this, SLOT(displayCurrentResults(ResultsDisplayReservoir)));
-
+        QObject::connect(l_gridSearchQt, SIGNAL(sendLogInfo(QString, QColor)),                        this, SLOT(displayLogInfo(QString, QColor)));
         // model
-        ModelQt *l_model = m_pWInterface->model();
-        QObject::connect(l_model->reservoir(), SIGNAL(sendComputingState(int,int,QString)), this, SLOT(updateProgressBar(int, int, QString)));
-        QObject::connect(m_uiInterface->cbEnableMultiThread, SIGNAL(toggled(bool)), l_model->reservoir(), SLOT(enableMaxOmpThreadNumber(bool)));
-        QObject::connect(m_uiInterface->cbEnableDisplay, SIGNAL(clicked(bool)), l_model->reservoir(), SLOT(enableDisplay(bool)));
-        QObject::connect(l_model->reservoir(), SIGNAL(sendXMatriceData(QVector<QVector<double> >*, int, int )), this, SLOT(displayXMatrix(QVector<QVector<double> >*, int, int)));
+        QObject::connect(l_model,SIGNAL(sendLogInfo(QString, QColor)),                      this,  SLOT(displayLogInfo(QString, QColor)));
+        QObject::connect(l_model,SIGNAL(sendOutputMatrix(cv::Mat, Sentences)),              this,  SLOT(displayOutputMatrix(cv::Mat, Sentences)));
+        QObject::connect(l_model,SIGNAL(sendTrainInputMatrix(cv::Mat,cv::Mat,Sentences)),   this,  SLOT(displayTrainInputMatrix(cv::Mat,cv::Mat, Sentences)));
+        // reservoir
+        QObject::connect(l_model->reservoir(),  SIGNAL(sendInfoPlot(int,int,int,QString)),                          this,           SLOT(initPlot(int,int,int,QString)));
+        QObject::connect(l_model->reservoir(),  SIGNAL(sendLogInfo(QString, QColor)),                               this,           SLOT(displayLogInfo(QString, QColor)));
+        QObject::connect(l_model->reservoir(),  SIGNAL(sendXMatriceData(QVector<QVector<double> >*, int, int )),    this,           SLOT(displayXMatrix(QVector<QVector<double> >*, int, int)));
+        QObject::connect(l_model->reservoir(),  SIGNAL(sendComputingState(int,int,QString)),                        this,           SLOT(updateProgressBar(int, int, QString)));
+        QObject::connect(l_model->reservoir(),  SIGNAL(sendLoadedTrainingParameters(QStringList)),                  m_pWInterface,  SLOT(setLoadedTrainingParameters(QStringList)));
+        QObject::connect(l_model->reservoir(),  SIGNAL(sendLoadedWParameters(QStringList)),                         m_pWInterface,  SLOT(setLoadedWParameters(QStringList)));
+        QObject::connect(l_model->reservoir(),  SIGNAL(sendLoadedWInParameters(QStringList)),                       m_pWInterface,  SLOT(setLoadedWInParameters(QStringList)));
+        // worker
+        QObject::connect(m_pWInterface, SIGNAL(sendLogInfo(QString, QColor)),               this,                                   SLOT(displayLogInfo(QString, QColor)));
+        QObject::connect(m_pWInterface, SIGNAL(displayValidityOperationSignal(bool, int)),  this,                                   SLOT(displayValidityOperation(bool, int)));
+        QObject::connect(m_pWInterface, SIGNAL(endTrainingSignal(bool)),                    m_uiInterface->pbSaveLastTrainingFile,  SLOT(setEnabled(bool)));
 
-        QObject::connect(l_model->reservoir(), SIGNAL(sendInfoPlot(int,int,int,QString)), this, SLOT(initPlot(int,int,int,QString)));
-        QObject::connect(l_model->reservoir(), SIGNAL(sendLogInfo(QString, QColor)), this, SLOT(displayLogInfo(QString, QColor)));
-        QObject::connect(l_model, SIGNAL(sendLogInfo(QString, QColor)), this, SLOT(displayLogInfo(QString, QColor)));
-        QObject::connect(m_pWInterface,         SIGNAL(sendLogInfo(QString, QColor)), this, SLOT(displayLogInfo(QString, QColor)));
-        QObject::connect(m_pWInterface->gridSearch(),   SIGNAL(sendLogInfo(QString, QColor)), this, SLOT(displayLogInfo(QString, QColor)));
-        QObject::connect(l_model, SIGNAL(sendOutputMatrix(cv::Mat, Sentences)), this, SLOT(displayOutputMatrix(cv::Mat, Sentences)));
-        QObject::connect(l_model, SIGNAL(sendTrainInputMatrix(cv::Mat,cv::Mat)), this, SLOT(displayTrainInputMatrix(cv::Mat,cv::Mat)));
-        QObject::connect(this,                 SIGNAL(sendMatrixXDisplayParameters(bool,bool,int,int,int)), l_model->reservoir(), SLOT(updateMatrixXDisplayParameters(bool,bool,int,int,int)));
-        QObject::connect(l_model->reservoir(), SIGNAL(sendLoadedParameters(QStringList)), m_pWInterface, SLOT(setLoadedParameters(QStringList)));
-
-    // interface setting
+    // init widgets
+        // pushbuttons
         m_uiInterface->pbComputing->setRange(0,100);
         m_uiInterface->pbComputing->setValue(0);
+        m_uiInterface->pbStop->setVisible(false);
+        m_uiInterface->pbAddCorpus->setStyleSheet("* { font-weight: bold }");
+        m_uiInterface->pbStart->setStyleSheet("* { font-weight: bold }");
+        m_uiInterface->pbLoadSettings->setStyleSheet("* { font-weight: bold }");
+        // scroll
+        m_uiInterface->scrollAreaPlotX->setWidgetResizable(true);
+        m_uiInterface->scrollAreaPlotOutput->setWidgetResizable(true);
+        m_uiInterface->scrollAreaPlotInput->setWidgetResizable(true);
+        // tab widgets
+        m_uiInterface->twDisplay->setTabEnabled(1, false);
+        // interface
+        setStyleSheet("QGroupBox { color: blue; } ");
 
     // init thread
         m_pWInterface->moveToThread(&m_TInterface);
@@ -298,12 +314,13 @@ void Interface::loadTraining()
         return;
     }
 
-    QFile l_fileW(l_sPathTrainingFile + "/w.txt");
-    QFile l_fileWin(l_sPathTrainingFile + "/wIn.txt");
+    QFile l_fileW(l_sPathTrainingFile    + "/w.txt");
+    QFile l_fileWin(l_sPathTrainingFile  + "/wIn.txt");
     QFile l_fileWOut(l_sPathTrainingFile + "/wOut.txt");
+    QFile l_fileParam(l_sPathTrainingFile + "/param.txt");
 
     QPalette l_palette;
-    if(l_fileW.exists() && l_fileWin.exists() && l_fileWOut.exists())
+    if(l_fileW.exists() && l_fileWin.exists() && l_fileWOut.exists() && l_fileParam.exists())
     {
         // send directory path
         l_palette.setColor(QPalette::Text,Qt::black);
@@ -315,12 +332,121 @@ void Interface::loadTraining()
     else
     {
         l_palette.setColor(QPalette::Text,Qt::red);
-        m_uiInterface->leCurrentTrainingFile->setText("Training matrices not found in the directory...");
-        std::cerr << "Training matrices not found, loading not done. " << std::endl;
-        displayLogInfo("Training matrices not found, loading not done. \n", QColor(Qt::red));
+
+        QString l_message;
+
+
+        if(!l_fileWin.exists())
+        {
+            m_uiInterface->leCurrentTrainingFile->setText("Training matrices not found in the directory...");
+            l_message = "Training matrices not found, loading not done. \n";
+        }
+        else
+        {
+            m_uiInterface->leCurrentTrainingFile->setText("Parameter file not found in the directory...");
+            l_message = "Parameter file not found, loading not done. \n";
+        }
+
+
+        std::cerr << l_message.toStdString() << std::endl;
+        displayLogInfo(l_message, QColor(Qt::red));
     }
 
     m_uiInterface->leCurrentTrainingFile->setPalette(l_palette);
+}
+
+void Interface::loadWMatrix()
+{
+    QString l_sPathWFile = QFileDialog::getExistingDirectory(this, "Select directory", m_absolutePath + "../data/input/Matrices/W");
+
+    if(l_sPathWFile.size() == 0 )
+    {
+        return;
+    }
+
+    QFile l_fileW(l_sPathWFile    + "/w.txt");
+    QFile l_fileParam(l_sPathWFile + "/param.txt");
+
+    QPalette l_palette;
+    if(l_fileW.exists() && l_fileParam.exists())
+    {
+        // send directory path
+        l_palette.setColor(QPalette::Text,Qt::black);
+        m_uiInterface->leW->setText(l_sPathWFile);
+        m_uiInterface->cbW->setEnabled(true);
+
+        emit loadWSignal(l_sPathWFile);
+    }
+    else
+    {
+        l_palette.setColor(QPalette::Text,Qt::red);
+
+        QString l_message;
+
+
+        if(!l_fileW.exists())
+        {
+            m_uiInterface->leW->setText("W matrice not found in the directory...");
+            l_message = "W matrice not found, loading not done. \n";
+        }
+        else
+        {
+            m_uiInterface->leW->setText("Parameter file not found in the directory...");
+            l_message = "Parameter file not found, loading not done. \n";
+        }
+
+        std::cerr << l_message.toStdString() << std::endl;
+        displayLogInfo(l_message, QColor(Qt::red));
+    }
+
+    m_uiInterface->leW->setPalette(l_palette);
+}
+
+void Interface::loadWInMatrix()
+{
+    QString l_sPathWInFile = QFileDialog::getExistingDirectory(this, "Select directory", m_absolutePath + "../data/input/Matrices/WIn");
+
+    if(l_sPathWInFile.size() == 0 )
+    {
+        return;
+    }
+
+    QFile l_fileWIn(l_sPathWInFile    + "/wIn.txt");
+    QFile l_fileParam(l_sPathWInFile + "/param.txt");
+
+    QPalette l_palette;
+    if(l_fileWIn.exists() && l_fileParam.exists())
+    {
+        // send directory path
+        l_palette.setColor(QPalette::Text,Qt::black);
+        m_uiInterface->leWIn->setText(l_sPathWInFile);
+        m_uiInterface->cbWIn->setEnabled(true);
+
+        emit loadWInSignal(l_sPathWInFile);
+    }
+    else
+    {
+        l_palette.setColor(QPalette::Text,Qt::red);
+
+        QString l_message;
+
+
+        if(!l_fileWIn.exists())
+        {
+            m_uiInterface->leWIn->setText("WIn matrice not found in the directory...");
+            l_message = "WIn matrice not found, loading not done. \n";
+        }
+        else
+        {
+            m_uiInterface->leWIn->setText("Parameter file not found in the directory...");
+            l_message = "Parameter file not found, loading not done. \n";
+        }
+
+        std::cerr << l_message.toStdString() << std::endl;
+        displayLogInfo(l_message, QColor(Qt::red));
+    }
+
+    m_uiInterface->leWIn->setPalette(l_palette);
 }
 
 void Interface::updateReservoirParameters(int value)
@@ -345,6 +471,8 @@ void Interface::updateReservoirParameters()
 
     l_params.m_useCuda                  = m_uiInterface->cbEnableGPU->isChecked();
     l_params.m_useLoadedTraining        = m_uiInterface->cbTrainingFile->isChecked();
+    l_params.m_useLoadedW               = m_uiInterface->cbW->isChecked();
+    l_params.m_useLoadedWIn             = m_uiInterface->cbWIn->isChecked();
     l_params.m_useOnlyStartValue        = m_uiInterface->cbOnlyStartValue->isChecked();
 
     l_params.m_neuronsStart             = m_uiInterface->sbStartNeurons->value();
@@ -383,7 +511,7 @@ void Interface::updateReservoirParameters()
     l_params.m_sparcityOperation        = m_uiInterface->leSparcityOperation->text();
 
     // disable parameters interface if a training file is used
-        if(m_uiInterface->cbTrainingFile->isChecked())
+        if(m_uiInterface->cbTrainingFile->isChecked() || m_uiInterface->cbW->isChecked() || m_uiInterface->cbWIn->isChecked())
         {
             m_uiInterface->gbReservoirParameters->setEnabled(false);
         }
@@ -581,6 +709,900 @@ void Interface::updateProgressBar(int currentValue, int valueMax, QString text)
     m_uiInterface->laStateComputing->setText(text);
 }
 
+
+
+void Interface::cleanResultsDisplay()
+{
+    m_uiInterface->tbResults->clear();
+}
+
+void Interface::displayLogInfo(QString info, QColor colorText)
+{
+    if(m_logFile.isOpen())
+    {
+        QTextStream l_stream(&m_logFile);
+        l_stream << info;
+    }
+
+    m_uiInterface->tbInfos->setTextColor(colorText);
+    m_uiInterface->tbInfos->insertPlainText (info);
+    m_uiInterface->tbInfos->verticalScrollBar()->setValue(m_uiInterface->tbInfos->verticalScrollBar()->maximum());
+}
+
+
+void Interface::displayOutputMatrix(cv::Mat output, Sentences sentences)
+{
+    QVector<QVector<QVector<double> > > l_sentences; // dim 1 -> sentences / dim 2 -> CCW / dim 3 -> values
+
+    // delete previous plots and labels
+        qDeleteAll(m_plotListTrainSentenceOutput.begin(), m_plotListTrainSentenceOutput.end());
+        qDeleteAll(m_plotLabelListTrainSentenceOutput.begin(), m_plotLabelListTrainSentenceOutput.end());
+        qDeleteAll(m_labelListRetrievedSentences.begin(), m_labelListRetrievedSentences.end());
+        m_plotListTrainSentenceOutput.clear();
+        m_plotLabelListTrainSentenceOutput.clear();
+        m_labelListRetrievedSentences.clear();
+
+        LanguageParameters l_language = m_pWInterface->languageParameters();
+        QStringList l_CCW = l_language.m_CCW.split(' ');
+        l_CCW << "X";
+
+    // create x curves values
+        QVector<double> l_xValues;
+        for(int ii = 0; ii < output.size[1]; ++ii)
+        {
+            l_xValues << ii;
+        }
+
+    // create y curves values
+        for(int ii = 0; ii < output.size[0]; ++ii)
+        {
+            QVector<QVector<double> > l_CCW;
+
+            for(int jj = 0; jj  < output.size[2]; ++jj)
+            {
+                QVector<double> l_values;
+
+                for(int kk = 0; kk < output.size[1]; ++kk)
+                {
+                    l_values << static_cast<double>(output.at<float>(ii,kk,jj));
+                }
+                l_CCW << l_values;
+
+            }
+            l_sentences << l_CCW;
+        }
+
+    // set curve legend labels
+        for(int ii = 0; ii < l_CCW.size(); ++ii)
+        {
+            QLabel *l_labelCCW = new QLabel();
+            QPalette l_palette = l_labelCCW->palette();
+            l_palette.setColor(l_labelCCW->foregroundRole(), m_colorsCCW[ii]);
+            l_palette.setColor(l_labelCCW->backgroundRole(), Qt::white);
+            l_labelCCW->setAutoFillBackground (true);
+            l_labelCCW->setPalette(l_palette);
+//            l_labelCCW->setText(l_CCW[ii].toUpper());
+
+            QString labelText = "<P><b>";
+            labelText .append(l_CCW[ii].toUpper());
+            labelText .append("</b></P>");
+            l_labelCCW->setText(labelText);
+
+            l_labelCCW->setAlignment(Qt::AlignCenter);
+
+            m_plotLabelListTrainSentenceOutput.push_back(l_labelCCW);
+            m_uiInterface->hlLabelsOutputPlot->addWidget(m_plotLabelListTrainSentenceOutput.back());
+        }
+
+    // create the plots
+        for(int ii = 0; ii < l_sentences.size(); ++ii)
+        {
+            QCustomPlot *l_plotDisplay = new QCustomPlot(this);
+            l_plotDisplay->setFixedHeight(150);
+            l_plotDisplay->setFixedWidth(output.size[2]*35);
+
+            QCPItemText *l_textLabelSentence = new QCPItemText(l_plotDisplay);
+            l_plotDisplay->addItem(l_textLabelSentence);
+            l_textLabelSentence->setPositionAlignment(Qt::AlignTop|Qt::AlignHCenter);
+            l_textLabelSentence->position->setType(QCPItemPosition::ptAxisRectRatio);
+            l_textLabelSentence->position->setCoords(0.5, 0); // place position at center/top of axis rect
+
+            Sentence l_senenteRetrieved = sentences[ii];
+            QString l_text;
+            for(int jj = 0; jj < l_senenteRetrieved.size(); ++jj)
+            {
+                QString l_part = QString::fromStdString(l_senenteRetrieved[jj]);
+
+                bool l_isWordCCW = false;
+                for(int kk = 0; kk < l_CCW.size(); ++kk)
+                {
+                    if(l_part == l_CCW[kk])
+                    {
+                        l_text += "<font color=" + m_colorsCCW[kk].name() + ">";
+                        l_isWordCCW = true;
+                        break;
+                    }
+                }
+                if(!l_isWordCCW)
+                {
+                    l_text += "<font color=" + m_colorsCCW.back().name() + ">";
+                }
+
+                l_text += QString::fromStdString(l_senenteRetrieved[jj]).toUpper() + " </font>";
+            }
+
+            l_textLabelSentence->setFont(QFont(font().family(), 8)); // make font a bit larger
+            l_textLabelSentence->setText("");
+
+            m_plotListTrainSentenceOutput.push_back(l_plotDisplay);
+
+            QLabel *l_sentenceText = new QLabel;
+            l_sentenceText->setText("<P><b>Sentence " + QString::number(ii+1) + " :   " + l_text + "</b></P>");
+            m_labelListRetrievedSentences.push_back(l_sentenceText);
+
+
+            m_uiInterface->vlOutputPlot->addWidget(m_labelListRetrievedSentences.back());
+            m_uiInterface->vlOutputPlot->addWidget(m_plotListTrainSentenceOutput.back());
+
+            double l_maxY = DBL_MIN;
+            double l_minY = DBL_MAX;
+
+            for(int jj = 0; jj < l_sentences[0].size(); ++jj)
+            {
+                m_plotListTrainSentenceOutput.back()->addGraph();
+                QPen l_pen(m_colorsCCW[jj]);
+                l_pen.setWidthF(3);
+                m_plotListTrainSentenceOutput[ii]->graph(jj)->setPen(l_pen);
+                m_plotListTrainSentenceOutput[ii]->graph(jj)->setData(l_xValues, l_sentences[ii][jj]);
+
+                for(QVector<double>::iterator it = l_sentences[ii][jj].begin(); it != l_sentences[ii][jj].end(); ++it)
+                {
+                    if((*it) > l_maxY)
+                    {
+                        l_maxY = (*it);
+                    }
+                    if((*it) < l_minY)
+                    {
+                        l_minY = (*it);
+                    }
+                }
+
+            }
+
+            m_plotListTrainSentenceOutput.back()->xAxis->setRange(0, output.size[1]);
+            m_plotListTrainSentenceOutput.back()->yAxis->setRange(l_minY,l_maxY);
+            m_plotListTrainSentenceOutput.back()->replot();
+        }
+}
+
+void Interface::displayTrainInputMatrix(cv::Mat trainMeaning, cv::Mat trainSentence, Sentences sentences)
+{
+    QVector<QVector<QVector<double> > > l_sentences; // dim 1 -> sentences / dim 2 -> CCW / dim 3 -> values
+    QVector<QVector<QVector<double> > > l_meaning; // dim 1 -> sentences / dim 2 -> Structure / dim 3 -> values
+
+    // delete previous plots and labels
+        qDeleteAll(m_plotListTrainSentenceInput.begin(), m_plotListTrainSentenceInput.end());
+        qDeleteAll(m_plotListTrainMeaningInput.begin(), m_plotListTrainMeaningInput.end());
+        qDeleteAll(m_plotLabelListTrainSentenceInput.begin(), m_plotLabelListTrainSentenceInput.end());
+        qDeleteAll(m_labelListInputSentences.begin(), m_labelListInputSentences.end());
+        m_plotListTrainSentenceInput.clear();
+        m_plotListTrainMeaningInput.clear();
+        m_plotLabelListTrainSentenceInput.clear();
+        m_labelListInputSentences.clear();
+
+        LanguageParameters l_language = m_pWInterface->languageParameters();
+        QStringList l_CCW = l_language.m_CCW.split(' ');
+        l_CCW << "X";
+
+    // create y curves values for sentences
+        for(int ii = 0; ii < trainSentence.size[0]; ++ii)
+        {
+            QVector<QVector<double> > l_CCW;
+
+            for(int jj = 0; jj  < trainSentence.size[2]; ++jj)
+            {
+                QVector<double> l_values;
+
+                for(int kk = 0; kk < trainSentence.size[1]; ++kk)
+                {
+                    l_values << static_cast<double>(trainSentence.at<float>(ii,kk,jj));
+                }
+                l_CCW << l_values;
+
+            }
+            l_sentences << l_CCW;
+        }
+    // create y curves values for meaning
+        for(int ii = 0; ii < trainMeaning.size[0]; ++ii)
+        {
+            QVector<QVector<double> > l_Structure;
+
+            for(int jj = 0; jj  < trainMeaning.size[2]; ++jj)
+            {
+                QVector<double> l_values;
+
+                for(int kk = 0; kk < trainMeaning.size[1]; ++kk)
+                {
+                    l_values << static_cast<double>(trainMeaning.at<float>(ii,kk,jj));
+                }
+                l_Structure << l_values;
+
+            }
+            l_meaning << l_Structure;
+        }
+
+
+    // create x curves values
+        QVector<double> l_xValues;
+        for(int ii = 0; ii < trainSentence.size[1]; ++ii)
+        {
+            l_xValues << ii;
+        }
+
+    // set curve legend labels
+        for(int ii = 0; ii < l_CCW.size(); ++ii)
+        {
+            QLabel *l_labelCCW = new QLabel();
+            QPalette l_palette = l_labelCCW->palette();
+            l_palette.setColor(l_labelCCW->foregroundRole(), m_colorsCCW[ii]);
+            l_palette.setColor(l_labelCCW->backgroundRole(), Qt::white);
+            l_labelCCW->setAutoFillBackground (true);
+            l_labelCCW->setPalette(l_palette);
+
+            QString labelText = "<P><b>";
+            labelText .append(l_CCW[ii].toUpper());
+            labelText .append("</b></P>");
+            l_labelCCW->setText(labelText);
+
+            l_labelCCW->setAlignment(Qt::AlignCenter);
+            m_plotLabelListTrainSentenceInput.push_back(l_labelCCW);
+            m_uiInterface->hlLabelsInputPlot->addWidget(m_plotLabelListTrainSentenceInput.back());
+        }
+
+    // create the plots
+        for(int ii = 0; ii < l_sentences.size(); ++ii)
+        {
+            // add sentences
+                QCustomPlot *l_plotDisplaySentence = new QCustomPlot(this);
+                l_plotDisplaySentence->setFixedHeight(150);
+                l_plotDisplaySentence->setFixedWidth(trainSentence.size[2]*35);
+
+                m_plotListTrainSentenceInput.push_back(l_plotDisplaySentence);
+
+
+            // add sentence label
+                Sentence l_senenteRetrieved = sentences[ii];
+                QString l_text;
+                for(int jj = 0; jj < l_senenteRetrieved.size(); ++jj)
+                {
+                    QString l_part = QString::fromStdString(l_senenteRetrieved[jj]);
+
+                    bool l_isWordCCW = false;
+                    for(int kk = 0; kk < l_CCW.size(); ++kk)
+                    {
+                        if(l_part == l_CCW[kk])
+                        {
+                            l_text += "<font color=" + m_colorsCCW[kk].name() + ">";
+                            l_isWordCCW = true;
+                            break;
+                        }
+                    }
+                    if(!l_isWordCCW)
+                    {
+                        l_text += "<font color=" + m_colorsCCW.back().name() + ">";
+                    }
+
+                    l_text += QString::fromStdString(l_senenteRetrieved[jj]).toUpper() + " </font>";
+                }
+
+
+                QCPItemText *l_textLabelSentence = new QCPItemText(l_plotDisplaySentence);
+                l_plotDisplaySentence->addItem(l_textLabelSentence);
+                l_textLabelSentence->setPositionAlignment(Qt::AlignTop|Qt::AlignHCenter);
+                l_textLabelSentence->position->setType(QCPItemPosition::ptAxisRectRatio);
+                l_textLabelSentence->position->setCoords(0.5, 0); // place position at center/top of axis rect
+                l_textLabelSentence->setText("");
+                l_textLabelSentence->setFont(QFont(font().family(), 8)); // make font a bit larger
+
+                QLabel *l_sentenceText = new QLabel;
+                l_sentenceText->setText("<P><b>Sentence " + QString::number(ii+1) + " :   " + l_text + "</b></P>");
+                m_labelListInputSentences.push_back(l_sentenceText);
+
+                double l_maxY = DBL_MIN;
+                double l_minY = DBL_MAX;
+
+                for(int jj = 0; jj < l_sentences[0].size(); ++jj)
+                {
+                    m_plotListTrainSentenceInput.back()->addGraph();
+                    QPen l_pen(m_colorsCCW[jj]);
+                    l_pen.setWidthF(3);
+                    m_plotListTrainSentenceInput[ii]->graph(jj)->setPen(l_pen);
+                    m_plotListTrainSentenceInput[ii]->graph(jj)->setData(l_xValues, l_sentences[ii][jj]);
+
+                    for(QVector<double>::iterator it = l_sentences[ii][jj].begin(); it != l_sentences[ii][jj].end(); ++it)
+                    {
+                        if((*it) > l_maxY)
+                        {
+                            l_maxY = (*it);
+                        }
+                        if((*it) < l_minY)
+                        {
+                            l_minY = (*it);
+                        }
+                    }
+                }
+
+                m_plotListTrainSentenceInput.back()->xAxis->setRange(0, trainSentence.size[1]);
+                m_plotListTrainSentenceInput.back()->yAxis->setRange(l_minY,l_maxY);
+                m_plotListTrainSentenceInput.back()->replot();
+
+            // add meaning
+                QCustomPlot *l_plotDisplayMeaning = new QCustomPlot(this);
+                l_plotDisplayMeaning->setFixedHeight(100);
+                l_plotDisplayMeaning->setFixedWidth(trainMeaning.size[2]*10);
+                m_plotListTrainMeaningInput.push_back(l_plotDisplayMeaning);
+                m_uiInterface->vlInputPlot->addWidget(m_labelListInputSentences.back());
+                m_uiInterface->vlInputPlot->addWidget(m_plotListTrainSentenceInput.back());
+//                m_uiInterface->vlInputPlot->addWidget(m_plotListTrainMeaningInput.back());
+
+
+                QCPColorMap *l_colorMap = new QCPColorMap(l_plotDisplayMeaning->xAxis, l_plotDisplayMeaning->yAxis);
+                l_plotDisplayMeaning->addPlottable(l_colorMap);
+                l_colorMap->data()->setSize(trainMeaning.size[2], trainMeaning.size[1]);
+
+                double z;
+                for(int jj = 0; jj < trainMeaning.size[1]; ++jj)
+                {
+                    for(int kk = 0; kk < trainMeaning.size[2]; ++kk)
+                    {
+                        z = static_cast<double>(trainMeaning.at<float>(ii,jj,kk));
+                        l_colorMap->data()->setCell(kk, jj, z);
+                    }
+                }
+
+                // add a color scale:
+                QCPColorScale *colorScale = new QCPColorScale(l_plotDisplayMeaning);
+//                l_plotDisplayMeaning->plotLayout()->addElement(0, 1, colorScale); // add it to the right of the main axis rect
+                colorScale->setType(QCPAxis::atRight); // scale shall be vertical bar with tick/axis labels right (actually atRight is already the default)
+                l_colorMap->setColorScale(colorScale); // associate the color map with the color scale
+
+                l_colorMap->setGradient(QCPColorGradient::gpPolar);
+                l_colorMap->rescaleDataRange(true);
+                l_plotDisplayMeaning->rescaleAxes();
+                colorScale->axis()->setLabel("Meaning");
+
+                m_plotListTrainMeaningInput.back()->xAxis->setAutoTickStep(false);
+                m_plotListTrainMeaningInput.back()->xAxis->setAutoTickLabels(false);
+                m_plotListTrainMeaningInput.back()->replot();
+        }
+}
+
+void Interface::openCorpus()
+{
+    int l_currentIndex = m_uiInterface->lwCorpus->currentRow();
+
+    if(l_currentIndex >= 0)
+    {
+        QDesktopServices::openUrl(QUrl("file:///" + m_uiInterface->lwCorpus->currentItem()->text()));
+        m_uiInterface->lwCorpus->currentItem()->setTextColor(QColor(255,0,0));
+    }
+}
+
+void Interface::reloadCorpus()
+{
+    int l_currentIndex2Reload = m_uiInterface->lwCorpus->currentRow();
+
+    if(l_currentIndex2Reload >= 0)
+    {
+        QString l_pathCorpus2Reload = m_uiInterface->lwCorpus->currentItem()->text();
+
+        // remove item
+            delete m_uiInterface->lwCorpus->takeItem(l_currentIndex2Reload);
+            emit removeCorpusSignal(l_currentIndex2Reload);
+
+        // wait
+            QTime l_oDieTime = QTime::currentTime().addMSecs(10);
+            while( QTime::currentTime() < l_oDieTime)
+            {
+                QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+            }
+
+        // send item
+            m_uiInterface->lwCorpus->addItem(l_pathCorpus2Reload);
+            emit addCorpusSignal(l_pathCorpus2Reload);
+
+        m_uiInterface->lwCorpus->setCurrentRow(m_uiInterface->lwCorpus->count()-1);
+        m_uiInterface->lwCorpus->currentItem()->setTextColor(QColor(0,0,0));
+    }
+}
+
+
+void Interface::loadSettings()
+{
+    QString l_sPathSettings = QFileDialog::getOpenFileName(this, "Load settings file", m_absolutePath + "../data/input/Settings", "Corpus file (*.txt)");
+
+    if(l_sPathSettings.size() > 0)
+    {
+        QStringList l_CCW, l_structure;
+        extractDataFromSettingFile(l_sPathSettings,l_CCW, l_structure);
+
+        m_uiInterface->leSettingFile->setText(l_sPathSettings);
+        m_uiInterface->leDisplayCCW->setText(l_CCW.join(" "));
+        m_uiInterface->leDisplayStructure->setText(l_structure.join(" "));
+
+        LanguageParameters l_params;
+        l_params.m_CCW = l_CCW.join(" ");
+        l_params.m_structure = l_structure.join(" ");
+
+        // create color for each CCW
+            int l_nbLoop = 0;
+            m_colorsCCW.clear();
+            while(m_colorsCCW.size() < l_CCW.size()+1)
+            {
+                ++l_nbLoop;;
+                bool l_addColor = true;
+
+                int l_r = rand()%240;
+                int l_g = rand()%255;
+                int l_b = rand()%255;
+
+                if(l_nbLoop < 500)
+                {
+                    for(int ii = 0; ii < m_colorsCCW.size(); ++ii)
+                    {
+                        int l_diffRed = m_colorsCCW[ii].red()-l_r;
+                        if(l_diffRed < 0)
+                        {
+                            l_diffRed = -l_diffRed;
+                        }
+                        int l_diffGreen = m_colorsCCW[ii].green()-l_g;
+                        if(l_diffGreen < 0)
+                        {
+                            l_diffGreen = - l_diffGreen;
+                        }
+                        int l_diffBlue = m_colorsCCW[ii].blue()-l_b;
+                        if(l_diffBlue < 0)
+                        {
+                            l_diffBlue = - l_diffBlue;
+                        }
+
+                        if(l_diffRed + l_diffGreen + l_diffBlue < 150)
+                        {
+                            l_addColor = false;
+                            break;
+                        }
+                    }
+                }
+
+                if(l_addColor)
+                {
+                    m_colorsCCW << QColor(l_r,l_g,l_b);
+                }
+            }
+
+
+        emit sendLanguageParametersSignal(l_params);
+
+        // unlock start
+        if(m_uiInterface->lwCorpus->count() > 0)
+        {
+            m_uiInterface->pbStart->setEnabled(true);
+        }
+    }
+}
+
+void Interface::updateSettings()
+{
+    LanguageParameters l_params;
+    l_params.m_CCW = m_uiInterface->leDisplayCCW->text();
+    l_params.m_structure = m_uiInterface->leDisplayStructure->text();
+
+    if(l_params.m_CCW.size() > 0 && l_params.m_structure.size() > 0)
+    {
+        emit sendLanguageParametersSignal(l_params);
+
+        // unlock start
+        if(m_uiInterface->lwCorpus->count() > 0)
+        {
+            m_uiInterface->pbStart->setEnabled(true);
+        }
+    }
+    else
+    {
+        m_uiInterface->pbStart->setEnabled(false);
+    }
+}
+
+void Interface::openCorpus(QModelIndex index)
+{
+    int l_clickedRow = index.row();
+
+    if(l_clickedRow >= 0)
+    {
+        QDesktopServices::openUrl(QUrl("file:///" + m_uiInterface->lwCorpus->currentItem()->text()));
+        m_uiInterface->lwCorpus->currentItem()->setTextColor(QColor(255,0,0));
+    }
+}
+
+void Interface::setXTabFocus(int index)
+{
+    if(index == 1)
+    {
+        m_uiInterface->twDisplay->setTabEnabled(1, true);
+        m_uiInterface->twDisplay->setCurrentIndex(1);
+    }
+    else
+    {
+        m_uiInterface->twDisplay->setTabEnabled(1, false);
+        m_uiInterface->twDisplay->setCurrentIndex(0);
+    }
+}
+
+void Interface::disableCustomMatrix(int index)
+{
+    if(index !=0)
+    {
+        m_uiInterface->cbW->setChecked(false);
+        m_uiInterface->cbWIn->setChecked(false);
+    }
+}
+
+void Interface::disableTraining(int index)
+{
+    if(index !=0)
+    {
+        m_uiInterface->cbTrainingFile->setChecked(false);
+    }
+}
+
+
+InterfaceWorker::InterfaceWorker() : m_gridSearch(new GridSearchQt(m_model)), m_nbOfCorpus(0)
+{
+    qRegisterMetaType<ReservoirParameters>("ReservoirParameters");
+    qRegisterMetaType<LanguageParameters>("LanguageParameters");
+    qRegisterMetaType<ModelParametersQt>("ModelParametersQt");
+    qRegisterMetaType<ResultsDisplayReservoir>("ResultsDisplayReservoir");
+    qRegisterMetaType<QVector<QVector<double> > >("QVector<QVector<double> >");
+    qRegisterMetaType<cv::Mat>("cv::Mat");
+    qRegisterMetaType<Sentences >("Sentences");
+}
+
+InterfaceWorker::~InterfaceWorker()
+{
+    delete m_gridSearch;
+}
+
+GridSearchQt *InterfaceWorker::gridSearch() const
+{
+    return m_gridSearch;
+}
+
+ModelQt *InterfaceWorker::model()
+{
+    return &m_model;
+}
+
+LanguageParameters InterfaceWorker::languageParameters() const
+{
+    return m_languageParameters;
+}
+
+void InterfaceWorker::addCorpus(QString corpusPath)
+{
+    m_corpusList.push_back(corpusPath);
+
+    std::vector<std::string> l_stringListCorpus;
+
+    for(int ii = 0; ii < m_corpusList.size(); ++ii)
+    {
+        l_stringListCorpus.push_back(m_corpusList[ii].toStdString());
+    }
+
+    m_gridSearch->setCorpusList(l_stringListCorpus);
+    ++m_nbOfCorpus;
+}
+
+void InterfaceWorker::removeCorpus(int index)
+{
+    if(index == -1)
+    {
+        return;
+    }
+
+    m_corpusList.removeAt(index);
+
+    std::vector<std::string> l_stringListCorpus;
+
+    for(int ii = 0; ii < m_corpusList.size(); ++ii)
+    {
+        l_stringListCorpus.push_back(m_corpusList[ii].toStdString());
+    }
+
+    m_gridSearch->setCorpusList(l_stringListCorpus);
+    --m_nbOfCorpus;
+}
+
+void InterfaceWorker::updateReservoirParameters(ReservoirParameters newParams)
+{
+    m_reservoirParameters = newParams;
+}
+
+void InterfaceWorker::updateLanguageParameters(LanguageParameters newParams)
+{
+    m_languageParameters = newParams;
+}
+
+void InterfaceWorker::start()
+{
+    if(m_nbOfCorpus <= 0)
+    {
+        QString l_message = "Cannot start, no corpus is defined. \n";
+        emit sendLogInfo(l_message, QColor(Qt::red));
+        std::cerr << l_message.toStdString() << std::endl;
+        return;
+    }
+
+    // define language parameters
+        Sentence l_CCW, l_structure;
+        QStringList l_CCWList = m_languageParameters.m_CCW.split(" ");
+        for(int ii = 0; ii < l_CCWList.size(); ++ii)
+        {
+            l_CCW.push_back(l_CCWList[ii].toStdString());
+        }
+        QStringList l_structureList = m_languageParameters.m_structure.split(" ");
+        for(int ii = 0; ii < l_structureList.size(); ++ii)
+        {
+            l_structure.push_back(l_structureList[ii].toStdString());
+        }
+
+        m_model.setCCWAndStructure(l_CCW, l_structure);
+
+    // define all grid search parameters
+        m_gridSearch->deleteParameterValues();
+        m_gridSearch->setCudaParameters(m_reservoirParameters.m_useCuda, m_reservoirParameters.m_useCuda);
+
+        bool l_operationValid;
+        int l_OperationInvalid = 0;
+
+
+        bool l_onlyStartValue = m_reservoirParameters.m_useOnlyStartValue;
+
+        if(m_reservoirParameters.m_neuronsEnabled)
+        {
+            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::NEURONS_NB, m_reservoirParameters.m_neuronsStart, m_reservoirParameters.m_neuronsEnd,
+                                                                m_reservoirParameters.m_neuronsOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_neuronsNbOfUses);
+            emit displayValidityOperationSignal(l_operationValid, GridSearchQt::NEURONS_NB);
+            if(!l_operationValid)
+            {
+                ++l_OperationInvalid;
+            }
+        }
+        if(m_reservoirParameters.m_leakRateEnabled)
+        {
+            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::LEAK_RATE,m_reservoirParameters.m_leakRateStart, m_reservoirParameters.m_leakRateEnd,
+                                                                m_reservoirParameters.m_leakRateOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_leakRateNbOfUses);
+            emit displayValidityOperationSignal(l_operationValid, GridSearchQt::LEAK_RATE);
+            if(!l_operationValid)
+            {
+                ++l_OperationInvalid;
+            }
+        }
+        if(m_reservoirParameters.m_issEnabled)
+        {
+            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::INPUT_SCALING,m_reservoirParameters.m_issStart, m_reservoirParameters.m_issEnd,
+                                                                m_reservoirParameters.m_issOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_issNbOfUses);
+            emit displayValidityOperationSignal(l_operationValid, GridSearchQt::INPUT_SCALING);
+            if(!l_operationValid)
+            {
+                ++l_OperationInvalid;
+            }
+        }
+        if(m_reservoirParameters.m_spectralRadiusEnabled)
+        {
+            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::SPECTRAL_RADIUS,    m_reservoirParameters.m_spectralRadiusStart,  m_reservoirParameters.m_spectralRadiusEnd,
+                                                                m_reservoirParameters.m_spectralRadiusOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_spectralRadiusNbOfUses);
+            emit displayValidityOperationSignal(l_operationValid, GridSearchQt::SPECTRAL_RADIUS);
+            if(!l_operationValid)
+            {
+                ++l_OperationInvalid;
+            }
+        }
+        if(m_reservoirParameters.m_ridgeEnabled)
+        {
+            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::RIDGE,m_reservoirParameters.m_ridgeStart, m_reservoirParameters.m_ridgeEnd,
+                                                                m_reservoirParameters.m_ridgeOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_ridgeNbOfUses);
+            emit displayValidityOperationSignal(l_operationValid, GridSearchQt::RIDGE);
+            if(!l_operationValid)
+            {
+                ++l_OperationInvalid;
+            }
+        }
+        if(m_reservoirParameters.m_sparcityEnabled)
+        {
+            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::SPARCITY, m_reservoirParameters.m_sparcityStart,  m_reservoirParameters.m_sparcityEnd,
+                                                                m_reservoirParameters.m_sparcityOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_sparcityNbOfUses);
+            emit displayValidityOperationSignal(l_operationValid, GridSearchQt::SPARCITY);
+            if(!l_operationValid)
+            {
+                ++l_OperationInvalid;
+            }
+        }
+
+        if(l_OperationInvalid != 0)
+        {
+            QString l_message = "\nCannot start, " + QString::number(l_OperationInvalid) + " operation are invalid. (Displayed in red)\n";
+            sendLogInfo(l_message, QColor(Qt::red));
+            std::cerr << l_message.toStdString() << std::endl;
+            return;
+        }
+
+        bool l_doTrain, l_doTest;
+
+        switch(m_reservoirParameters.m_action)
+        {
+            case TRAINING_RES :
+                l_doTrain = true;
+                l_doTest = false;
+            break;
+            case TEST_RES :
+                l_doTrain = false;
+                l_doTest = true;
+            break;
+            case BOTH_RES :
+                l_doTrain = true;
+                l_doTest = true;
+            break;
+        }
+
+    QDateTime l_dateTime;
+    l_dateTime = l_dateTime.currentDateTime();
+    QDate l_date = l_dateTime.date();
+    QTime l_time = QTime::currentTime();
+    QString l_uniqueName = l_date.toString("dd_MM_yyyy") + "_" +  QString::number(l_time.hour()) + "h" + QString::number(l_time.minute()) + "m" + QString::number(l_time.second()) + "s.txt";
+    QString l_pathRes    =  "../data/Results/res_"  + l_uniqueName;
+    QString l_pathResRaw =  "../data/Results/raw/res_" + l_uniqueName;
+
+    if(m_reservoirParameters.m_useLoadedTraining)
+    {
+        if(m_parametersTrainingLoaded.size() > 0)
+        {
+            m_gridSearch->setParameterValues(GridSearchQt::NEURONS_NB,      m_parametersTrainingLoaded[0].toInt(),    m_parametersTrainingLoaded[0].toInt(),   "+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::SPARCITY,        m_parametersTrainingLoaded[1].toDouble(), m_parametersTrainingLoaded[1].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::SPECTRAL_RADIUS, m_parametersTrainingLoaded[2].toDouble(), m_parametersTrainingLoaded[2].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::INPUT_SCALING,   m_parametersTrainingLoaded[3].toDouble(), m_parametersTrainingLoaded[3].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::LEAK_RATE,       m_parametersTrainingLoaded[4].toDouble(), m_parametersTrainingLoaded[4].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::RIDGE,           m_parametersTrainingLoaded[5].toDouble(), m_parametersTrainingLoaded[5].toDouble(),"+0", true, 1);
+        }
+    }
+
+    if(m_reservoirParameters.m_useLoadedW && !m_reservoirParameters.m_useLoadedWIn)
+    {
+        if(m_parametersWLoaded.size() > 0)
+        {
+            m_gridSearch->setParameterValues(GridSearchQt::NEURONS_NB,      m_parametersWLoaded[0].toInt(),    m_parametersWLoaded[0].toInt(),   "+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::SPARCITY,        m_parametersWLoaded[1].toDouble(), m_parametersWLoaded[1].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::SPECTRAL_RADIUS, m_parametersWLoaded[2].toDouble(), m_parametersWLoaded[2].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::INPUT_SCALING,   m_parametersWLoaded[3].toDouble(), m_parametersWLoaded[3].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::LEAK_RATE,       m_parametersWLoaded[4].toDouble(), m_parametersWLoaded[4].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::RIDGE,           m_parametersWLoaded[5].toDouble(), m_parametersWLoaded[5].toDouble(),"+0", true, 1);
+        }
+    }
+    else if(m_reservoirParameters.m_useLoadedWIn & !m_reservoirParameters.m_useLoadedW)
+    {
+        if(m_parametersWInLoaded.size() > 0)
+        {
+            m_gridSearch->setParameterValues(GridSearchQt::NEURONS_NB,      m_parametersWInLoaded[0].toInt(),    m_parametersWInLoaded[0].toInt(),   "+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::SPARCITY,        m_parametersWInLoaded[1].toDouble(), m_parametersWInLoaded[1].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::SPECTRAL_RADIUS, m_parametersWInLoaded[2].toDouble(), m_parametersWInLoaded[2].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::INPUT_SCALING,   m_parametersWInLoaded[3].toDouble(), m_parametersWInLoaded[3].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::LEAK_RATE,       m_parametersWInLoaded[4].toDouble(), m_parametersWInLoaded[4].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::RIDGE,           m_parametersWInLoaded[5].toDouble(), m_parametersWInLoaded[5].toDouble(),"+0", true, 1);
+        }
+    }
+    else if(m_reservoirParameters.m_useLoadedW && m_reservoirParameters.m_useLoadedWIn)
+    {
+        bool l_paramValid = true;
+        if(m_parametersWLoaded.size() == m_parametersWInLoaded.size())
+        {
+            for(int ii = 0; ii < m_parametersWLoaded.size(); ++ii)
+            {
+                if(m_parametersWLoaded[ii] != m_parametersWInLoaded[ii])
+                {
+                    l_paramValid = false;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            l_paramValid = false;
+        }
+
+        if(m_parametersWInLoaded.size() > 0 && l_paramValid)
+        {
+            m_gridSearch->setParameterValues(GridSearchQt::NEURONS_NB,      m_parametersWInLoaded[0].toInt(),    m_parametersWInLoaded[0].toInt(),   "+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::SPARCITY,        m_parametersWInLoaded[1].toDouble(), m_parametersWInLoaded[1].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::SPECTRAL_RADIUS, m_parametersWInLoaded[2].toDouble(), m_parametersWInLoaded[2].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::INPUT_SCALING,   m_parametersWInLoaded[3].toDouble(), m_parametersWInLoaded[3].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::LEAK_RATE,       m_parametersWInLoaded[4].toDouble(), m_parametersWInLoaded[4].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearchQt::RIDGE,           m_parametersWInLoaded[5].toDouble(), m_parametersWInLoaded[5].toDouble(),"+0", true, 1);
+        }
+
+        if(!l_paramValid)
+        {
+            QString l_message = "W and WIn doesn't have the same parameter file. \n";
+            emit sendLogInfo(l_message, QColor(Qt::red));
+            std::cerr << l_message.toStdString() << std::endl;
+            return;
+        }
+    }
+
+
+    // launch reservoir computing
+    lockInterfaceSignal(true);
+        m_gridSearch->launchTrainWithAllParameters(l_pathRes.toStdString(), l_pathResRaw.toStdString(), l_doTrain, l_doTest, m_reservoirParameters.m_useLoadedTraining,
+                                                   m_reservoirParameters.m_useLoadedW, m_reservoirParameters.m_useLoadedWIn);
+    lockInterfaceSignal(false);
+
+    emit endTrainingSignal(true);
+}
+
+void InterfaceWorker::stop()
+{
+    lockInterfaceSignal(false);
+}
+
+void InterfaceWorker::saveLastTraining(QString pathDirectory)
+{
+    if(pathDirectory.size() > 0)
+    {
+        m_model.saveTraining(pathDirectory.toStdString());
+        sendLogInfo("Training saved in the directory : " + pathDirectory + "\n", QColor(0,0,255));
+    }
+}
+
+void InterfaceWorker::loadTraining(QString pathDirectory)
+{
+    if(pathDirectory.size() > 0)
+    {
+        m_model.loadTraining(pathDirectory.toStdString());
+        sendLogInfo("Training loaded in the directory : " + pathDirectory + "\n", QColor(Qt::blue));
+    }
+}
+
+void InterfaceWorker::loadW(QString pathDirectory)
+{
+    if(pathDirectory.size() > 0)
+    {
+        m_model.loadW(pathDirectory.toStdString());
+        sendLogInfo("W matrice loaded in the directory : " + pathDirectory + "\n", QColor(Qt::blue));
+    }
+}
+
+void InterfaceWorker::loadWIn(QString pathDirectory)
+{
+    if(pathDirectory.size() > 0)
+    {
+        m_model.loadWIn(pathDirectory.toStdString());
+        sendLogInfo("WIn matrice loaded in the directory : " + pathDirectory + "\n", QColor(Qt::blue));
+    }
+}
+
+void InterfaceWorker::setLoadedTrainingParameters(QStringList loadedParams)
+{
+    m_parametersTrainingLoaded = loadedParams;
+}
+
+void InterfaceWorker::setLoadedWParameters(QStringList loadedParams)
+{
+    m_parametersWLoaded = loadedParams;
+}
+
+void InterfaceWorker::setLoadedWInParameters(QStringList loadedParams)
+{
+    m_parametersWInLoaded = loadedParams;
+}
+
 void Interface::initPlot(int nbCurves, int sizeDim1Meaning, int sizeDim2Meaning, QString name)
 {
     qDeleteAll(m_plotListX.begin(), m_plotListX.end());
@@ -737,804 +1759,4 @@ void Interface::displayXMatrix(QVector<QVector<double> > *values, int currentSen
     m_neuronDisplayMutex.unlock();
 
     delete values;
-}
-
-
-void Interface::cleanResultsDisplay()
-{
-    m_uiInterface->tbResults->clear();
-}
-
-void Interface::displayLogInfo(QString info, QColor colorText)
-{
-    if(m_logFile.isOpen())
-    {
-        QTextStream l_stream(&m_logFile);
-        l_stream << info;
-    }
-
-    m_uiInterface->tbInfos->setTextColor(colorText);
-    m_uiInterface->tbInfos->insertPlainText (info);
-    m_uiInterface->tbInfos->verticalScrollBar()->setValue(m_uiInterface->tbInfos->verticalScrollBar()->maximum());
-}
-
-void Interface::displayOutputMatrix(cv::Mat output, Sentences sentences)
-{
-    QVector<QVector<QVector<double> > > l_sentences; // dim 1 -> sentences / dim 2 -> CCW / dim 3 -> values
-
-    // delete previous plots and labels
-        qDeleteAll(m_plotListOutput.begin(), m_plotListOutput.end());
-        qDeleteAll(m_plotLabelListOutput.begin(), m_plotLabelListOutput.end());
-        qDeleteAll(m_sentencesLabel.begin(), m_sentencesLabel.end());
-        m_plotListOutput.clear();
-        m_plotLabelListOutput.clear();
-        m_sentencesLabel.clear();
-
-        LanguageParameters l_language = m_pWInterface->languageParameters();
-        QStringList l_CCW = l_language.m_CCW.split(' ');
-        l_CCW << "X";
-
-
-    // create color for each CCW
-        QVector<QColor> l_colors;
-        int l_nbLoop = 0;
-        while(l_colors.size() < l_CCW.size())
-        {
-            ++l_nbLoop;;
-            bool l_addColor = true;
-
-            int l_r = rand()%240;
-            int l_g = rand()%255;
-            int l_b = rand()%255;
-
-            if(l_nbLoop < 500)
-            {
-                for(int ii = 0; ii < l_colors.size(); ++ii)
-                {
-                    int l_diffRed = l_colors[ii].red()-l_r;
-                    if(l_diffRed < 0)
-                    {
-                        l_diffRed = -l_diffRed;
-                    }
-                    int l_diffGreen = l_colors[ii].green()-l_g;
-                    if(l_diffGreen < 0)
-                    {
-                        l_diffGreen = - l_diffGreen;
-                    }
-                    int l_diffBlue = l_colors[ii].blue()-l_b;
-                    if(l_diffBlue < 0)
-                    {
-                        l_diffBlue = - l_diffBlue;
-                    }
-
-                    if(l_diffRed + l_diffGreen + l_diffBlue < 150)
-                    {
-                        l_addColor = false;
-                        break;
-                    }
-                }
-            }
-
-            if(l_addColor)
-            {
-                l_colors << QColor(l_r,l_g,l_b);
-            }
-
-        }
-
-    // create x curves values
-        QVector<double> l_xValues;
-        for(int ii = 0; ii < output.size[1]; ++ii)
-        {
-            l_xValues << ii;
-        }
-
-    // create y curves values
-        for(int ii = 0; ii < output.size[0]; ++ii)
-        {
-            QVector<QVector<double> > l_CCW;
-
-            for(int jj = 0; jj  < output.size[2]; ++jj)
-            {
-                QVector<double> l_values;
-
-                for(int kk = 0; kk < output.size[1]; ++kk)
-                {
-                    l_values << static_cast<double>(output.at<float>(ii,kk,jj));
-                }
-                l_CCW << l_values;
-
-            }
-            l_sentences << l_CCW;
-        }
-
-    // set curve legend labels
-        for(int ii = 0; ii < l_CCW.size(); ++ii)
-        {
-            QLabel *l_labelCCW = new QLabel();
-            QPalette l_palette = l_labelCCW->palette();
-            l_palette.setColor(l_labelCCW->foregroundRole(), l_colors[ii]);
-            l_palette.setColor(l_labelCCW->backgroundRole(), Qt::white);
-            l_labelCCW->setAutoFillBackground (true);
-            l_labelCCW->setPalette(l_palette);
-//            l_labelCCW->setText(l_CCW[ii].toUpper());
-
-            QString labelText = "<P><b>";
-            labelText .append(l_CCW[ii].toUpper());
-            labelText .append("</b></P>");
-            l_labelCCW->setText(labelText);
-
-            l_labelCCW->setAlignment(Qt::AlignCenter);
-
-            m_plotLabelListOutput.push_back(l_labelCCW);
-            m_uiInterface->hlLabelsOutputPlot->addWidget(m_plotLabelListOutput.back());
-        }
-
-    // create the plots
-        for(int ii = 0; ii < l_sentences.size(); ++ii)
-        {
-            QCustomPlot *l_plotDisplay = new QCustomPlot(this);
-            l_plotDisplay->setFixedHeight(175);
-            l_plotDisplay->setFixedWidth(output.size[2]*35);
-
-            QCPItemText *l_textLabelSentence = new QCPItemText(l_plotDisplay);
-            l_plotDisplay->addItem(l_textLabelSentence);
-            l_textLabelSentence->setPositionAlignment(Qt::AlignTop|Qt::AlignHCenter);
-            l_textLabelSentence->position->setType(QCPItemPosition::ptAxisRectRatio);
-            l_textLabelSentence->position->setCoords(0.5, 0); // place position at center/top of axis rect
-
-            Sentence l_senenteRetrieved = sentences[ii];
-            QString l_text;
-            for(int jj = 0; jj < l_senenteRetrieved.size(); ++jj)
-            {
-                QString l_part = QString::fromStdString(l_senenteRetrieved[jj]);
-
-                bool l_isWordCCW = false;
-                for(int kk = 0; kk < l_CCW.size(); ++kk)
-                {
-                    if(l_part == l_CCW[kk])
-                    {
-                        l_text += "<font color=" + l_colors[kk].name() + ">";
-                        l_isWordCCW = true;
-                        break;
-                    }
-                }
-                if(!l_isWordCCW)
-                {
-                    l_text += "<font color=" + l_colors.back().name() + ">";
-                }
-
-                l_text += QString::fromStdString(l_senenteRetrieved[jj]) + " </font>";
-            }
-
-            l_textLabelSentence->setFont(QFont(font().family(), 8)); // make font a bit larger
-            l_textLabelSentence->setText("");
-
-            m_plotListOutput.push_back(l_plotDisplay);
-
-            QLabel *l_sentenceText = new QLabel;
-            l_sentenceText->setText("<P>Sentence " + QString::number(ii+1) + " -> " + l_text + "</P>");
-            m_sentencesLabel.push_back(l_sentenceText);
-
-
-            m_uiInterface->vlOutputPlot->addWidget(m_sentencesLabel.back());
-            m_uiInterface->vlOutputPlot->addWidget(m_plotListOutput.back());
-
-            double l_maxY = DBL_MIN;
-            double l_minY = DBL_MAX;
-
-            for(int jj = 0; jj < l_sentences[0].size(); ++jj)
-            {
-                m_plotListOutput.back()->addGraph();
-                QPen l_pen(l_colors[jj]);
-                l_pen.setWidthF(3);
-                m_plotListOutput[ii]->graph(jj)->setPen(l_pen);
-                m_plotListOutput[ii]->graph(jj)->setData(l_xValues, l_sentences[ii][jj]);
-
-                for(QVector<double>::iterator it = l_sentences[ii][jj].begin(); it != l_sentences[ii][jj].end(); ++it)
-                {
-                    if((*it) > l_maxY)
-                    {
-                        l_maxY = (*it);
-                    }
-                    if((*it) < l_minY)
-                    {
-                        l_minY = (*it);
-                    }
-                }
-
-            }
-
-            m_plotListOutput.back()->xAxis->setRange(0, output.size[1]);
-            m_plotListOutput.back()->yAxis->setRange(l_minY,l_maxY+0.2);
-            m_plotListOutput.back()->replot();
-        }
-}
-
-void Interface::displayTrainInputMatrix(cv::Mat trainMeaning, cv::Mat trainSentence)
-{
-    QVector<QVector<QVector<double> > > l_sentences; // dim 1 -> sentences / dim 2 -> CCW / dim 3 -> values
-    QVector<QVector<QVector<double> > > l_meaning; // dim 1 -> sentences / dim 2 -> Structure / dim 3 -> values
-
-    // delete previous plots and labels
-        qDeleteAll(m_plotListTrainSentenceInput.begin(), m_plotListTrainSentenceInput.end());
-        qDeleteAll(m_plotListTrainMeaningInput.begin(), m_plotListTrainMeaningInput.end());
-        qDeleteAll(m_plotLabelListTrainSentenceInput.begin(), m_plotLabelListTrainSentenceInput.end());
-        m_plotListTrainSentenceInput.clear();
-        m_plotListTrainMeaningInput.clear();
-        m_plotLabelListTrainSentenceInput.clear();
-
-        LanguageParameters l_language = m_pWInterface->languageParameters();
-        QStringList l_CCW = l_language.m_CCW.split(' ');
-        l_CCW << "X";
-
-    // create y curves values for sentences
-        for(int ii = 0; ii < trainSentence.size[0]; ++ii)
-        {
-            QVector<QVector<double> > l_CCW;
-
-            for(int jj = 0; jj  < trainSentence.size[2]; ++jj)
-            {
-                QVector<double> l_values;
-
-                for(int kk = 0; kk < trainSentence.size[1]; ++kk)
-                {
-                    l_values << static_cast<double>(trainSentence.at<float>(ii,kk,jj));
-                }
-                l_CCW << l_values;
-
-            }
-            l_sentences << l_CCW;
-        }
-    // create y curves values for meaning
-        for(int ii = 0; ii < trainMeaning.size[0]; ++ii)
-        {
-            QVector<QVector<double> > l_Structure;
-
-            for(int jj = 0; jj  < trainMeaning.size[2]; ++jj)
-            {
-                QVector<double> l_values;
-
-                for(int kk = 0; kk < trainMeaning.size[1]; ++kk)
-                {
-                    l_values << static_cast<double>(trainMeaning.at<float>(ii,kk,jj));
-                }
-                l_Structure << l_values;
-
-            }
-            l_meaning << l_Structure;
-        }
-
-    // create color for each CCW
-        QVector<QColor> l_colors;
-        int l_nbLoop = 0;
-        while(l_colors.size() < l_CCW.size())
-        {
-            ++l_nbLoop;;
-            bool l_addColor = true;
-
-            int l_r = rand()%240;
-            int l_g = rand()%255;
-            int l_b = rand()%205;
-
-            if(l_nbLoop < 500)
-            {
-                for(int ii = 0; ii < l_colors.size(); ++ii)
-                {
-                    int l_diffRed = l_colors[ii].red()-l_r;
-                    if(l_diffRed < 0)
-                    {
-                        l_diffRed = - l_diffRed;
-                    }
-                    int l_diffGreen = l_colors[ii].green()-l_g;
-                    if(l_diffGreen < 0)
-                    {
-                        l_diffGreen = - l_diffGreen;
-                    }
-                    int l_diffBlue = l_colors[ii].blue()-l_b;
-                    if(l_diffBlue < 0)
-                    {
-                        l_diffBlue = - l_diffBlue;
-                    }
-
-                    if(l_diffRed + l_diffGreen + l_diffBlue < 150)
-                    {
-                        l_addColor = false;
-                        break;
-                    }
-                }
-            }
-
-            if(l_addColor)
-            {
-                l_colors << QColor(l_r,l_g,l_b);
-            }
-        }
-
-    // create x curves values
-        QVector<double> l_xValues;
-        for(int ii = 0; ii < trainSentence.size[1]; ++ii)
-        {
-            l_xValues << ii;
-        }
-
-    // set curve legend labels
-        for(int ii = 0; ii < l_CCW.size(); ++ii)
-        {
-            QLabel *l_labelCCW = new QLabel();
-            QPalette l_palette = l_labelCCW->palette();
-            l_palette.setColor(l_labelCCW->foregroundRole(), l_colors[ii]);
-            l_palette.setColor(l_labelCCW->backgroundRole(), Qt::white);
-            l_labelCCW->setAutoFillBackground (true);
-            l_labelCCW->setPalette(l_palette);
-
-            QString labelText = "<P><b>";
-            labelText .append(l_CCW[ii].toUpper());
-            labelText .append("</b></P>");
-            l_labelCCW->setText(labelText);
-
-            l_labelCCW->setAlignment(Qt::AlignCenter);
-            m_plotLabelListTrainSentenceInput.push_back(l_labelCCW);
-            m_uiInterface->hlLabelsInputPlot->addWidget(m_plotLabelListTrainSentenceInput.back());
-        }
-
-    // create the plots
-
-    qDebug() << l_meaning.size() << " " << l_meaning[0].size() << " " << l_meaning[0][0].size() ;
-        for(int ii = 0; ii < l_sentences.size(); ++ii)
-        {
-            // add sentences
-                QCustomPlot *l_plotDisplaySentence = new QCustomPlot(this);
-                l_plotDisplaySentence->setFixedHeight(150);
-                l_plotDisplaySentence->setFixedWidth(trainSentence.size[2]*35);
-
-                m_plotListTrainSentenceInput.push_back(l_plotDisplaySentence);
-                m_uiInterface->vlInputPlot->addWidget(m_plotListTrainSentenceInput.back());
-
-                QCPItemText *l_textLabelSentence = new QCPItemText(l_plotDisplaySentence);
-                l_plotDisplaySentence->addItem(l_textLabelSentence);
-                l_textLabelSentence->setPositionAlignment(Qt::AlignTop|Qt::AlignHCenter);
-                l_textLabelSentence->position->setType(QCPItemPosition::ptAxisRectRatio);
-                l_textLabelSentence->position->setCoords(0.5, 0); // place position at center/top of axis rect
-                l_textLabelSentence->setText("Sentence " + QString::number(ii+1));
-                l_textLabelSentence->setFont(QFont(font().family(), 8)); // make font a bit larger
-
-
-                double l_maxY = DBL_MIN;
-                double l_minY = DBL_MAX;
-
-                for(int jj = 0; jj < l_sentences[0].size(); ++jj)
-                {
-                    m_plotListTrainSentenceInput.back()->addGraph();
-                    QPen l_pen(l_colors[jj]);
-                    l_pen.setWidthF(3);
-                    m_plotListTrainSentenceInput[ii]->graph(jj)->setPen(l_pen);
-                    m_plotListTrainSentenceInput[ii]->graph(jj)->setData(l_xValues, l_sentences[ii][jj]);
-
-                    for(QVector<double>::iterator it = l_sentences[ii][jj].begin(); it != l_sentences[ii][jj].end(); ++it)
-                    {
-                        if((*it) > l_maxY)
-                        {
-                            l_maxY = (*it);
-                        }
-                        if((*it) < l_minY)
-                        {
-                            l_minY = (*it);
-                        }
-                    }
-                }
-
-                m_plotListTrainSentenceInput.back()->xAxis->setRange(0, trainSentence.size[1]);
-                m_plotListTrainSentenceInput.back()->yAxis->setRange(l_minY,l_maxY);
-                m_plotListTrainSentenceInput.back()->replot();
-
-            // add meaning
-                QCustomPlot *l_plotDisplayMeaning = new QCustomPlot(this);
-                l_plotDisplayMeaning->setFixedHeight(100);
-                l_plotDisplayMeaning->setFixedWidth(trainMeaning.size[2]*10);
-                m_plotListTrainMeaningInput.push_back(l_plotDisplayMeaning);
-                m_uiInterface->vlInputPlot->addWidget(m_plotListTrainMeaningInput.back());
-
-                QCPColorMap *l_colorMap = new QCPColorMap(l_plotDisplayMeaning->xAxis, l_plotDisplayMeaning->yAxis);
-                l_plotDisplayMeaning->addPlottable(l_colorMap);
-                l_colorMap->data()->setSize(trainMeaning.size[2], trainMeaning.size[1]);
-
-                double z;
-                for(int jj = 0; jj < trainMeaning.size[1]; ++jj)
-                {
-                    for(int kk = 0; kk < trainMeaning.size[2]; ++kk)
-                    {
-                        z = static_cast<double>(trainMeaning.at<float>(ii,jj,kk));
-                        l_colorMap->data()->setCell(kk, jj, z);
-                    }
-                }
-
-                // add a color scale:
-                QCPColorScale *colorScale = new QCPColorScale(l_plotDisplayMeaning);
-                l_plotDisplayMeaning->plotLayout()->addElement(0, 1, colorScale); // add it to the right of the main axis rect
-                colorScale->setType(QCPAxis::atRight); // scale shall be vertical bar with tick/axis labels right (actually atRight is already the default)
-                l_colorMap->setColorScale(colorScale); // associate the color map with the color scale
-
-                l_colorMap->setGradient(QCPColorGradient::gpPolar);
-                l_colorMap->rescaleDataRange(true);
-                l_plotDisplayMeaning->rescaleAxes();
-                colorScale->axis()->setLabel("Meaning");
-
-
-                m_plotListTrainMeaningInput.back()->xAxis->setAutoTickStep(false);
-                m_plotListTrainMeaningInput.back()->xAxis->setAutoTickLabels(false);
-                m_plotListTrainMeaningInput.back()->replot();
-        }
-}
-
-void Interface::openCorpus()
-{
-    int l_currentIndex = m_uiInterface->lwCorpus->currentRow();
-
-    if(l_currentIndex >= 0)
-    {
-        QDesktopServices::openUrl(QUrl("file:///" + m_uiInterface->lwCorpus->currentItem()->text()));
-        m_uiInterface->lwCorpus->currentItem()->setTextColor(QColor(255,0,0));
-    }
-}
-
-void Interface::reloadCorpus()
-{
-    int l_currentIndex2Reload = m_uiInterface->lwCorpus->currentRow();
-
-    if(l_currentIndex2Reload >= 0)
-    {
-        QString l_pathCorpus2Reload = m_uiInterface->lwCorpus->currentItem()->text();
-
-        // remove item
-            delete m_uiInterface->lwCorpus->takeItem(l_currentIndex2Reload);
-            emit removeCorpusSignal(l_currentIndex2Reload);
-
-        // wait
-            QTime l_oDieTime = QTime::currentTime().addMSecs(10);
-            while( QTime::currentTime() < l_oDieTime)
-            {
-                QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
-            }
-
-        // send item
-            m_uiInterface->lwCorpus->addItem(l_pathCorpus2Reload);
-            emit addCorpusSignal(l_pathCorpus2Reload);
-
-        m_uiInterface->lwCorpus->setCurrentRow(m_uiInterface->lwCorpus->count()-1);
-        m_uiInterface->lwCorpus->currentItem()->setTextColor(QColor(0,0,0));
-    }
-}
-
-
-void Interface::loadSettings()
-{
-    QString l_sPathSettings = QFileDialog::getOpenFileName(this, "Load settings file", m_absolutePath + "../data/input/Settings", "Corpus file (*.txt)");
-
-    if(l_sPathSettings.size() > 0)
-    {
-        QStringList l_CCW, l_structure;
-        extractDataFromSettingFile(l_sPathSettings,l_CCW, l_structure);
-
-        m_uiInterface->leSettingFile->setText(l_sPathSettings);
-        m_uiInterface->leDisplayCCW->setText(l_CCW.join(" "));
-        m_uiInterface->leDisplayStructure->setText(l_structure.join(" "));
-
-        LanguageParameters l_params;
-        l_params.m_CCW = l_CCW.join(" ");
-        l_params.m_structure = l_structure.join(" ");
-
-        emit sendLanguageParametersSignal(l_params);
-
-        // unlock start
-        if(m_uiInterface->lwCorpus->count() > 0)
-        {
-            m_uiInterface->pbStart->setEnabled(true);
-        }
-    }
-}
-
-void Interface::updateSettings()
-{
-    LanguageParameters l_params;
-    l_params.m_CCW = m_uiInterface->leDisplayCCW->text();
-    l_params.m_structure = m_uiInterface->leDisplayStructure->text();
-
-    if(l_params.m_CCW.size() > 0 && l_params.m_structure.size() > 0)
-    {
-        emit sendLanguageParametersSignal(l_params);
-
-        // unlock start
-        if(m_uiInterface->lwCorpus->count() > 0)
-        {
-            m_uiInterface->pbStart->setEnabled(true);
-        }
-    }
-    else
-    {
-        m_uiInterface->pbStart->setEnabled(false);
-    }
-}
-
-void Interface::openCorpus(QModelIndex index)
-{
-    int l_clickedRow = index.row();
-
-    if(l_clickedRow >= 0)
-    {
-        QDesktopServices::openUrl(QUrl("file:///" + m_uiInterface->lwCorpus->currentItem()->text()));
-        m_uiInterface->lwCorpus->currentItem()->setTextColor(QColor(255,0,0));
-    }
-}
-
-void Interface::setXTabFocus(int index)
-{
-    if(index == 1)
-    {
-        m_uiInterface->twDisplay->setTabEnabled(1, true);
-        m_uiInterface->twDisplay->setCurrentIndex(1);
-    }
-    else
-    {
-        m_uiInterface->twDisplay->setTabEnabled(1, false);
-        m_uiInterface->twDisplay->setCurrentIndex(0);
-    }
-}
-
-
-InterfaceWorker::InterfaceWorker() : m_gridSearch(new GridSearchQt(m_model)), m_nbOfCorpus(0)
-{
-    qRegisterMetaType<ReservoirParameters>("ReservoirParameters");
-    qRegisterMetaType<LanguageParameters>("LanguageParameters");
-    qRegisterMetaType<ModelParametersQt>("ModelParametersQt");
-    qRegisterMetaType<ResultsDisplayReservoir>("ResultsDisplayReservoir");
-    qRegisterMetaType<QVector<QVector<double> > >("QVector<QVector<double> >");
-    qRegisterMetaType<cv::Mat>("cv::Mat");
-    qRegisterMetaType<Sentences >("Sentences");
-}
-
-InterfaceWorker::~InterfaceWorker()
-{
-    delete m_gridSearch;
-}
-
-GridSearchQt *InterfaceWorker::gridSearch() const
-{
-    return m_gridSearch;
-}
-
-ModelQt *InterfaceWorker::model()
-{
-    return &m_model;
-}
-
-LanguageParameters InterfaceWorker::languageParameters() const
-{
-    return m_languageParameters;
-}
-
-void InterfaceWorker::addCorpus(QString corpusPath)
-{
-    m_corpusList.push_back(corpusPath);
-
-    std::vector<std::string> l_stringListCorpus;
-
-    for(int ii = 0; ii < m_corpusList.size(); ++ii)
-    {
-        l_stringListCorpus.push_back(m_corpusList[ii].toStdString());
-    }
-
-    m_gridSearch->setCorpusList(l_stringListCorpus);
-    ++m_nbOfCorpus;
-}
-
-void InterfaceWorker::removeCorpus(int index)
-{
-    if(index == -1)
-    {
-        return;
-    }
-
-    m_corpusList.removeAt(index);
-
-    std::vector<std::string> l_stringListCorpus;
-
-    for(int ii = 0; ii < m_corpusList.size(); ++ii)
-    {
-        l_stringListCorpus.push_back(m_corpusList[ii].toStdString());
-    }
-
-    m_gridSearch->setCorpusList(l_stringListCorpus);
-    --m_nbOfCorpus;
-}
-
-void InterfaceWorker::updateReservoirParameters(ReservoirParameters newParams)
-{
-    m_reservoirParameters = newParams;
-}
-
-void InterfaceWorker::updateLanguageParameters(LanguageParameters newParams)
-{
-    m_languageParameters = newParams;
-}
-
-void InterfaceWorker::start()
-{
-    if(m_nbOfCorpus <= 0)
-    {
-        QString l_message = "Cannot start, no corpus is defined. \n";
-        emit sendLogInfo(l_message, QColor(Qt::red));
-        std::cerr << l_message.toStdString() << std::endl;
-        return;
-    }
-
-    emit startInitDisplaySignal();
-
-    // define language parameters
-        Sentence l_CCW, l_structure;
-        QStringList l_CCWList = m_languageParameters.m_CCW.split(" ");
-        for(int ii = 0; ii < l_CCWList.size(); ++ii)
-        {
-            l_CCW.push_back(l_CCWList[ii].toStdString());
-        }
-        QStringList l_structureList = m_languageParameters.m_structure.split(" ");
-        for(int ii = 0; ii < l_structureList.size(); ++ii)
-        {
-            l_structure.push_back(l_structureList[ii].toStdString());
-        }
-
-        m_model.setCCWAndStructure(l_CCW, l_structure);
-
-    // define all grid search parameters
-        m_gridSearch->deleteParameterValues();
-        m_gridSearch->setCudaParameters(m_reservoirParameters.m_useCuda, m_reservoirParameters.m_useCuda);
-
-        bool l_operationValid;
-        int l_OperationInvalid = 0;
-
-
-        bool l_onlyStartValue = m_reservoirParameters.m_useOnlyStartValue;
-
-        if(m_reservoirParameters.m_neuronsEnabled)
-        {
-            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::NEURONS_NB, m_reservoirParameters.m_neuronsStart, m_reservoirParameters.m_neuronsEnd,
-                                                                m_reservoirParameters.m_neuronsOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_neuronsNbOfUses);
-            emit displayValidityOperationSignal(l_operationValid, GridSearchQt::NEURONS_NB);
-            if(!l_operationValid)
-            {
-                ++l_OperationInvalid;
-            }
-        }
-        if(m_reservoirParameters.m_leakRateEnabled)
-        {
-            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::LEAK_RATE,m_reservoirParameters.m_leakRateStart, m_reservoirParameters.m_leakRateEnd,
-                                                                m_reservoirParameters.m_leakRateOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_leakRateNbOfUses);
-            emit displayValidityOperationSignal(l_operationValid, GridSearchQt::LEAK_RATE);
-            if(!l_operationValid)
-            {
-                ++l_OperationInvalid;
-            }
-        }
-        if(m_reservoirParameters.m_issEnabled)
-        {
-            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::INPUT_SCALING,m_reservoirParameters.m_issStart, m_reservoirParameters.m_issEnd,
-                                                                m_reservoirParameters.m_issOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_issNbOfUses);
-            emit displayValidityOperationSignal(l_operationValid, GridSearchQt::INPUT_SCALING);
-            if(!l_operationValid)
-            {
-                ++l_OperationInvalid;
-            }
-        }
-        if(m_reservoirParameters.m_spectralRadiusEnabled)
-        {
-            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::SPECTRAL_RADIUS,    m_reservoirParameters.m_spectralRadiusStart,  m_reservoirParameters.m_spectralRadiusEnd,
-                                                                m_reservoirParameters.m_spectralRadiusOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_spectralRadiusNbOfUses);
-            emit displayValidityOperationSignal(l_operationValid, GridSearchQt::SPECTRAL_RADIUS);
-            if(!l_operationValid)
-            {
-                ++l_OperationInvalid;
-            }
-        }
-        if(m_reservoirParameters.m_ridgeEnabled)
-        {
-            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::RIDGE,m_reservoirParameters.m_ridgeStart, m_reservoirParameters.m_ridgeEnd,
-                                                                m_reservoirParameters.m_ridgeOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_ridgeNbOfUses);
-            emit displayValidityOperationSignal(l_operationValid, GridSearchQt::RIDGE);
-            if(!l_operationValid)
-            {
-                ++l_OperationInvalid;
-            }
-        }
-        if(m_reservoirParameters.m_sparcityEnabled)
-        {
-            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::SPARCITY, m_reservoirParameters.m_sparcityStart,  m_reservoirParameters.m_sparcityEnd,
-                                                                m_reservoirParameters.m_sparcityOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_sparcityNbOfUses);
-            emit displayValidityOperationSignal(l_operationValid, GridSearchQt::SPARCITY);
-            if(!l_operationValid)
-            {
-                ++l_OperationInvalid;
-            }
-        }
-
-        if(l_OperationInvalid != 0)
-        {
-            QString l_message = "\nCannot start, " + QString::number(l_OperationInvalid) + " operation are invalid. (Displayed in red)\n";
-            sendLogInfo(l_message, QColor(Qt::red));
-            std::cerr << l_message.toStdString() << std::endl;
-            return;
-        }
-
-        bool l_doTrain, l_doTest;
-
-        switch(m_reservoirParameters.m_action)
-        {
-            case TRAINING_RES :
-                l_doTrain = true;
-                l_doTest = false;
-            break;
-            case TEST_RES :
-                l_doTrain = false;
-                l_doTest = true;
-            break;
-            case BOTH_RES :
-                l_doTrain = true;
-                l_doTest = true;
-            break;
-        }
-
-    QDateTime l_dateTime;
-    l_dateTime = l_dateTime.currentDateTime();
-    QDate l_date = l_dateTime.date();
-    QTime l_time = QTime::currentTime();
-    QString l_uniqueName = l_date.toString("dd_MM_yyyy") + "_" +  QString::number(l_time.hour()) + "h" + QString::number(l_time.minute()) + "m" + QString::number(l_time.second()) + "s.txt";
-    QString l_pathRes    =  "../data/Results/res_"  + l_uniqueName;
-    QString l_pathResRaw =  "../data/Results/raw/res_" + l_uniqueName;
-
-    if(m_reservoirParameters.m_useLoadedTraining)
-    {
-        if(m_parametersLoaded.size() > 0)
-        {
-            m_gridSearch->setParameterValues(GridSearchQt::NEURONS_NB,      m_parametersLoaded[0].toInt(),    m_parametersLoaded[0].toInt(),   "+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::SPARCITY,        m_parametersLoaded[1].toDouble(), m_parametersLoaded[1].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::SPECTRAL_RADIUS, m_parametersLoaded[2].toDouble(), m_parametersLoaded[2].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::INPUT_SCALING,   m_parametersLoaded[3].toDouble(), m_parametersLoaded[3].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::LEAK_RATE,       m_parametersLoaded[4].toDouble(), m_parametersLoaded[4].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::RIDGE,           m_parametersLoaded[5].toDouble(), m_parametersLoaded[5].toDouble(),"+0", true, 1);
-        }
-    }
-
-    // launch reservoir computing
-    lockInterfaceSignal(true);
-        m_gridSearch->launchTrainWithAllParameters(l_pathRes.toStdString(), l_pathResRaw.toStdString(), l_doTrain, l_doTest, m_reservoirParameters.m_useLoadedTraining);
-    lockInterfaceSignal(false);
-
-    emit endTrainingSignal(true);
-}
-
-void InterfaceWorker::stop()
-{
-    lockInterfaceSignal(false);
-}
-
-void InterfaceWorker::saveLastTraining(QString pathDirectory)
-{
-    if(pathDirectory.size() > 0)
-    {
-        m_model.saveTraining(pathDirectory.toStdString());
-        sendLogInfo("Training saved in the directory : " + pathDirectory + "\n", QColor(0,0,255));
-    }
-}
-
-void InterfaceWorker::loadTraining(QString pathDirectory)
-{
-    if(pathDirectory.size() > 0)
-    {
-        m_model.loadTraining(pathDirectory.toStdString());
-        sendLogInfo("Training loaded in the directory : " + pathDirectory + "\n", QColor(Qt::blue));
-    }
-}
-
-void InterfaceWorker::setLoadedParameters(QStringList loadedParams)
-{
-    m_parametersLoaded = loadedParams;
 }

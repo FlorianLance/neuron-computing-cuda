@@ -116,10 +116,28 @@ class ReservoirQt  : public QObject
         void loadTraining(const std::string &path);
 
         /**
+         * @brief loadW
+         * @param path
+         */
+        void loadW(const std::string &path);
+
+        /**
+         * @brief loadWIn
+         * @param path
+         */
+        void loadWIn(const std::string &path);
+
+        /**
          * @brief updateMatricesWithLoadedTraining
          */
         void updateMatricesWithLoadedTraining();
 
+        /**
+         * @brief setMatricesUse
+         * @param useCustomW
+         * @param useCustomWIn
+         */
+        void setMatricesUse(cbool useCustomW, cbool useCustomWIn);
 
     public slots :
 
@@ -178,9 +196,23 @@ class ReservoirQt  : public QObject
         /**
          * @brief sendLoadedParameters
          */
-        void sendLoadedParameters(QStringList);
+        void sendLoadedTrainingParameters(QStringList);
+
+        /**
+         * @brief sendLoadedWParameters
+         */
+        void sendLoadedWParameters(QStringList);
+
+        /**
+         * @brief sendLoadedWInParameters
+         */
+        void sendLoadedWInParameters(QStringList);
+
 
     private :
+
+        bool m_useW;
+        bool m_useWIn;
 
         bool m_useCudaInversion;        /**< uses cuda inversion matrice ? else uses opencv */
         bool m_useCudaMultiplication;   /**< uses cuda multiplication matrices ? else uses opencv */

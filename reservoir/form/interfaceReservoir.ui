@@ -248,7 +248,7 @@
                </layout>
               </widget>
              </item>
-             <item>
+             <item alignment="Qt::AlignHCenter">
               <widget class="QGroupBox" name="gbReservoirParameters">
                <property name="title">
                 <string>RESERVOIR PARAMETERS</string>
@@ -261,7 +261,7 @@
                   </property>
                  </widget>
                 </item>
-                <item row="2" column="2">
+                <item row="2" column="2" alignment="Qt::AlignHCenter">
                  <widget class="QLabel" name="label_3">
                   <property name="text">
                    <string>Start value</string>
@@ -327,14 +327,14 @@
                    <double>0.010000000000000</double>
                   </property>
                   <property name="value">
-                   <double>0.250000000000000</double>
+                   <double>0.500000000000000</double>
                   </property>
                  </widget>
                 </item>
                 <item row="5" column="4">
                  <widget class="QDoubleSpinBox" name="sbEndLeakRate">
                   <property name="value">
-                   <double>0.250000000000000</double>
+                   <double>0.500000000000000</double>
                   </property>
                  </widget>
                 </item>
@@ -352,17 +352,17 @@
                   </property>
                  </widget>
                 </item>
-                <item row="2" column="4">
+                <item row="2" column="4" alignment="Qt::AlignHCenter">
                  <widget class="QLabel" name="label_4">
                   <property name="text">
                    <string>End value</string>
                   </property>
                  </widget>
                 </item>
-                <item row="2" column="0">
+                <item row="2" column="0" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
                  <widget class="QLabel" name="label_5">
                   <property name="text">
-                   <string>Name parameter</string>
+                   <string>Name</string>
                   </property>
                  </widget>
                 </item>
@@ -373,7 +373,7 @@
                   </property>
                  </widget>
                 </item>
-                <item row="2" column="6">
+                <item row="2" column="6" alignment="Qt::AlignHCenter">
                  <widget class="QLabel" name="laOperation">
                   <property name="text">
                    <string>Operation </string>
@@ -551,7 +551,7 @@
                   </property>
                  </widget>
                 </item>
-                <item row="2" column="8">
+                <item row="2" column="8" alignment="Qt::AlignHCenter">
                  <widget class="QLabel" name="label_11">
                   <property name="text">
                    <string>Current value</string>
@@ -607,7 +607,7 @@
                   </property>
                  </widget>
                 </item>
-                <item row="2" column="10">
+                <item row="2" column="10" alignment="Qt::AlignHCenter">
                  <widget class="QLabel" name="label_18">
                   <property name="text">
                    <string>Enabled</string>
@@ -767,7 +767,7 @@
                   </property>
                  </widget>
                 </item>
-                <item row="2" column="12">
+                <item row="2" column="12" alignment="Qt::AlignHCenter">
                  <widget class="QLabel" name="laNbOfUse">
                   <property name="text">
                    <string>Nb of use </string>
@@ -848,64 +848,6 @@
                   </property>
                  </widget>
                 </item>
-                <item row="10" column="0" colspan="13">
-                 <widget class="Line" name="line_21">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                 </widget>
-                </item>
-                <item row="12" column="0" colspan="3">
-                 <widget class="QCheckBox" name="cbWIn">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="text">
-                   <string>Use custom WIn matrix        :</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="11" column="0" colspan="3">
-                 <widget class="QCheckBox" name="cbW">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="text">
-                   <string>Use custom W matrix           :</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="11" column="3" colspan="8">
-                 <widget class="QLineEdit" name="leW">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="readOnly">
-                   <bool>false</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item row="11" column="12">
-                 <widget class="QPushButton" name="pbLoadW">
-                  <property name="text">
-                   <string>Load</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="12" column="3" colspan="8">
-                 <widget class="QLineEdit" name="leWIn">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item row="12" column="12">
-                 <widget class="QPushButton" name="pbLoadWin">
-                  <property name="text">
-                   <string>Load</string>
-                  </property>
-                 </widget>
-                </item>
                </layout>
               </widget>
              </item>
@@ -915,6 +857,40 @@
                 <string>TRAIN / TEST</string>
                </property>
                <layout class="QGridLayout" name="gridLayout_7">
+                <item row="5" column="1" colspan="9">
+                 <widget class="QLineEdit" name="leWIn">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="1" colspan="9">
+                 <widget class="QLineEdit" name="leW">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="readOnly">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="0">
+                 <widget class="QCheckBox" name="cbWIn">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="text">
+                   <string>Use custom WIn matrix :</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="10">
+                 <widget class="QPushButton" name="pbLoadWin">
+                  <property name="text">
+                   <string>Load</string>
+                  </property>
+                 </widget>
+                </item>
                 <item row="1" column="0" colspan="11">
                  <widget class="Line" name="line_14">
                   <property name="orientation">
@@ -922,7 +898,7 @@
                   </property>
                  </widget>
                 </item>
-                <item row="4" column="0">
+                <item row="7" column="0">
                  <widget class="QPushButton" name="pbSaveLastTrainingFile">
                   <property name="enabled">
                    <bool>false</bool>
@@ -932,7 +908,7 @@
                   </property>
                  </widget>
                 </item>
-                <item row="3" column="0" colspan="11">
+                <item row="6" column="0" colspan="11">
                  <widget class="Line" name="line_16">
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
@@ -1027,7 +1003,7 @@
                   </property>
                  </spacer>
                 </item>
-                <item row="4" column="1">
+                <item row="7" column="1">
                  <widget class="QPushButton" name="pbSaveReplay">
                   <property name="enabled">
                    <bool>false</bool>
@@ -1044,6 +1020,30 @@
                   </property>
                   <property name="text">
                    <string>Test</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="10">
+                 <widget class="QPushButton" name="pbLoadW">
+                  <property name="text">
+                   <string>Load</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="0">
+                 <widget class="QCheckBox" name="cbW">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="text">
+                   <string>Use custom W matrix :</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="0" colspan="11">
+                 <widget class="Line" name="line_21">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
                   </property>
                  </widget>
                 </item>

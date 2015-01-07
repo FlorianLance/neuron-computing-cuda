@@ -1,7 +1,7 @@
 
 /**
  * \file Interface.h
- * \brief Defines SWViewerInterface
+ * \brief Defines Interface
  * \author Florian Lance
  * \date 01/12/14
  */
@@ -9,24 +9,19 @@
 #ifndef _INTERFACE_
 #define _INTERFACE_
 
-//#include <QtWidgets/qmainwindow.h>
-//#include <QtCore/qthread.h>
+// Qt
 #include <QMainWindow>
 #include <QThread>
 #include <QtGui>
 
-//#include "SWViewerWorker.h"
+// Qt customplot
+#include "qcustomplot.h"
 
+// Ui
 #include "../genUI/UI_Interface.h"
 
-
-//#include "GridSearch.h"
+// reservoir
 #include "GridSearchQtObject.h"
-
-
-#include "DisplayImageWidget.h"
-
-#include "qcustomplot.h"
 
 
 namespace Ui {
@@ -48,6 +43,8 @@ struct ReservoirParameters
     bool m_useCuda;
 
     bool m_useLoadedTraining;
+    bool m_useLoadedW;
+    bool m_useLoadedWIn;
     bool m_useOnlyStartValue;    
 
     ActionToDo m_action;
@@ -126,34 +123,56 @@ class Interface : public QMainWindow
         void closeEvent(QCloseEvent *event);
 
         /**
-         * @brief addCorpus
+         * @brief Add a corpus in the list
          */
         void addCorpus();
 
         /**
-         * @brief removeCorpus
+         * @brief Remove a corpus from the list
          */
         void removeCorpus();
 
         /**
-         * @brief saveTraining
+         * @brief Save the last training done
          */
         void saveTraining();
 
         /**
-         * @brief loadTraining
+         * @brief Load a training by picking it in a dialog window
          */
         void loadTraining();
+
+        /**
+         * @brief loadWMatrix
+         */
+        void loadWMatrix();
+
+        /**
+         * @brief loadWInMatrix
+         */
+        void loadWInMatrix();
 
         /**
          * @brief updateParamters
          */
         void updateReservoirParameters();
 
+        /**
+         * @brief updateReservoirParameters
+         * @param value
+         */
         void updateReservoirParameters(int value);
 
+        /**
+         * @brief updateReservoirParameters
+         * @param value
+         */
         void updateReservoirParameters(double value);
 
+        /**
+         * @brief updateReservoirParameters
+         * @param value
+         */
         void updateReservoirParameters(QString value);
 
         /**
@@ -228,7 +247,7 @@ class Interface : public QMainWindow
         /**
          * @brief displayTrainInputMatrix
          */
-        void displayTrainInputMatrix(cv::Mat trainMeaning, cv::Mat trainSentence);
+        void displayTrainInputMatrix(cv::Mat trainMeaning, cv::Mat trainSentence, Sentences sentences);
 
         /**
          * @brief openCorpus
@@ -255,12 +274,23 @@ class Interface : public QMainWindow
          */
         void openCorpus(QModelIndex index);
 
-
         /**
          * @brief setXTabFocus
          * @param index
          */
         void setXTabFocus(int index);
+
+        /**
+         * @brief disableCustomMatrix
+         * @param index
+         */
+        void disableCustomMatrix(int index);
+
+        /**
+         * @brief disableTraining
+         * @param index
+         */
+        void disableTraining(int index);
 
     signals:
 
@@ -285,6 +315,16 @@ class Interface : public QMainWindow
         void loadTrainingSignal(QString);
 
         /**
+         * @brief loadWSignal
+         */
+        void loadWSignal(QString);
+
+        /**
+         * @brief loadWSignal
+         */
+        void loadWInSignal(QString);
+
+        /**
          * @brief sendReservoirParametersSignal
          */
         void sendReservoirParametersSignal(ReservoirParameters);
@@ -307,44 +347,35 @@ class Interface : public QMainWindow
 
     private :
 
-        int m_sizeDim1Meaning;
-        int m_sizeDim2Meaning;
-
-//        QVector<
-
-
-        QFile m_logFile;
-
-        QString m_absolutePath;
+        // miscellanous
+        QString m_absolutePath;         /**< ... */
+        QFile m_logFile;                /**< ... */
+        QVector<QColor> m_colorsCCW;    /**< colors used for the CCW display */
 
         // widgets & ui
-        DisplayImageWidget *m_imageDisplay;
-        QVector<QCustomPlot*> m_plotListX;
-        QVector<QCustomPlot*> m_plotListOutput;
-        QVector<QCustomPlot*> m_plotListTrainSentenceInput;
-        QVector<QCustomPlot*> m_plotListTrainMeaningInput;
-        QVector<QLabel*> m_plotLabelListOutput;
-        QVector<QLabel*> m_plotLabelListTrainSentenceInput;
-        QVector<QLabel*> m_sentencesLabel;
+        //  input
+        QVector<QCustomPlot*> m_plotListTrainSentenceInput;     /**< ... */
+        QVector<QCustomPlot*> m_plotListTrainMeaningInput;      /**< ... */
+        QVector<QLabel*> m_plotLabelListTrainSentenceInput;     /**< ... */
+        QVector<QLabel*> m_labelListInputSentences;             /**< labels of the input sentences displayed in the input panel */
+        //  output
+        QVector<QCustomPlot*> m_plotListTrainSentenceOutput;    /**< ... */
+        QVector<QLabel*> m_labelListRetrievedSentences;             /**< labels of the retrieved sentences displayed in the output panel */
+        QVector<QLabel*> m_plotLabelListTrainSentenceOutput;    /**< ... */
+        Ui::UI_Reservoir* m_uiInterface;                        /**< qt main window */
 
-
-        QVector<QVector<double> > m_allValuesPlot;
-        QVector<double> m_allXPlot;
-//        QVBoxLayout *m_plotLayout;
-
-//        QCustomPlot *m_plotDisplay;
-        Ui::UI_Reservoir* m_uiInterface;   /**< qt main window */
-
-        // threads & workers
+        //threads / workers
         InterfaceWorker  *m_pWInterface;    /**< viewer worker */
-        QThread         m_TInterface;    /**< viewer thread */
+        QThread         m_TInterface;       /**< viewer thread */
 
-
-        int m_nbMaxNeuronsSentenceDisplayed;
-        int m_nbSentencesDisplayed;
-        QTime m_timerDisplayNeurons;
-        QMutex m_neuronDisplayMutex;
-
+        QVector<QCustomPlot*> m_plotListX;   // ?
+        int m_sizeDim1Meaning; // ?
+        int m_sizeDim2Meaning; // ?
+        QVector<QVector<double> > m_allValuesPlot; // ?
+        int m_nbMaxNeuronsSentenceDisplayed; // ?
+        int m_nbSentencesDisplayed; // ?
+        QTime m_timerDisplayNeurons; // ?
+        QMutex m_neuronDisplayMutex; // ?
 };
 
 
@@ -423,19 +454,46 @@ class InterfaceWorker : public QObject
 
         /**
          * @brief saveLastTraining
+         * @param pathDirectory
          */
         void saveLastTraining(QString pathDirectory);
 
         /**
          * @brief loadTraining
+         * @param pathDirectory
          */
         void loadTraining(QString pathDirectory);
 
         /**
-         * @brief setLoadedParameters
+         * @brief loadW
+         * @param pathDirectory
+         */
+        void loadW(QString pathDirectory);
+
+        /**
+         * @brief loadWIn
+         * @param pathDirectory
+         */
+        void loadWIn(QString pathDirectory);
+
+
+        /**
+         * @brief setLoadedTrainingParameters
          * @param loadedParams
          */
-        void setLoadedParameters(QStringList loadedParams);
+        void setLoadedTrainingParameters(QStringList loadedParams);
+
+        /**
+         * @brief setLoadedWParameters
+         * @param loadedParams
+         */
+        void setLoadedWParameters(QStringList loadedParams);
+
+        /**
+         * @brief setLoadedWInParameters
+         * @param loadedParams
+         */
+        void setLoadedWInParameters(QStringList loadedParams);
 
     signals:
 
@@ -456,11 +514,6 @@ class InterfaceWorker : public QObject
         void endTrainingSignal(bool);
 
         /**
-         * @brief startInitDisplaySignal TODO
-         */
-        void startInitDisplaySignal();
-
-        /**
          * @brief sendLogInfo
          */
         void sendLogInfo(QString, QColor);
@@ -469,7 +522,9 @@ class InterfaceWorker : public QObject
 
         int m_nbOfCorpus;
 
-        QStringList m_parametersLoaded;
+        QStringList m_parametersTrainingLoaded;
+        QStringList m_parametersWLoaded;
+        QStringList m_parametersWInLoaded;
 
         ReservoirParameters m_reservoirParameters;
         LanguageParameters m_languageParameters;

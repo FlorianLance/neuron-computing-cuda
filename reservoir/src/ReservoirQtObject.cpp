@@ -50,6 +50,10 @@ ReservoirQt::ReservoirQt()
     m_useCudaInversion      = true;
     m_useCudaMultiplication = false;
     m_sendMatrices = true;
+
+    m_useW   = false;
+    m_useWIn = false;
+
 }
 
 void ReservoirQt::setCudaProperties(cbool cudaInv, cbool cudaMult)
@@ -77,6 +81,10 @@ ReservoirQt::ReservoirQt(cuint nbNeurons, cfloat spectralRadius, cfloat inputSca
         m_sparcity = 10.f/m_nbNeurons;
     }
     m_initialized = true;
+
+    m_useW   = false;
+    m_useWIn = false;
+
 }
 
 void ReservoirQt::setParameters(cuint nbNeurons, cfloat spectralRadius, cfloat inputScaling, cfloat leakRate, cfloat sparcity, cfloat ridge, cbool verbose)
@@ -102,42 +110,54 @@ void ReservoirQt::setParameters(cuint nbNeurons, cfloat spectralRadius, cfloat i
 
 void ReservoirQt::generateMatrixW()
 {
-    // debug
-    emit sendLogInfo(QString::fromStdString(displayTime("START : generate W ", m_oTime, false, m_verbose)), QColor(Qt::black));
+    if(!m_useW)
+    {
+        emit sendLogInfo(QString::fromStdString(displayTime("START : generate W ", m_oTime, false, m_verbose)), QColor(Qt::black));
 
-    // init w matrix [N x N]
-    m_w = cv::Mat(m_nbNeurons, m_nbNeurons, CV_32FC1, cv::Scalar(0.f));
+        // init w matrix [N x N]
+        m_w = cv::Mat(m_nbNeurons, m_nbNeurons, CV_32FC1, cv::Scalar(0.f));
 
-    // fill w matrix with random values [-0.5, 0.5]
-        for(int ii = 0; ii < m_w.rows*m_w.cols;++ii)
-        {
-            if(static_cast <float> (rand()) / static_cast <float> (RAND_MAX) < m_sparcity)
+        // fill w matrix with random values [-0.5, 0.5]
+            for(int ii = 0; ii < m_w.rows*m_w.cols;++ii)
             {
-                float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-                m_w.at<float>(ii) = (r -0.5f) * m_spectralRadius;
+                if(static_cast <float> (rand()) / static_cast <float> (RAND_MAX) < m_sparcity)
+                {
+                    float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+                    m_w.at<float>(ii) = (r -0.5f) * m_spectralRadius;
+                }
             }
-        }
 
-    // debug
-    emit sendLogInfo(QString::fromStdString(displayTime("END : generate W ", m_oTime, false, m_verbose)), QColor(Qt::black));
+        emit sendLogInfo(QString::fromStdString(displayTime("END : generate W ", m_oTime, false, m_verbose)), QColor(Qt::black));
+    }
+    else
+    {
+        m_w = m_wLoaded.clone();
+    }
 }
 
 void ReservoirQt::generateWIn(cuint dimInput)
 {
-    emit sendLogInfo(QString::fromStdString(displayTime("START : generate WIn ", m_oTime, false, m_verbose)), QColor(Qt::black));
+    if(!m_useWIn)
+    {
+        emit sendLogInfo(QString::fromStdString(displayTime("START : generate WIn ", m_oTime, false, m_verbose)), QColor(Qt::black));
 
-    // init wIn
-        m_wIn = cv::Mat(m_nbNeurons, dimInput + 1, CV_32FC1);
+        // init wIn
+            m_wIn = cv::Mat(m_nbNeurons, dimInput + 1, CV_32FC1);
 
-    // fill wIn matrix with random values [0, 1]
-        cv::MatIterator_<float> it = m_wIn.begin<float>(), it_end = m_wIn.end<float>();
-        float l_randMax = static_cast <float> (RAND_MAX);
-        for(;it != it_end; ++it)
-        {
-            (*it) = (static_cast <float> (rand()) / l_randMax) * m_inputScaling;
-        }
+        // fill wIn matrix with random values [0, 1]
+            cv::MatIterator_<float> it = m_wIn.begin<float>(), it_end = m_wIn.end<float>();
+            float l_randMax = static_cast <float> (RAND_MAX);
+            for(;it != it_end; ++it)
+            {
+                (*it) = (static_cast <float> (rand()) / l_randMax) * m_inputScaling;
+            }
 
-    emit sendLogInfo(QString::fromStdString(displayTime("END : generate WIn ", m_oTime, false, m_verbose)), QColor(Qt::black));
+        emit sendLogInfo(QString::fromStdString(displayTime("END : generate WIn ", m_oTime, false, m_verbose)), QColor(Qt::black));
+    }
+    else
+    {
+        m_wIn = m_wInLoaded.clone();
+    }
 }
 
 void ReservoirQt::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher, cv::Mat &sentencesOutputTrain, cv::Mat &xTot)
@@ -713,7 +733,37 @@ void ReservoirQt::loadTraining(const std::string &path)
         QTextStream l_stream(&l_paramFile);
         QString l_content = l_stream.readAll();
         parameters = l_content.split(' ');
-        sendLoadedParameters(parameters);
+        sendLoadedTrainingParameters(parameters);
+    }
+}
+
+void ReservoirQt::loadW(const string &path)
+{
+    load2DMatrixStd<float>(path + "/w.txt", m_wLoaded);
+
+    QFile l_paramFile(QString::fromStdString(path) + "/param.txt");
+    if(l_paramFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QStringList parameters;
+        QTextStream l_stream(&l_paramFile);
+        QString l_content = l_stream.readAll();
+        parameters = l_content.split(' ');
+        sendLoadedWParameters(parameters);
+    }
+}
+
+void ReservoirQt::loadWIn(const string &path)
+{
+    load2DMatrixStd<float>(path + "/wIn.txt", m_wInLoaded);
+
+    QFile l_paramFile(QString::fromStdString(path) + "/param.txt");
+    if(l_paramFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QStringList parameters;
+        QTextStream l_stream(&l_paramFile);
+        QString l_content = l_stream.readAll();
+        parameters = l_content.split(' ');
+        sendLoadedWInParameters(parameters);
     }
 }
 
@@ -731,6 +781,12 @@ void ReservoirQt::updateMatricesWithLoadedTraining()
         std::cerr << l_error << std::endl;
         emit sendLogInfo(QString::fromStdString(l_error), QColor(Qt::red));
     }
+}
+
+void ReservoirQt::setMatricesUse(cbool useCustomW, cbool useCustomWIn)
+{
+    m_useW   = useCustomW;
+    m_useWIn = useCustomWIn;
 }
 
 void ReservoirQt::enableMaxOmpThreadNumber(bool enable)

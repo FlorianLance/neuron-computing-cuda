@@ -84,8 +84,11 @@ class GridSearchQt : public QObject
          * @param doTraining
          * @param doTest
          * @param loadTraining
+         * @param loadW
+         * @param loadWIn
          */
-        void launchTrainWithAllParameters(const std::string resultsFilePath, const std::string resultsRawFilePath, cbool doTraining = true, cbool doTest = false, cbool loadTraining = false);
+        void launchTrainWithAllParameters(const std::string resultsFilePath, const std::string resultsRawFilePath, cbool doTraining = true, cbool doTest = false, cbool loadTraining = false
+                , cbool loadW = false, cbool loadWIn = false);
 
         /**
          * @brief Define the range of values for a parameter to be used.

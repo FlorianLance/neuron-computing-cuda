@@ -21,7 +21,7 @@ void GridSearchQt::setCudaParameters(cbool useCudaInversion, cbool useCudaMultip
     m_useCudaMult   = useCudaMultiplication;
 }
 
-void GridSearchQt::launchTrainWithAllParameters(const std::string resultsFilePath, const std::string resultsRawFilePath, cbool doTraining, cbool doTest, cbool loadTraining)
+void GridSearchQt::launchTrainWithAllParameters(const std::string resultsFilePath, const std::string resultsRawFilePath, cbool doTraining, cbool doTest, cbool loadTraining, cbool loadW, cbool loadWIn)
 {
     if(m_corpusList.size() == 0)
     {
@@ -148,6 +148,8 @@ void GridSearchQt::launchTrainWithAllParameters(const std::string resultsFilePat
                                 l_currentParameters.m_useCudaMult       = m_useCudaMult;
 
                                 l_currentParameters.m_useLoadedTraining = loadTraining;
+                                l_currentParameters.m_useLoadedW        = loadW;
+                                l_currentParameters.m_useLoadedWIn      = loadWIn;
 
                                 emit sendCurrentParametersSignal(l_currentParameters);
 

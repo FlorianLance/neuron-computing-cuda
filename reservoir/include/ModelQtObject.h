@@ -77,6 +77,8 @@ struct ModelParametersQt
     }
 
     bool m_useLoadedTraining;
+    bool m_useLoadedW;
+    bool m_useLoadedWIn;
 
     // cuda
     bool m_useCudaInv;              /**< uses the cuda inversion ? */
@@ -219,6 +221,17 @@ class ModelQt : public QObject
          */
         void loadTraining(const std::string &pathDirectory);
 
+        /**
+         * @brief loadW
+         * @param pathDirectory
+         */
+        void loadW(const std::string &pathDirectory);
+
+        /**
+         * @brief loadWIn
+         * @param pathDirectory
+         */
+        void loadWIn(const std::string &pathDirectory);
 
         /**
          * @brief reservoir
@@ -237,7 +250,7 @@ class ModelQt : public QObject
         /**
          * @brief sendTrainInputMatrix
          */
-        void sendTrainInputMatrix(cv::Mat, cv::Mat);
+        void sendTrainInputMatrix(cv::Mat, cv::Mat, Sentences);
 
         /**
          * @brief sendLogInfo
