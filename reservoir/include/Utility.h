@@ -671,6 +671,7 @@ static void save3DMatrixToText(const QString &pathFile, const cv::Mat &mat3D)
     if(l_file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
         QTextStream out(&l_file);
+        out << mat3D.size[0] << " " << mat3D.size[1] << " " << mat3D.size[2] << "\n";
 
         if(l_32b)
         {

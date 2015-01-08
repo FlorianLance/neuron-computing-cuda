@@ -32,6 +32,11 @@ namespace Ui {
 class InterfaceWorker;
 
 
+struct ReplayParameters
+{
+
+};
+
 struct LanguageParameters
 {
     QString m_structure;
@@ -138,6 +143,11 @@ class Interface : public QMainWindow
         void saveTraining();
 
         /**
+         * @brief saveReplay
+         */
+        void saveReplay();
+
+        /**
          * @brief Load a training by picking it in a dialog window
          */
         void loadTraining();
@@ -151,6 +161,11 @@ class Interface : public QMainWindow
          * @brief loadWInMatrix
          */
         void loadWInMatrix();
+
+        /**
+         * @brief loadReplay
+         */
+        void loadReplay();
 
         /**
          * @brief updateParamters
@@ -310,6 +325,11 @@ class Interface : public QMainWindow
         void saveTrainingSignal(QString);
 
         /**
+         * @brief saveReplaySignal
+         */
+        void saveReplaySignal(QString);
+
+        /**
          * @brief loadTrainingSignal
          */
         void loadTrainingSignal(QString);
@@ -323,6 +343,11 @@ class Interface : public QMainWindow
          * @brief loadWSignal
          */
         void loadWInSignal(QString);
+
+        /**
+         * @brief loadReplaySignal
+         */
+        void loadReplaySignal(QString);
 
         /**
          * @brief sendReservoirParametersSignal
@@ -368,6 +393,11 @@ class Interface : public QMainWindow
         InterfaceWorker  *m_pWInterface;    /**< viewer worker */
         QThread         m_TInterface;       /**< viewer thread */
 
+        // test
+        QVector<QCustomPlot*> m_replayPlotList;
+        QVector<double> m_replayData;
+
+        // old
         QVector<QCustomPlot*> m_plotListX;   // ?
         int m_sizeDim1Meaning; // ?
         int m_sizeDim2Meaning; // ?
@@ -391,8 +421,9 @@ class InterfaceWorker : public QObject
 
         /**
          * \brief constructor of InterfaceWorker
+         * @param absolutePath
          */
-        InterfaceWorker();
+        InterfaceWorker(QString absolutePath);
 
         /**
          * \brief destructor of InterfaceWorker
@@ -459,6 +490,13 @@ class InterfaceWorker : public QObject
         void saveLastTraining(QString pathDirectory);
 
         /**
+         * @brief saveLastReplay
+         * @param pathDirectory
+         */
+        void saveLastReplay(QString pathDirectory);
+
+
+        /**
          * @brief loadTraining
          * @param pathDirectory
          */
@@ -495,6 +533,12 @@ class InterfaceWorker : public QObject
          */
         void setLoadedWInParameters(QStringList loadedParams);
 
+        /**
+         * @brief loadReplay
+         * @param pathReplay
+         */
+        void loadReplay(QString pathReplay);
+
     signals:
 
         /**
@@ -522,18 +566,22 @@ class InterfaceWorker : public QObject
 
         int m_nbOfCorpus;
 
+        QString m_absolutePath;
+
         QStringList m_parametersTrainingLoaded;
         QStringList m_parametersWLoaded;
         QStringList m_parametersWInLoaded;
 
         ReservoirParameters m_reservoirParameters;
         LanguageParameters m_languageParameters;
+        ReplayParameters m_replayParameters;
 
         ModelQt m_model;
         GridSearchQt *m_gridSearch;
 
         QStringList m_corpusList;
 };
+
 
 
 #endif

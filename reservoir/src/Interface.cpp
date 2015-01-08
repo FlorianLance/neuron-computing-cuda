@@ -76,7 +76,7 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         }
 
     // init worker
-        m_pWInterface = new InterfaceWorker();
+        m_pWInterface = new InterfaceWorker(m_absolutePath);
 
     // init connections
         GridSearchQt *l_gridSearchQt = m_pWInterface->gridSearch();
@@ -93,6 +93,7 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(m_uiInterface->pbAddCorpus,            SIGNAL(clicked()), this,            SLOT(addCorpus()));
         QObject::connect(m_uiInterface->pbRemoveCorpus,         SIGNAL(clicked()), this,            SLOT(removeCorpus()));
         QObject::connect(m_uiInterface->pbSaveLastTrainingFile, SIGNAL(clicked()), this,            SLOT(saveTraining()));
+        QObject::connect(m_uiInterface->pbSaveReplay,           SIGNAL(clicked()), this,            SLOT(saveReplay()));
         QObject::connect(m_uiInterface->pbClearResults,         SIGNAL(clicked()), this,            SLOT(cleanResultsDisplay()));
         QObject::connect(m_uiInterface->pbLoadTrainingFile,     SIGNAL(clicked()), this,            SLOT(loadTraining()));
         QObject::connect(m_uiInterface->pbLoadW,                SIGNAL(clicked()), this,            SLOT(loadWMatrix()));
@@ -100,6 +101,7 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(m_uiInterface->pbOpenSelectedCorpus,   SIGNAL(clicked()), this,            SLOT(openCorpus()));
         QObject::connect(m_uiInterface->pbReloadSelectedCorpus, SIGNAL(clicked()), this,            SLOT(reloadCorpus()));
         QObject::connect(m_uiInterface->pbLoadSettings,         SIGNAL(clicked()), this,            SLOT(loadSettings()));
+        QObject::connect(m_uiInterface->pbLoadReplay,           SIGNAL(clicked()), this,            SLOT(loadReplay()));
 
         // radio button
         QObject::connect(m_uiInterface->rbTrain,    SIGNAL(clicked()), SLOT(updateReservoirParameters()));
@@ -129,10 +131,10 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(m_uiInterface->sbNbUseSpectralRadius,  SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
         QObject::connect(m_uiInterface->sbNbUseRidge,           SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
         QObject::connect(m_uiInterface->sbNbUseSparcity,        SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
-        QObject::connect(m_uiInterface->sbMaxSentencesDisplayed,SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
         QObject::connect(m_uiInterface->sbStartRangeNeuronDisplay,SIGNAL(valueChanged(int)),  SLOT(updateReservoirParameters(int)));
         QObject::connect(m_uiInterface->sbEndRangeNeuronDisplay,SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
         QObject::connect(m_uiInterface->sbNbRandomNeurons,      SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
+//        QObject::connect(m_uiInterface->sbMaxSentencesDisplayed,SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
 
         // checkbox
         QObject::connect(m_uiInterface->cbNeurons,              SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
@@ -149,10 +151,10 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(m_uiInterface->cbWIn,                  SIGNAL(stateChanged(int)), SLOT(disableTraining(int)));
         QObject::connect(m_uiInterface->cbOnlyStartValue,       SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
         QObject::connect(m_uiInterface->cbEnableGPU,            SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
-        QObject::connect(m_uiInterface->cbEnableDisplay,        SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
-        QObject::connect(m_uiInterface->cbSelectRandomNeurons,  SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
         QObject::connect(m_uiInterface->cbEnableMultiThread,    SIGNAL(toggled(bool)), l_model->reservoir(), SLOT(enableMaxOmpThreadNumber(bool)));
-        QObject::connect(m_uiInterface->cbEnableDisplay,        SIGNAL(clicked(bool)), l_model->reservoir(), SLOT(enableDisplay(bool)));
+//        QObject::connect(m_uiInterface->cbEnableDisplay,        SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
+//        QObject::connect(m_uiInterface->cbSelectRandomNeurons,  SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
+//        QObject::connect(m_uiInterface->cbEnableDisplay,        SIGNAL(clicked(bool)), l_model->reservoir(), SLOT(enableDisplay(bool)));
 
         // lineedit
         QObject::connect(m_uiInterface->leNeuronsOperation,         SIGNAL(editingFinished()), SLOT(updateReservoirParameters()));
@@ -174,9 +176,11 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(this, SIGNAL(sendReservoirParametersSignal(ReservoirParameters)),  m_pWInterface,          SLOT(updateReservoirParameters(ReservoirParameters)));
         QObject::connect(this, SIGNAL(sendLanguageParametersSignal(LanguageParameters)),    m_pWInterface,          SLOT(updateLanguageParameters(LanguageParameters)));
         QObject::connect(this, SIGNAL(saveTrainingSignal(QString)),                         m_pWInterface,          SLOT(saveLastTraining(QString)));
+        QObject::connect(this, SIGNAL(saveReplaySignal(QString)),                           m_pWInterface,          SLOT(saveLastReplay(QString)));
         QObject::connect(this, SIGNAL(loadTrainingSignal(QString)),                         m_pWInterface,          SLOT(loadTraining(QString)));
         QObject::connect(this, SIGNAL(loadWSignal(QString)),                                m_pWInterface,          SLOT(loadW(QString)));
         QObject::connect(this, SIGNAL(loadWInSignal(QString)),                              m_pWInterface,          SLOT(loadWIn(QString)));
+        QObject::connect(this, SIGNAL(loadReplaySignal(QString)),                           m_pWInterface,          SLOT(loadReplay(QString)));
 
         // gridsearch
         QObject::connect(l_gridSearchQt, SIGNAL(sendCurrentParametersSignal(ModelParametersQt)),      this, SLOT(displayCurrentParameters(ModelParametersQt)));
@@ -198,6 +202,7 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(m_pWInterface, SIGNAL(sendLogInfo(QString, QColor)),               this,                                   SLOT(displayLogInfo(QString, QColor)));
         QObject::connect(m_pWInterface, SIGNAL(displayValidityOperationSignal(bool, int)),  this,                                   SLOT(displayValidityOperation(bool, int)));
         QObject::connect(m_pWInterface, SIGNAL(endTrainingSignal(bool)),                    m_uiInterface->pbSaveLastTrainingFile,  SLOT(setEnabled(bool)));
+        QObject::connect(m_pWInterface, SIGNAL(endTrainingSignal(bool)),                    m_uiInterface->pbSaveReplay,            SLOT(setEnabled(bool)));
 
     // init widgets
         // pushbuttons
@@ -214,7 +219,8 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         // tab widgets
         m_uiInterface->twDisplay->setTabEnabled(1, false);
         // interface
-        setStyleSheet("QGroupBox { color: blue; } ");
+        setStyleSheet("QGroupBox { color: blue; } ");        
+
 
     // init thread
         m_pWInterface->moveToThread(&m_TInterface);
@@ -292,6 +298,7 @@ void Interface::removeCorpus()
     }
 }
 
+
 void Interface::saveTraining()
 {
     QString l_sPathTrainingFile = QFileDialog::getExistingDirectory(this, "Select directory", m_absolutePath + "../data/training");
@@ -304,6 +311,21 @@ void Interface::saveTraining()
     // send directory path
     emit saveTrainingSignal(l_sPathTrainingFile);
 }
+
+void Interface::saveReplay()
+{
+    QString l_sPathReplay = QFileDialog::getExistingDirectory(this, "Select directory", m_absolutePath + "../data/replay");
+
+    if(l_sPathReplay.size() == 0)
+    {
+        return;
+    }
+
+    // send directory path
+    emit saveReplaySignal(l_sPathReplay);
+}
+
+
 
 void Interface::loadTraining()
 {
@@ -402,6 +424,7 @@ void Interface::loadWMatrix()
     m_uiInterface->leW->setPalette(l_palette);
 }
 
+
 void Interface::loadWInMatrix()
 {
     QString l_sPathWInFile = QFileDialog::getExistingDirectory(this, "Select directory", m_absolutePath + "../data/input/Matrices/WIn");
@@ -447,6 +470,18 @@ void Interface::loadWInMatrix()
     }
 
     m_uiInterface->leWIn->setPalette(l_palette);
+}
+
+void Interface::loadReplay()
+{
+    QString l_pathReplay = QFileDialog::getExistingDirectory(this, "Select directory", m_absolutePath + "../data/replay");
+
+    if(l_pathReplay.size() == 0 )
+    {
+        return;
+    }
+
+//    load3D
 }
 
 void Interface::updateReservoirParameters(int value)
@@ -538,9 +573,9 @@ void Interface::updateReservoirParameters()
 
 
     // display neurons activities parameters
-        m_nbMaxNeuronsSentenceDisplayed = m_uiInterface->sbMaxSentencesDisplayed->value();
-        emit sendMatrixXDisplayParameters(m_uiInterface->cbEnableDisplay->isChecked(), m_uiInterface->cbSelectRandomNeurons->isChecked(),
-                                          m_uiInterface->sbNbRandomNeurons->value(), m_uiInterface->sbStartRangeNeuronDisplay->value(), m_uiInterface->sbEndRangeNeuronDisplay->value());
+//        m_nbMaxNeuronsSentenceDisplayed = m_uiInterface->sbMaxSentencesDisplayed->value();
+//        emit sendMatrixXDisplayParameters(m_uiInterface->cbEnableDisplay->isChecked(), m_uiInterface->cbSelectRandomNeurons->isChecked(),
+//                                          m_uiInterface->sbNbRandomNeurons->value(), m_uiInterface->sbStartRangeNeuronDisplay->value(), m_uiInterface->sbEndRangeNeuronDisplay->value());
 }
 
 void Interface::lockInterface(bool lock)
@@ -1256,8 +1291,8 @@ void Interface::disableTraining(int index)
 }
 
 
-InterfaceWorker::InterfaceWorker() : m_gridSearch(new GridSearchQt(m_model)), m_nbOfCorpus(0)
-{
+InterfaceWorker::InterfaceWorker(QString absolutePath) : m_gridSearch(new GridSearchQt(m_model)), m_nbOfCorpus(0), m_absolutePath(absolutePath)
+{    
     qRegisterMetaType<ReservoirParameters>("ReservoirParameters");
     qRegisterMetaType<LanguageParameters>("LanguageParameters");
     qRegisterMetaType<ModelParametersQt>("ModelParametersQt");
@@ -1561,6 +1596,15 @@ void InterfaceWorker::saveLastTraining(QString pathDirectory)
     }
 }
 
+void InterfaceWorker::saveLastReplay(QString pathDirectory)
+{
+    if(pathDirectory.size() > 0)
+    {
+        m_model.saveReplay(pathDirectory.toStdString());
+        sendLogInfo("Replay saved in the directory : " + pathDirectory + "\n", QColor(0,0,255));
+    }
+}
+
 void InterfaceWorker::loadTraining(QString pathDirectory)
 {
     if(pathDirectory.size() > 0)
@@ -1602,6 +1646,30 @@ void InterfaceWorker::setLoadedWInParameters(QStringList loadedParams)
 {
     m_parametersWInLoaded = loadedParams;
 }
+
+void InterfaceWorker::loadReplay(QString pathReplay)
+{
+    qDebug() <<  pathReplay;
+
+//    load3DMatrixFromNpPythonSaveText();
+//    load2DMatrixStd<float>(l_pathReplay + "/w.txt", m_wLoaded);
+}
+
+
+// TEST
+
+
+
+
+
+
+
+
+
+
+
+
+// OLD
 
 void Interface::initPlot(int nbCurves, int sizeDim1Meaning, int sizeDim2Meaning, QString name)
 {

@@ -216,6 +216,12 @@ class ModelQt : public QObject
         void saveTraining(const std::string &pathDirectory);
 
         /**
+         * @brief saveReplay
+         * @param pathDirectory
+         */
+        void saveReplay(const std::string &pathDirectory);
+
+        /**
          * @brief loadTraining
          * @param pathDirectory
          */

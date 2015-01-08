@@ -196,8 +196,7 @@ void GridSearchQt::launchTrainWithAllParameters(const std::string resultsFilePat
                                     std::cout << "########## Start the test number : " << l_currentTest++ << " / " << l_nbTrain << std::endl << std::endl;                                    
 
                                     if(m_model->launchTests())
-                                    {
-                                        m_model->retrieveTestsSentences();
+                                    {                                        
                                         m_model->displayResults(false,true);
                                     }
                                 }

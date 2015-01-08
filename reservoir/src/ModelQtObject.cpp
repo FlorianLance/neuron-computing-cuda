@@ -427,10 +427,15 @@ void ModelQt::computeResultsData(cbool trainResults, const std::string &pathSave
 }
 
 void ModelQt::saveTraining(const std::string &pathDirectory)
-{
+{    
     m_reservoir->saveTraining(pathDirectory);
 }
 
+void ModelQt::saveReplay(const std::string &pathDirectory)
+{
+    save3DMatrixToText(QString::fromStdString(pathDirectory) + "/xTot.txt", m_internalStatesTrain);
+//    saveTraining(pathDirectory);
+}
 
 void ModelQt::loadTraining(const std::string &pathDirectory)
 {
@@ -623,6 +628,11 @@ bool ModelQt::launchTests(const std::string &corpusTestFilePath)
         sendLogInfo(QString::fromStdString(displayTime("Start reservoir testing ", l_testTime, false, m_verbose)), QColor(Qt::black));
             m_reservoir->test(l_3DMatStimMeanTest, m_3DMatSentencesOutputTest, l_internalStatesTest);
         sendLogInfo(QString::fromStdString(displayTime("End reservoir testing ", l_testTime, true, m_verbose)), QColor(Qt::black));
+
+        retrieveTestsSentences();
+
+    // send output matrix for displaying CCW in the interface
+        emit sendOutputMatrix(m_3DMatSentencesOutputTest, m_recoveredSentencesTest);
 
     return true;
 }
