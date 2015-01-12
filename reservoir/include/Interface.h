@@ -33,8 +33,17 @@ class InterfaceWorker;
 
 
 struct ReplayParameters
-{
+{    
+    bool m_randomNeurons;
+    bool m_randomSentence;
 
+    int m_rangeNeuronsStart;
+    int m_rangeNeuronsEnd;
+    int m_randomNeuronsNumber;
+
+    int m_rangeSentencesStart;
+    int m_rangeSentencesEnd;
+    int m_randomSentencesNumber;
 };
 
 struct LanguageParameters
@@ -191,6 +200,17 @@ class Interface : public QMainWindow
         void updateReservoirParameters(QString value);
 
         /**
+         * @brief updateReplayParameters
+         */
+        void updateReplayParameters();
+
+        /**
+         * @brief updateReplayParameters
+         * @param value
+         */
+        void updateReplayParameters(int value);
+
+        /**
          * @brief lockInterface
          * @param lock
          */
@@ -307,6 +327,16 @@ class Interface : public QMainWindow
          */
         void disableTraining(int index);
 
+        /**
+         * @brief resetLoadingBar
+         */
+        void resetLoadingBar();
+
+        /**
+         * @brief replayLoaded
+         */
+        void replayLoaded();
+
     signals:
 
         /**
@@ -360,10 +390,14 @@ class Interface : public QMainWindow
         void sendLanguageParametersSignal(LanguageParameters);
 
         /**
+         * @brief sendReplayParametersSignal
+         */
+        void sendReplayParametersSignal(ReplayParameters);
+
+        /**
          * @brief leaveProgram
          */
         void leaveProgram();
-
 
         /**
          * @brief sendMatrixXDisplayParameters
@@ -474,6 +508,12 @@ class InterfaceWorker : public QObject
         void updateLanguageParameters(LanguageParameters newParams);
 
         /**
+         * @brief updateReplayParameters
+         * @param newParams
+         */
+        void updateReplayParameters(ReplayParameters newParams);
+
+        /**
          * @brief start
          */
         void start();
@@ -539,6 +579,11 @@ class InterfaceWorker : public QObject
          */
         void loadReplay(QString pathReplay);
 
+        /**
+         * @brief startReplay
+         */
+        void startReplay();
+
     signals:
 
         /**
@@ -562,7 +607,14 @@ class InterfaceWorker : public QObject
          */
         void sendLogInfo(QString, QColor);
 
+        /**
+         * @brief replayLoaded
+         */
+        void replayLoaded();
+
     private :
+
+        cv::Mat m_xTot;
 
         int m_nbOfCorpus;
 

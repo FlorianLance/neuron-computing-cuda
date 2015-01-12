@@ -671,13 +671,13 @@ static void save3DMatrixToText(const QString &pathFile, const cv::Mat &mat3D)
     if(l_file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
         QTextStream out(&l_file);
-        out << mat3D.size[0] << " " << mat3D.size[1] << " " << mat3D.size[2] << "\n";
+        out << "# " << mat3D.size[0] << " " << mat3D.size[1] << " " << mat3D.size[2] << "\n";
 
         if(l_32b)
         {
             for(int ii = 0; ii < mat3D.size[0]; ++ii)
             {
-                out << "New slice : \n";
+                out << "# " << ii <<  "\n";
                 for(int jj = 0; jj < mat3D.size[1]; ++jj)
                 {
                     for(int kk = 0; kk < mat3D.size[2]; ++kk)
@@ -864,12 +864,14 @@ static void load3DMatrixFromNpPythonSaveText(const QString &pathFile, cv::Mat &m
 }
 
 
+
+
 /**
  * @brief load3DMatrixFromNpPythonSaveText
  * @param pathFile
  * @param mat3D
  */
-static void load3DMatrixFromNpPythonSaveTextF(const QString &pathFile, cv::Mat &mat3D)
+static bool load3DMatrixFromNpPythonSaveTextF(const QString &pathFile, cv::Mat &mat3D)
 {
     QFile l_file(pathFile);
 
@@ -933,10 +935,12 @@ static void load3DMatrixFromNpPythonSaveTextF(const QString &pathFile, cv::Mat &
             ++jj;
             kk = 0;
         }
+        return true;
     }
     else
     {
         std::cerr << "Can not open python 3D file. " << std::endl;
+        return false;
     }
 }
 

@@ -1,5 +1,5 @@
 
-if(chdir "./dist/doc/SWoOZ/html")
+if(chdir "./dist/doc/Reservoir-cuda/html")
 {
     system("index.html");
     1;
