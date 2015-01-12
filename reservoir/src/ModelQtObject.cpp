@@ -434,7 +434,6 @@ void ModelQt::saveTraining(const std::string &pathDirectory)
 void ModelQt::saveReplay(const std::string &pathDirectory)
 {
     save3DMatrixToText(QString::fromStdString(pathDirectory) + "/xTot.txt", m_internalStatesTrain);
-//    saveTraining(pathDirectory);
 }
 
 void ModelQt::loadTraining(const std::string &pathDirectory)

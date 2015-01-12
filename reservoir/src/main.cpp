@@ -10,9 +10,12 @@ int main(int argc, char* argv[])
     srand(1);
     culaWarmup(1);
 
+    convertCorpus("../data/input/Corpus/old_format/26.txt", "../data/input/Corpus/26.txt");
+    convertCorpus("../data/input/Corpus/old_format/354.txt", "../data/input/Corpus/354.txt");
 
     // ############################################## GENERALISATION 1
 
+    /*
         ModelParameters l_parameters;
         l_parameters.m_ridge = 1e-5;
         l_parameters.m_corpusFilePath = "../data/input/Corpus/120.txt";
@@ -123,6 +126,9 @@ int main(int argc, char* argv[])
 
         culaStop();
         return 0;
+
+
+        */
 
     // ############################################## GENERALISATION 2
 

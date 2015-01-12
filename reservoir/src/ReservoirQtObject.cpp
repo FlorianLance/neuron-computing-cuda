@@ -190,218 +190,139 @@ void ReservoirQt::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher
 
     float l_invLeakRate = 1.f - m_leakRate;
 
-    // mutex for openmp threads
-//        QMutex l_lockerMainThread;
 
-    // retrieve infos for displaying neurons activities
-//        bool l_displayEnabled   = m_displayEnabled;
-//        bool l_randomNeurons   = m_randomNeurons;
-//        int l_nbRandomNeurons   = m_nbRandomNeurons;
-//        int l_startIdNeurons    = m_startIdNeurons;
-//        int l_endIdNeurons      = m_endIdNeurons;
-//        if(l_endIdNeurons > m_nbNeurons)
-//        {
-//            l_endIdNeurons = m_nbNeurons;
-//        }
+    #pragma omp parallel for num_threads(m_numThread)
+        for(int ii = 0; ii < meaningInputTrain.size[0]; ++ii)
+        {
+            cv::Mat l_X = l_X2Copy.clone();
+            cv::Mat l_xPrev, l_x;
+            cv::Mat l_subMean(meaningInputTrain.size[1], meaningInputTrain.size[2], CV_32FC1, meaningInputTrain.data + meaningInputTrain.step[0] *ii);
 
-    // create id of the neurons activities to be displayed
-//        QVector<int> l_idNeurons;
-//        if(l_randomNeurons)
-//        {
-//            while(l_idNeurons.size() < l_nbRandomNeurons)
-//            {
-//                bool l_addId = true;
-//                int l_idNeuron = rand()%m_nbNeurons;
-
-//                for(int ii = 0; ii < l_idNeurons.size(); ++ii)
-//                {
-//                    if(l_idNeuron == l_idNeurons[ii])
-//                    {
-//                        l_addId = false;
-//                        break;
-//                    }
-//                }
-
-//                if(l_addId)
-//                {
-//                    l_idNeurons << l_idNeuron;
-//                }
-//            }
-//        }
-//        else
-//        {
-//            if(l_endIdNeurons < l_startIdNeurons)
-//            {
-//                l_endIdNeurons = l_startIdNeurons;
-//            }
-
-//            for(int ii = l_startIdNeurons; ii <= l_endIdNeurons; ++ii)
-//            {
-//                l_idNeurons << ii;
-//            }
-//        }
-
-
-    // info for generating the real time plot
-//        emit sendInfoPlot(l_idNeurons.size(), meaningInputTrain.size[0], meaningInputTrain.size[1], QString("train"));
-
-        #pragma omp parallel for num_threads(m_numThread)
-            for(int ii = 0; ii < meaningInputTrain.size[0]; ++ii)
+            for(int jj = 0; jj < meaningInputTrain.size[1]; ++jj)
             {
-                cv::Mat l_X = l_X2Copy.clone();
-                cv::Mat l_xPrev, l_x;
-                cv::Mat l_subMean(meaningInputTrain.size[1], meaningInputTrain.size[2], CV_32FC1, meaningInputTrain.data + meaningInputTrain.step[0] *ii);
-
-                for(int jj = 0; jj < meaningInputTrain.size[1]; ++jj)
+                // X will contain all the internal states of the reservoir for all timesteps
+                if(jj == 0)
                 {
-                    // X will contain all the internal states of the reservoir for all timesteps
-                    if(jj == 0)
+                    l_xPrev = l_xPrev2Copy;
+                }
+                else
+                {
+                    l_xPrev = l_x;
+                }
+
+                cv::Mat l_u = l_subMean.row(jj);
+                cv::Mat l_temp(l_subMean.cols+1, 1, CV_32FC1);
+                l_temp.at<float>(0) = 1.f;
+
+                for(int kk = 0; kk < l_subMean.cols; ++kk)
+                {
+                    l_temp.at<float>(kk+1) = l_u.at<float>(kk);
+                }
+
+                cv::Mat l_xTemp = (m_wIn * l_temp)+ (m_w * l_xPrev);
+
+                cv::MatIterator_<float> it = l_xTemp.begin<float>(), it_end = l_xTemp.end<float>();
+                for(;it != it_end; ++it)
+                {
+                    (*it) = tanh(*it);
+                }
+
+                l_x = (l_xPrev * l_invLeakRate) + (l_xTemp * m_leakRate);
+
+
+                cv::Mat display(l_X.rows, l_X.cols, CV_8UC3);
+                for(int oo = 0; oo < display.rows * display.cols; ++oo)
+                {
+                    float l_val = l_X.at<float>(oo);
+                    if(l_val < 0)
                     {
-                        l_xPrev = l_xPrev2Copy;
+                        int l_val2 = static_cast<int>(255*l_val);
+                        if(l_val2 > 255)
+                        {
+                            l_val = 255;
+                        }
+
+                        display.at<cv::Vec3b>(oo) = cv::Vec3b(l_val2,0,122);
                     }
                     else
                     {
-                        l_xPrev = l_x;
-                    }
-
-                    cv::Mat l_u = l_subMean.row(jj);
-                    cv::Mat l_temp(l_subMean.cols+1, 1, CV_32FC1);
-                    l_temp.at<float>(0) = 1.f;
-
-                    for(int kk = 0; kk < l_subMean.cols; ++kk)
-                    {
-                        l_temp.at<float>(kk+1) = l_u.at<float>(kk);
-                    }
-
-                    cv::Mat l_xTemp = (m_wIn * l_temp)+ (m_w * l_xPrev);
-
-                    cv::MatIterator_<float> it = l_xTemp.begin<float>(), it_end = l_xTemp.end<float>();
-                    for(;it != it_end; ++it)
-                    {
-                        (*it) = tanh(*it);
-                    }
-
-                    l_x = (l_xPrev * l_invLeakRate) + (l_xTemp * m_leakRate);
-
-
-                    cv::Mat display(l_X.rows, l_X.cols, CV_8UC3);
-                    for(int oo = 0; oo < display.rows * display.cols; ++oo)
-                    {
-                        float l_val = l_X.at<float>(oo);
-                        if(l_val < 0)
+                        int l_val2 =  -static_cast<int>(255*l_val);
+                        if(l_val2 > 255)
                         {
-                            int l_val2 = static_cast<int>(255*l_val);
-                            if(l_val2 > 255)
-                            {
-                                l_val = 255;
-                            }
-
-                            display.at<cv::Vec3b>(oo) = cv::Vec3b(l_val2,0,122);
+                            l_val = 255;
                         }
-                        else
-                        {
-                            int l_val2 =  -static_cast<int>(255*l_val);
-                            if(l_val2 > 255)
-                            {
-                                l_val = 255;
-                            }
-                            display.at<cv::Vec3b>(oo) = cv::Vec3b(0,l_val2,122);
-                        }
+                        display.at<cv::Vec3b>(oo) = cv::Vec3b(0,l_val2,122);
                     }
-
-                    cv::Mat l_temp2(l_temp.rows + l_x.rows, 1, CV_32FC1);
-
-                    for(int kk = 0; kk < l_temp.rows + l_x.rows; ++kk)
-                    {
-                        if(kk < l_temp.rows)
-                        {
-                            l_temp2.at<float>(kk) = l_temp.at<float>(kk);
-                        }
-                        else
-                        {
-                            l_temp2.at<float>(kk) = l_x.at<float>(kk - l_temp.rows);
-                        }
-                    }
-
-                    l_temp2.copyTo( l_X.col(jj));
                 }
 
-                for(int jj = 0; jj < l_X.rows; ++jj)
+                cv::Mat l_temp2(l_temp.rows + l_x.rows, 1, CV_32FC1);
+
+                for(int kk = 0; kk < l_temp.rows + l_x.rows; ++kk)
                 {
-                    for(int kk = 0; kk < l_X.cols; ++kk)
+                    if(kk < l_temp.rows)
                     {
-                        xTot.at<float>(ii,jj,kk) = l_X.at<float>(jj,kk);
+                        l_temp2.at<float>(kk) = l_temp.at<float>(kk);
+                    }
+                    else
+                    {
+                        l_temp2.at<float>(kk) = l_x.at<float>(kk - l_temp.rows);
                     }
                 }
 
-                emit sendComputingState(++l_steps, meaningInputTrain.size[0]*2, QString("Build X"));
-
-                // send neurons activities to be displayed
-//                l_lockerMainThread.lock();
-
-//                if(l_displayEnabled)
-//                {
-//                    QVector<QVector<double> > *l_values = new QVector<QVector<double> >;
-
-//                    for(int jj = 0; jj < l_idNeurons.size(); ++jj)
-//                    {
-//                        QVector<double> l_line;
-
-//                        int l_idNeuron = l_idNeurons[jj] + 1 + meaningInputTrain.size[2];
-
-//                        for(int kk = 0; kk < l_X.cols; ++kk)
-//                        {
-//                            l_line << static_cast<double>(l_X.at<float>(l_idNeuron,kk));
-//                        }
-
-//                        (*l_values) << l_line;
-//                    }
-
-//                    emit sendXMatriceData(l_values, ii, meaningInputTrain.size[0]);
-//                }
-//                l_lockerMainThread.unlock();
+                l_temp2.copyTo( l_X.col(jj));
             }
-        // end pragma
 
-        // clean inused matrices
-            l_X2Copy.release();
-            l_xPrev2Copy.release();
-
-        emit sendLogInfo(QString::fromStdString(displayTime("END : sub train ", m_oTime, false, m_verbose)), QColor(Qt::black));
-
-        emit sendComputingState(50, 100, QString("Tychonov-start"));
-        tikhonovRegularization(xTot, teacher, meaningInputTrain.size[2]);
-        emit sendComputingState(95, 100, QString("Tychonov-end"));
-
-        sentencesOutputTrain = teacher.clone();
-        sentencesOutputTrain.setTo(0.f);
-
-
-        #pragma omp parallel for
-            for(int ii = 0; ii < xTot.size[0]; ++ii)
+            for(int jj = 0; jj < l_X.rows; ++jj)
             {
-                cv::Mat l_X = cv::Mat::zeros(xTot.size[1], xTot.size[2], CV_32FC1);
-
-                for(int jj = 0; jj < l_X.rows; ++jj)
+                for(int kk = 0; kk < l_X.cols; ++kk)
                 {
-                    for(int kk = 0; kk < l_X.cols; ++kk)
-                    {
-                        l_X.at<float>(jj,kk) = xTot.at<float>(ii,jj,kk);
-                    }
-                }
-
-                cv::Mat res;
-
-                res = (m_wOut * l_X).t();
-
-                for(int jj = 0; jj < sentencesOutputTrain.size[1]; ++jj)
-                {
-                    for(int kk = 0; kk < sentencesOutputTrain.size[2]; ++kk)
-                    {
-                        sentencesOutputTrain.at<float>(ii,jj,kk) = res.at<float>(jj,kk);
-                    }
+                    xTot.at<float>(ii,jj,kk) = l_X.at<float>(jj,kk);
                 }
             }
+
+            emit sendComputingState(++l_steps, meaningInputTrain.size[0]*2, QString("Build X"));
+        }
+    // end pragma
+
+    // clean inused matrices
+        l_X2Copy.release();
+        l_xPrev2Copy.release();
+
+    emit sendLogInfo(QString::fromStdString(displayTime("END : sub train ", m_oTime, false, m_verbose)), QColor(Qt::black));
+
+    emit sendComputingState(50, 100, QString("Tychonov-start"));
+    tikhonovRegularization(xTot, teacher, meaningInputTrain.size[2]);
+    emit sendComputingState(95, 100, QString("Tychonov-end"));
+
+    sentencesOutputTrain = teacher.clone();
+    sentencesOutputTrain.setTo(0.f);
+
+
+    #pragma omp parallel for
+        for(int ii = 0; ii < xTot.size[0]; ++ii)
+        {
+            cv::Mat l_X = cv::Mat::zeros(xTot.size[1], xTot.size[2], CV_32FC1);
+
+            for(int jj = 0; jj < l_X.rows; ++jj)
+            {
+                for(int kk = 0; kk < l_X.cols; ++kk)
+                {
+                    l_X.at<float>(jj,kk) = xTot.at<float>(ii,jj,kk);
+                }
+            }
+
+            cv::Mat res;
+
+            res = (m_wOut * l_X).t();
+
+            for(int jj = 0; jj < sentencesOutputTrain.size[1]; ++jj)
+            {
+                for(int kk = 0; kk < sentencesOutputTrain.size[2]; ++kk)
+                {
+                    sentencesOutputTrain.at<float>(ii,jj,kk) = res.at<float>(jj,kk);
+                }
+            }
+        }
         // end pragma
 
 //    cv::Mat *l_outputClone = new cv::Mat; // TODO :

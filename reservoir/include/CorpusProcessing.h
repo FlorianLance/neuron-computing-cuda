@@ -901,15 +901,18 @@ static void convertLineCorpusInfo(const QStringList &data, const QStringList &in
 /**
  * @brief Convert an old formatted PAOR corpus to the new PAOR encoding.
  */
-static void convertCorpus()
+static void convertCorpus(QString pathCorpusOldFormat, QString pathCorpusNewFormat)
 {
     QVector<QStringList> trainData, infoTrain, trainMeaning;
-    extractAllDataFromCorpusFile(QString("../data/input/Corpus/old/Corpus_formatted_PAOR/corpus_462_proper.txt"), trainData, infoTrain, trainMeaning);
+    extractAllDataFromCorpusFile(pathCorpusOldFormat, trainData, infoTrain, trainMeaning);
 
-    QFile l_file("../data/input/Corpus/462__.txt");
+
+    QFile l_file(pathCorpusNewFormat);
     if(l_file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
         QTextStream out(&l_file);
+
+        out << "<train data>\n";
 
         for(int ii = 0; ii < trainData.size(); ++ii)
         {
@@ -918,6 +921,8 @@ static void convertCorpus()
 
             out << l_line << "\n";
         }
+
+        out << "</train data>\n<test data>\n</test data>";
     }
 }
 

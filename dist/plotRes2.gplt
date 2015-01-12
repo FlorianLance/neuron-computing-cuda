@@ -14,6 +14,7 @@ set style line 9 lc rgb '#ffff00' lt 1 lw 2 pt 78 ps 1.1   #
 
 # define display macros
 display1 = 'set pm3d; set view map; unset contour; unset grid; set dgrid3d;set key outside; unset surface'
+# display1 = 'set pm3d; set view map; unset contour; unset grid; set dgrid3d;set key outside; unset surface'
 display2 = 'set pm3d; set view 49, 28, 1, 1.48 ; set contour; set grid; set dgrid3d;set key outside; set surface; set hidden3d'
 
 # define labels
@@ -147,29 +148,61 @@ unset multiplot
 f(x)=a*x+b  #The fit functions
 g(x)=c*x+d
 
-display1 = 'set pm3d; set view map; unset contour; unset grid; set dgrid3d;set key outside; unset surface'
+display1 = 'set pm3d; set view map;unset contour; unset grid;set key outside; unset surface'
+set dgrid3d 11,11
+#display1 = 'set pm3d; set view map; unset contour; unset grid; set dgrid3d;set key outside; unset surface'
 display2 = 'set pm3d; set view 49, 28, 1, 1.48 ; set contour; set grid; set dgrid3d;set key outside; set surface; set hidden3d'
 
 
 
-title_10 = "CC"
-file =  "../dist/data/Results/interfacetest_raw.txt"
-set output "../dist/data/Results/grid_search_2.png"
-set terminal png size 1000,1000
-set multiplot layout 1,1 title "Reservoir Grid-search leak rate / input scaling"
+title_10 = "CCW absolute"
+title_11 = "ALL words absolute"
+file =  "../dist/data/Results/raw/res_12_01_2015_10h33m23s.txt"
+set output "../dist/data/Results/plot/leakrate_iss.png"
+set terminal png size 2500,3000
+set multiplot layout 3,2 title "Reservoir Grid-search leak rate / input scaling / spectral radius"
 
 set xlabel "leak rate"
 set ylabel "input scaling"
+
+
+set yrange [-0.1:1.1]
+set ytics 0,0.1,1;
+set xtics 0,0.1,1;
+set xrange [-0.1:1.1]
+set cbrange [0:100]
+
+
 set zlabel "ALL WORDS performance"
 set ztics 0,10,100
-set zrange [0:100]
+set zrange [-10:110]
 
 eval(display1)
-#splot file u @spectral_radius_id:@leakrate_id:@res3_id t title_10
-#splot file u @spectral_radius_id:@input_scaling_id:@res3_id t title_10
-splot file u @leakrate_id:@input_scaling_id:@res3_id t title_10
+#set palette defined (0 "blue", 33 "white", 66 "orange", 100 "red")
+set palette rgbformulae 22,13,-31
+
+splot file u @leakrate_id:@input_scaling_id:@res1_id t title_10
+splot file u @leakrate_id:@input_scaling_id:@res3_id t title_11
 
 
+file =  "../dist/data/Results/raw/res_12_01_2015_11h29m54s.txt"
+
+set ylabel "spectral radius"
+set yrange [-1:51]
+set ytics 0,5,50;
+
+splot file u @leakrate_id:@spectral_radius_id:@res1_id t title_10
+splot file u @leakrate_id:@spectral_radius_id:@res3_id t title_11
+
+
+file =  "../dist/data/Results/raw/res_12_01_2015_12h1m32s.txt"
+
+set xlabel "input scaling"
+set yrange [-1:11]
+set ytics 0,1,10;
+
+splot file u @input_scaling_id:@spectral_radius_id:@res1_id t title_10
+splot file u @input_scaling_id:@spectral_radius_id:@res3_id t title_11
 
 unset multiplot
 #eval(neuron_leakrate_res2)
