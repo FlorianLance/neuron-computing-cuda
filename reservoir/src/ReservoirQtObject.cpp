@@ -588,6 +588,7 @@ void ReservoirQt::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTe
     else
     {
         emit sendComputingState(60, 100, QString("Tikhonov-3"));
+
         cv::invert(l_mat2inv, invCV, cv::DECOMP_SVD);
         l_mat2inv.release();
 

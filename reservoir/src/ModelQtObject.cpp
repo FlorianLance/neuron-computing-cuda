@@ -456,6 +456,11 @@ ReservoirQt *ModelQt::reservoir()
     return m_reservoir;
 }
 
+cv::Mat *ModelQt::xTotMatrice()
+{
+    return &m_internalStatesTrain;
+}
+
 void ModelQt::launchTraining()
 {
     // init time
@@ -522,7 +527,7 @@ void ModelQt::launchTraining()
         convQt2DString2Std2DString(l_trainSentence, m_trainSentence);
 
     // send train input matrices to be displayed
-        sendTrainInputMatrix(l_3DMatStimMeanTrain,l_3DMatStimSentTrain,m_trainSentence);
+        sendTrainInputMatrixSignal(l_3DMatStimMeanTrain,l_3DMatStimSentTrain,m_trainSentence);
 
     // train reservoir        
         sendLogInfo(QString::fromStdString(displayTime("Start reservoir training ", l_trainingTime, false, m_verbose)), QColor(Qt::black));

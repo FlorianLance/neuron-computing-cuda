@@ -1,6 +1,6 @@
 
 
-#include "GridSearch.h"
+#include "GridSearchQtObject.h"
 #include "Generalization.h"
 
 #include "gpuMat/cudaMultiplications.h"
@@ -10,8 +10,8 @@ int main(int argc, char* argv[])
     srand(1);
     culaWarmup(1);
 
-    convertCorpus("../data/input/Corpus/old_format/26.txt", "../data/input/Corpus/26.txt");
-    convertCorpus("../data/input/Corpus/old_format/354.txt", "../data/input/Corpus/354.txt");
+//    convertCorpus("../data/input/Corpus/old_format/26.txt", "../data/input/Corpus/26.txt");
+//    convertCorpus("../data/input/Corpus/old_format/354.txt", "../data/input/Corpus/354.txt");
 
     // ############################################## GENERALISATION 1
 

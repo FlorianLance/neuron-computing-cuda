@@ -160,7 +160,7 @@ title_11 = "ALL words absolute"
 file =  "../dist/data/Results/raw/res_12_01_2015_10h33m23s.txt"
 set output "../dist/data/Results/plot/leakrate_iss.png"
 set terminal png size 2500,3000
-set multiplot layout 3,2 title "Reservoir Grid-search leak rate / input scaling / spectral radius"
+set multiplot layout 3,2 title "Reservoir Grid-search leak rate / input scaling / spectral radius - corpus 10 / 500 N"
 
 set xlabel "leak rate"
 set ylabel "input scaling"
@@ -195,7 +195,7 @@ splot file u @leakrate_id:@spectral_radius_id:@res1_id t title_10
 splot file u @leakrate_id:@spectral_radius_id:@res3_id t title_11
 
 
-file =  "../dist/data/Results/raw/res_12_01_2015_12h1m32s.txt"
+file =  "../dist/data/Results/raw/res_13_01_2015_9h41m16s.txt"
 
 set xlabel "input scaling"
 set yrange [-1:11]

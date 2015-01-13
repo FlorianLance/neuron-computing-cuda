@@ -9,7 +9,7 @@
 #ifndef GENERALIZATION_H
 #define GENERALIZATION_H
 
-#include <Model.h>
+#include <ModelQtObject.h>
 
 /**
  * @brief The Generalization class
@@ -26,7 +26,7 @@ class Generalization
          * @brief Generalization constructor.
          * @param [in] model : model to be used for the generation.
          */
-        Generalization(Model &model);
+        Generalization(ModelQt &model);
 
 
         /**
@@ -88,7 +88,7 @@ class Generalization
 
     private :
 
-        Model *m_model;  /**< pointer to the model */
+        ModelQt *m_model;  /**< pointer to the model */
 
         QVector<QStringList> m_trainMeaning,m_trainInfo,m_trainSentence;
 };

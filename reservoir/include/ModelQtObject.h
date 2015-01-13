@@ -245,6 +245,12 @@ class ModelQt : public QObject
          */
         ReservoirQt *reservoir();
 
+        /**
+         * @brief xTotMatrice
+         * @return
+         */
+        cv::Mat *xTotMatrice();
+
 
         Sentences m_recoveredSentencesTrain;    /**< ... */
         Sentences m_recoveredSentencesTest;     /**< ... */
@@ -254,9 +260,9 @@ class ModelQt : public QObject
     signals :
 
         /**
-         * @brief sendTrainInputMatrix
+         * @brief sendTrainInputMatrixSignal
          */
-        void sendTrainInputMatrix(cv::Mat, cv::Mat, Sentences);
+        void sendTrainInputMatrixSignal(cv::Mat, cv::Mat, Sentences);
 
         /**
          * @brief sendLogInfo

@@ -10,7 +10,7 @@
 
 
 
-Generalization::Generalization(Model &model) : m_model(&model)
+Generalization::Generalization(ModelQt &model) : m_model(&model)
 {}
 
 
@@ -252,7 +252,7 @@ void Generalization::startXVerification(const std::string &xCheckTrainPath, cons
     QVector<QStringList> l_inused;
     extractAllDataFromCorpusFile(m_model->parameters().m_corpusFilePath.c_str(), m_trainMeaning,m_trainInfo,m_trainSentence, l_inused,l_inused,l_inused);
 
-    ModelParameters l_currentParameters  = m_model->parameters();
+    ModelParametersQt l_currentParameters  = m_model->parameters();
     l_currentParameters.m_corpusFilePath = "../data/input/Corpus/XCheck.txt";
 
     l_currentParameters.display();    
@@ -314,7 +314,7 @@ void Generalization::startXVerification(const std::string &xCheckTrainPath, cons
             m_model->launchTraining();
 
             double l_time = static_cast<double>((clock() - l_timeTraining)) / CLOCKS_PER_SEC;
-            m_model->retrieveTrainSentences();
+//            m_model->retrieveTrainSentences();
 
 
             std::vector<double> l_diffSizeOCW, l_absoluteCorrectPositionAndWordCCW, l_correctPositionAndWordCCW, l_absoluteCorrectPositionAndWordAll, l_correctPositionAndWordAll;

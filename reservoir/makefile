@@ -19,7 +19,7 @@ LINK=link
 ############################################################################## OBJ LISTS
 
 RESERVOIR_OBJ=\
-    $(LIBDIR)/Reservoir.obj $(LIBDIR)/Model.obj $(LIBDIR)/inversions.obj $(LIBDIR)/multiplications.obj $(LIBDIR)/GridSearch.obj $(LIBDIR)/Generalization.obj $(LIBDIR)/main.obj\
+    $(LIBDIR)/Generalization.obj $(LIBDIR)/ReservoirQtObject.obj $(LIBDIR)/ModelQtObject.obj $(LIBDIR)/inversions.obj $(LIBDIR)/multiplications.obj $(LIBDIR)/GridSearchQtObject.obj $(LIBDIR)/main.obj\
 
 RESERVOIR_RFMODULE=\
     $(RESERVOIR_OBJ)
@@ -29,13 +29,13 @@ RESERVOIR_COMMAND=\
 
 RESERVOIR_QT_INTERFACE_OBJ=\
     $(LIBDIR)/ReservoirQtObject.obj $(LIBDIR)/ModelQtObject.obj $(LIBDIR)/inversions.obj $(LIBDIR)/multiplications.obj\
-    $(LIBDIR)/qcustomplot.obj $(LIBDIR)/GridSearchQtObject.obj $(LIBDIR)/DisplayImageWidget.obj $(LIBDIR)/Interface.obj\
+    $(LIBDIR)/qcustomplot.obj $(LIBDIR)/GridSearchQtObject.obj $(LIBDIR)/Interface.obj $(LIBDIR)/InterfaceWorker.obj\
 
 ############################################################################## MOC LIST
 
 RESERVOIR_MOC=\
-    $(MOCDIR)/moc_Interface.cpp $(MOCDIR)/moc_ReservoirQtObject.cpp $(MOCDIR)/moc_ModelQtObject.cpp $(MOCDIR)/moc_GridSearchQtObject.cpp\
-    $(MOCDIR)/moc_DisplayImageWidget.cpp $(MOCDIR)/moc_qcustomplot.cpp\
+    $(MOCDIR)/moc_Interface.cpp $(MOCDIR)/moc_InterfaceWorker.cpp $(MOCDIR)/moc_ReservoirQtObject.cpp $(MOCDIR)/moc_ModelQtObject.cpp $(MOCDIR)/moc_GridSearchQtObject.cpp\
+    $(MOCDIR)/moc_qcustomplot.cpp\
 
 ############################################################################## Makefile commands
 
@@ -67,20 +67,11 @@ $(BINDIR)/reservoir-x64.exe: $(RESERVOIR_COMMAND) $(LIBS_RESERVOIR)
 
 ##################################################### sources files
 
-$(LIBDIR)/Reservoir.obj: ./src/Reservoir.cpp
-        $(CC) -c ./src/Reservoir.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/Reservoir.obj"
-
 $(LIBDIR)/ReservoirQtObject.obj: ./src/ReservoirQtObject.cpp
         $(CC) -c ./src/ReservoirQtObject.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/ReservoirQtObject.obj"
 
-$(LIBDIR)/Model.obj: ./src/Model.cpp
-        $(CC) -c ./src/Model.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/Model.obj"
-
 $(LIBDIR)/ModelQtObject.obj: ./src/ModelQtObject.cpp
         $(CC) -c ./src/ModelQtObject.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/ModelQtObject.obj"
-
-$(LIBDIR)/GridSearch.obj: ./src/GridSearch.cpp
-        $(CC) -c ./src/GridSearch.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/GridSearch.obj"
 
 $(LIBDIR)/GridSearchQtObject.obj: ./src/GridSearchQtObject.cpp
         $(CC) -c ./src/GridSearchQtObject.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/GridSearchQtObject.obj"
@@ -94,11 +85,8 @@ $(LIBDIR)/main.obj: ./src/main.cpp
 $(LIBDIR)/Interface.obj: ./src/Interface.cpp
         $(CC) -c ./src/Interface.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/Interface.obj"
 
-$(LIBDIR)/DisplayImageWidget.obj: ./src/DisplayImageWidget.cpp
-        $(CC) -c ./src/DisplayImageWidget.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/DisplayImageWidget.obj"
-
-$(LIBDIR)/DisplayCurvesWidget.obj: ./src/DisplayCurvesWidget.cpp
-        $(CC) -c ./src/DisplayCurvesWidget.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/DisplayCurvesWidget.obj"
+$(LIBDIR)/InterfaceWorker.obj: ./src/InterfaceWorker.cpp
+        $(CC) -c ./src/InterfaceWorker.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/InterfaceWorker.obj"
 
 $(LIBDIR)/qcustomplot.obj: ./src/qcustomplot.cpp
         $(CC) -c ./src/qcustomplot.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/qcustomplot.obj"
@@ -114,6 +102,9 @@ $(QTGENW)/UI_Interface.h: $(FORMDIR)/interfaceReservoir.ui
 $(MOCDIR)/moc_Interface.cpp: ./include/Interface.h
          moc  ./include/Interface.h -o $@
 
+$(MOCDIR)/moc_InterfaceWorker.cpp: ./include/InterfaceWorker.h
+         moc  ./include/InterfaceWorker.h -o $@
+
 $(MOCDIR)/moc_ReservoirQtObject.cpp: ./include/ReservoirQtObject.h
          moc  ./include/ReservoirQtObject.h -o $@
 
@@ -122,9 +113,6 @@ $(MOCDIR)/moc_ModelQtObject.cpp: ./include/ModelQtObject.h
 
 $(MOCDIR)/moc_GridSearchQtObject.cpp: ./include/GridSearchQtObject.h
          moc  ./include/GridSearchQtObject.h -o $@
-
-$(MOCDIR)/moc_DisplayImageWidget.cpp: ./include/DisplayImageWidget.h
-         moc  ./include/DisplayImageWidget.h -o $@
 
 $(MOCDIR)/moc_qcustomplot.cpp: ./include/qcustomplot.h
          moc  ./include/qcustomplot.h -o $@

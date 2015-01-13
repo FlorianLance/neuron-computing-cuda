@@ -2,16 +2,13 @@
 
 /**
  * \file Interface.cpp
- * \brief Defines SWViewerInterface
+ * \brief Defines Interface
  * \author Florian Lance
  * \date 01/12/14
  */
 
 #include "Interface.h"
 #include "../moc/moc_Interface.cpp"
-
-#include <QDateTime>
-#include <QCheckBox>
 
 #include <time.h>
 
@@ -23,14 +20,14 @@ int main(int argc, char* argv[])
 
     QApplication l_oApp(argc, argv);
     Interface l_oViewerInterface(&l_oApp);
-    l_oViewerInterface.move(50,50);
+    l_oViewerInterface.move(0,0);
     l_oViewerInterface.show();
 
     return l_oApp.exec();
 }
 
 
-Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
+Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir), m_replayLoaded(false)
 {    
     // set absolute path
         m_absolutePath = QDir::currentPath() + "/";
@@ -106,13 +103,15 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(m_uiInterface->pbLoadReplay,           SIGNAL(clicked()), this,            SLOT(loadReplay()));
 
         // radio button
-        QObject::connect(m_uiInterface->rbTrain,            SIGNAL(clicked()), SLOT(updateReservoirParameters()));
-        QObject::connect(m_uiInterface->rbTest,             SIGNAL(clicked()), SLOT(updateReservoirParameters()));
-        QObject::connect(m_uiInterface->rbBoth,             SIGNAL(clicked()), SLOT(updateReservoirParameters()));
-        QObject::connect(m_uiInterface->rbRangeNeurons,     SIGNAL(clicked()), SLOT(updateReplayParameters()));
-        QObject::connect(m_uiInterface->rbRandomNeurons,    SIGNAL(clicked()), SLOT(updateReplayParameters()));
-        QObject::connect(m_uiInterface->rbRangeSentences,   SIGNAL(clicked()), SLOT(updateReplayParameters()));
-        QObject::connect(m_uiInterface->rbRandomSentences,  SIGNAL(clicked()), SLOT(updateReplayParameters()));
+        QObject::connect(m_uiInterface->rbTrain,                SIGNAL(clicked()), SLOT(updateReservoirParameters()));
+        QObject::connect(m_uiInterface->rbTest,                 SIGNAL(clicked()), SLOT(updateReservoirParameters()));
+        QObject::connect(m_uiInterface->rbBoth,                 SIGNAL(clicked()), SLOT(updateReservoirParameters()));
+        QObject::connect(m_uiInterface->rbRangeNeurons,         SIGNAL(clicked()), SLOT(updateReplayParameters()));
+        QObject::connect(m_uiInterface->rbRandomNeurons,        SIGNAL(clicked()), SLOT(updateReplayParameters()));
+        QObject::connect(m_uiInterface->rbRangeSentences,       SIGNAL(clicked()), SLOT(updateReplayParameters()));
+        QObject::connect(m_uiInterface->rbRandomSentences,      SIGNAL(clicked()), SLOT(updateReplayParameters()));
+        QObject::connect(m_uiInterface->rbLastTrainingReplay,   SIGNAL(clicked()), SLOT(updateReplayParameters()));
+        QObject::connect(m_uiInterface->rbLoadReplay,           SIGNAL(clicked()), SLOT(updateReplayParameters()));
 
         // tab
         QObject::connect(m_uiInterface->twSettings,  SIGNAL(currentChanged(int)), this , SLOT(setXTabFocus(int)));
@@ -196,13 +195,11 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(l_gridSearchQt, SIGNAL(sendResultsReservoirSignal(ResultsDisplayReservoir)), this, SLOT(displayCurrentResults(ResultsDisplayReservoir)));
         QObject::connect(l_gridSearchQt, SIGNAL(sendLogInfo(QString, QColor)),                        this, SLOT(displayLogInfo(QString, QColor)));
         // model
-        QObject::connect(l_model,SIGNAL(sendLogInfo(QString, QColor)),                      this,  SLOT(displayLogInfo(QString, QColor)));
-        QObject::connect(l_model,SIGNAL(sendOutputMatrix(cv::Mat, Sentences)),              this,  SLOT(displayOutputMatrix(cv::Mat, Sentences)));
-        QObject::connect(l_model,SIGNAL(sendTrainInputMatrix(cv::Mat,cv::Mat,Sentences)),   this,  SLOT(displayTrainInputMatrix(cv::Mat,cv::Mat, Sentences)));
+        QObject::connect(l_model,SIGNAL(sendLogInfo(QString, QColor)),                          this,  SLOT(displayLogInfo(QString, QColor)));
+        QObject::connect(l_model,SIGNAL(sendOutputMatrix(cv::Mat, Sentences)),                  this,  SLOT(displayOutputMatrix(cv::Mat, Sentences)));
+        QObject::connect(l_model,SIGNAL(sendTrainInputMatrixSignal(cv::Mat,cv::Mat,Sentences)), this,  SLOT(displayTrainInputMatrix(cv::Mat,cv::Mat, Sentences)));
         // reservoir
-        QObject::connect(l_model->reservoir(),  SIGNAL(sendInfoPlot(int,int,int,QString)),                          this,           SLOT(initPlot(int,int,int,QString)));
         QObject::connect(l_model->reservoir(),  SIGNAL(sendLogInfo(QString, QColor)),                               this,           SLOT(displayLogInfo(QString, QColor)));
-        QObject::connect(l_model->reservoir(),  SIGNAL(sendXMatriceData(QVector<QVector<double> >*, int, int )),    this,           SLOT(displayXMatrix(QVector<QVector<double> >*, int, int)));
         QObject::connect(l_model->reservoir(),  SIGNAL(sendComputingState(int,int,QString)),                        this,           SLOT(updateProgressBar(int, int, QString)));
         QObject::connect(l_model->reservoir(),  SIGNAL(sendLoadedTrainingParameters(QStringList)),                  m_pWInterface,  SLOT(setLoadedTrainingParameters(QStringList)));
         QObject::connect(l_model->reservoir(),  SIGNAL(sendLoadedWParameters(QStringList)),                         m_pWInterface,  SLOT(setLoadedWParameters(QStringList)));
@@ -212,7 +209,9 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(m_pWInterface, SIGNAL(displayValidityOperationSignal(bool, int)),  this,                                   SLOT(displayValidityOperation(bool, int)));
         QObject::connect(m_pWInterface, SIGNAL(endTrainingSignal(bool)),                    m_uiInterface->pbSaveLastTrainingFile,  SLOT(setEnabled(bool)));
         QObject::connect(m_pWInterface, SIGNAL(endTrainingSignal(bool)),                    m_uiInterface->pbSaveReplay,            SLOT(setEnabled(bool)));
+        QObject::connect(m_pWInterface, SIGNAL(endTrainingSignal(bool)),                    m_uiInterface->rbLastTrainingReplay,    SLOT(setEnabled(bool)));
         QObject::connect(m_pWInterface, SIGNAL(replayLoaded()),                             this,                                   SLOT(replayLoaded()));
+        QObject::connect(m_pWInterface, SIGNAL(sendReplayData(QVector<QVector<double> > , QVector<int>, QVector<int>)), this,       SLOT(updateDisplayReplay(QVector<QVector<double> > , QVector<int>, QVector<int>)));
 
     // init widgets
         // pushbuttons
@@ -222,6 +221,8 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         m_uiInterface->pbAddCorpus->setStyleSheet("* { font-weight: bold }");
         m_uiInterface->pbStart->setStyleSheet("* { font-weight: bold }");
         m_uiInterface->pbLoadSettings->setStyleSheet("* { font-weight: bold }");
+        m_uiInterface->pbStartReplay->setStyleSheet("* { font-weight: bold }");
+        m_uiInterface->pbLoadReplay->setStyleSheet("* { font-weight: bold }");
         // scroll
         m_uiInterface->scrollAreaPlotX->setWidgetResizable(true);
         m_uiInterface->scrollAreaPlotOutput->setWidgetResizable(true);
@@ -241,6 +242,7 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
 
     // update worker parameters with defaults values
         updateReservoirParameters();
+        updateReplayParameters();
 }
 
 Interface::~Interface()
@@ -501,12 +503,12 @@ void Interface::loadReplay()
     {
         l_palette.setColor(QPalette::Text,Qt::black);
         m_uiInterface->lePathReplay->setText(l_pathReplay);
-        m_uiInterface->pbLoadReplay->setEnabled(false);
-        m_uiInterface->pbStartReplay->setEnabled(false);
         m_uiInterface->twSettings->setEnabled(false);
         m_uiInterface->pbComputing->setValue(0);
         m_uiInterface->laStateComputing->setText("Loading replay...");
         emit loadReplaySignal(l_pathReplay);
+
+        m_replayLoaded = true;
     }
     else
     {
@@ -520,6 +522,7 @@ void Interface::loadReplay()
     }
 
     m_uiInterface->lePathReplay->setPalette(l_palette);
+    updateReplayParameters();
 }
 
 void Interface::updateReservoirParameters(int value)
@@ -542,9 +545,11 @@ void Interface::updateReplayParameters(int value)
     updateReplayParameters();
 }
 
+
 void Interface::updateReplayParameters()
 {
     ReplayParameters l_params;
+    l_params.m_useLastTraining      = m_uiInterface->rbLastTrainingReplay->isChecked();
     l_params.m_randomNeurons        = m_uiInterface->rbRandomNeurons->isChecked();
     l_params.m_randomSentence       = m_uiInterface->rbRandomSentences->isChecked();
     l_params.m_rangeNeuronsStart    = m_uiInterface->sbStartRangeNeuronDisplay->value();
@@ -553,6 +558,17 @@ void Interface::updateReplayParameters()
     l_params.m_rangeSentencesEnd    = m_uiInterface->sbEndRangeSentencesDisplay->value();
     l_params.m_randomNeuronsNumber  = m_uiInterface->sbNbRandomNeurons->value();
     l_params.m_randomSentencesNumber= m_uiInterface->sbNbRandomSentences->value();
+
+    if(m_uiInterface->rbLastTrainingReplay->isChecked())
+    {
+        m_uiInterface->pbStartReplay->setEnabled(true);
+    }
+
+    if(m_uiInterface->rbLoadReplay->isChecked())
+    {
+        m_uiInterface->pbStartReplay->setEnabled(m_replayLoaded);
+    }
+
 
     emit sendReplayParametersSignal(l_params);
 }
@@ -627,17 +643,11 @@ void Interface::updateReservoirParameters()
     }
 
     emit sendReservoirParametersSignal(l_params);
-
-
-    // display neurons activities parameters
-//        m_nbMaxNeuronsSentenceDisplayed = m_uiInterface->sbMaxSentencesDisplayed->value();
-//        emit sendMatrixXDisplayParameters(m_uiInterface->cbEnableDisplay->isChecked(), m_uiInterface->cbSelectRandomNeurons->isChecked(),
-//                                          m_uiInterface->sbNbRandomNeurons->value(), m_uiInterface->sbStartRangeNeuronDisplay->value(), m_uiInterface->sbEndRangeNeuronDisplay->value());
 }
 
 void Interface::lockInterface(bool lock)
 {
-    m_uiInterface->tabSettings->setDisabled(lock);
+    m_uiInterface->twSettings->setEnabled(!lock);
 }
 
 void Interface::displayValidityOperation(bool operationValid, int indexParameter)
@@ -983,6 +993,7 @@ void Interface::displayTrainInputMatrix(cv::Mat trainMeaning, cv::Mat trainSente
         m_labelListInputSentences.clear();
 
         LanguageParameters l_language = m_pWInterface->languageParameters();
+
         QStringList l_CCW = l_language.m_CCW.split(' ');
         l_CCW << "X";
 
@@ -1022,7 +1033,6 @@ void Interface::displayTrainInputMatrix(cv::Mat trainMeaning, cv::Mat trainSente
             }
             l_meaning << l_Structure;
         }
-
 
     // create x curves values
         QVector<double> l_xValues;
@@ -1209,6 +1219,55 @@ void Interface::reloadCorpus()
 }
 
 
+void Interface::updateColorCCW(LanguageParameters params)
+{
+    // create color for each CCW
+    int l_nbLoop = 0;
+    m_colorsCCW.clear();
+    while(m_colorsCCW.size() < params.m_CCW.size()+1)
+    {
+        ++l_nbLoop;;
+        bool l_addColor = true;
+
+        int l_r = rand()%240;
+        int l_g = rand()%255;
+        int l_b = rand()%255;
+
+        if(l_nbLoop < 500)
+        {
+            for(int ii = 0; ii < m_colorsCCW.size(); ++ii)
+            {
+                int l_diffRed = m_colorsCCW[ii].red()-l_r;
+                if(l_diffRed < 0)
+                {
+                    l_diffRed = -l_diffRed;
+                }
+                int l_diffGreen = m_colorsCCW[ii].green()-l_g;
+                if(l_diffGreen < 0)
+                {
+                    l_diffGreen = - l_diffGreen;
+                }
+                int l_diffBlue = m_colorsCCW[ii].blue()-l_b;
+                if(l_diffBlue < 0)
+                {
+                    l_diffBlue = - l_diffBlue;
+                }
+
+                if(l_diffRed + l_diffGreen + l_diffBlue < 150)
+                {
+                    l_addColor = false;
+                    break;
+                }
+            }
+        }
+
+        if(l_addColor)
+        {
+            m_colorsCCW << QColor(l_r,l_g,l_b);
+        }
+    }
+}
+
 void Interface::loadSettings()
 {
     QString l_sPathSettings = QFileDialog::getOpenFileName(this, "Load settings file", m_absolutePath + "../data/input/Settings", "Corpus file (*.txt)");
@@ -1226,52 +1285,7 @@ void Interface::loadSettings()
         l_params.m_CCW = l_CCW.join(" ");
         l_params.m_structure = l_structure.join(" ");
 
-        // create color for each CCW
-            int l_nbLoop = 0;
-            m_colorsCCW.clear();
-            while(m_colorsCCW.size() < l_CCW.size()+1)
-            {
-                ++l_nbLoop;;
-                bool l_addColor = true;
-
-                int l_r = rand()%240;
-                int l_g = rand()%255;
-                int l_b = rand()%255;
-
-                if(l_nbLoop < 500)
-                {
-                    for(int ii = 0; ii < m_colorsCCW.size(); ++ii)
-                    {
-                        int l_diffRed = m_colorsCCW[ii].red()-l_r;
-                        if(l_diffRed < 0)
-                        {
-                            l_diffRed = -l_diffRed;
-                        }
-                        int l_diffGreen = m_colorsCCW[ii].green()-l_g;
-                        if(l_diffGreen < 0)
-                        {
-                            l_diffGreen = - l_diffGreen;
-                        }
-                        int l_diffBlue = m_colorsCCW[ii].blue()-l_b;
-                        if(l_diffBlue < 0)
-                        {
-                            l_diffBlue = - l_diffBlue;
-                        }
-
-                        if(l_diffRed + l_diffGreen + l_diffBlue < 150)
-                        {
-                            l_addColor = false;
-                            break;
-                        }
-                    }
-                }
-
-                if(l_addColor)
-                {
-                    m_colorsCCW << QColor(l_r,l_g,l_b);
-                }
-            }
-
+        updateColorCCW(l_params);
 
         emit sendLanguageParametersSignal(l_params);
 
@@ -1287,6 +1301,8 @@ void Interface::updateSettings()
 {
     LanguageParameters l_params;
     l_params.m_CCW = m_uiInterface->leDisplayCCW->text();
+    updateColorCCW(l_params);
+
     l_params.m_structure = m_uiInterface->leDisplayStructure->text();
 
     if(l_params.m_CCW.size() > 0 && l_params.m_structure.size() > 0)
@@ -1355,482 +1371,87 @@ void Interface::resetLoadingBar()
 
 void Interface::replayLoaded()
 {
-    m_uiInterface->pbStartReplay->setEnabled(true);
     m_uiInterface->laStateComputing->setText("Replay loaded...");
     m_uiInterface->pbComputing->setValue(100);
-    m_uiInterface->pbLoadReplay->setEnabled(true);
     m_uiInterface->twSettings->setEnabled(true);
 }
 
-
-InterfaceWorker::InterfaceWorker(QString absolutePath) : m_gridSearch(new GridSearchQt(m_model)), m_nbOfCorpus(0), m_absolutePath(absolutePath)
-{    
-    qRegisterMetaType<ReplayParameters>("ReplayParameters");
-    qRegisterMetaType<ReservoirParameters>("ReservoirParameters");
-    qRegisterMetaType<LanguageParameters>("LanguageParameters");
-    qRegisterMetaType<ModelParametersQt>("ModelParametersQt");
-    qRegisterMetaType<ResultsDisplayReservoir>("ResultsDisplayReservoir");
-    qRegisterMetaType<QVector<QVector<double> > >("QVector<QVector<double> >");
-    qRegisterMetaType<cv::Mat>("cv::Mat");
-    qRegisterMetaType<Sentences >("Sentences");
-}
-
-InterfaceWorker::~InterfaceWorker()
+void Interface::updateDisplayReplay(QVector<QVector<double> > data, QVector<int> neuronsId, QVector<int> sentencesId)
 {
-    delete m_gridSearch;
-}
+    m_uiInterface->twSettings->setEnabled(false);
+    m_uiInterface->pbComputing->setValue(0);
+    m_uiInterface->laStateComputing->setText("Plotting...");
 
-GridSearchQt *InterfaceWorker::gridSearch() const
-{
-    return m_gridSearch;
-}
-
-ModelQt *InterfaceWorker::model()
-{
-    return &m_model;
-}
-
-LanguageParameters InterfaceWorker::languageParameters() const
-{
-    return m_languageParameters;
-}
-
-void InterfaceWorker::addCorpus(QString corpusPath)
-{
-    m_corpusList.push_back(corpusPath);
-
-    std::vector<std::string> l_stringListCorpus;
-
-    for(int ii = 0; ii < m_corpusList.size(); ++ii)
+    QTime l_oDieTime = QTime::currentTime().addMSecs(10);
+    while( QTime::currentTime() < l_oDieTime)
     {
-        l_stringListCorpus.push_back(m_corpusList[ii].toStdString());
-    }
-
-    m_gridSearch->setCorpusList(l_stringListCorpus);
-    ++m_nbOfCorpus;
-}
-
-void InterfaceWorker::removeCorpus(int index)
-{
-    if(index == -1)
-    {
-        return;
-    }
-
-    m_corpusList.removeAt(index);
-
-    std::vector<std::string> l_stringListCorpus;
-
-    for(int ii = 0; ii < m_corpusList.size(); ++ii)
-    {
-        l_stringListCorpus.push_back(m_corpusList[ii].toStdString());
-    }
-
-    m_gridSearch->setCorpusList(l_stringListCorpus);
-    --m_nbOfCorpus;
-}
-
-void InterfaceWorker::updateReservoirParameters(ReservoirParameters newParams)
-{
-    m_reservoirParameters = newParams;
-}
-
-void InterfaceWorker::updateLanguageParameters(LanguageParameters newParams)
-{
-    m_languageParameters = newParams;
-}
-
-void InterfaceWorker::updateReplayParameters(ReplayParameters newParams)
-{
-    m_replayParameters.m_randomNeurons          = newParams.m_randomNeurons;
-    m_replayParameters.m_randomSentence         = newParams.m_randomSentence;
-    m_replayParameters.m_randomNeuronsNumber    = newParams.m_randomNeuronsNumber;
-    m_replayParameters.m_randomSentencesNumber  = newParams.m_randomSentencesNumber;
-    m_replayParameters.m_rangeSentencesStart    = newParams.m_rangeSentencesStart;
-    m_replayParameters.m_rangeSentencesEnd      = newParams.m_rangeSentencesEnd;
-    m_replayParameters.m_rangeNeuronsStart      = newParams.m_rangeNeuronsStart;
-    m_replayParameters.m_rangeNeuronsEnd        = newParams.m_rangeNeuronsEnd;
-}
-
-void InterfaceWorker::start()
-{
-    if(m_nbOfCorpus <= 0)
-    {
-        QString l_message = "Cannot start, no corpus is defined. \n";
-        emit sendLogInfo(l_message, QColor(Qt::red));
-        std::cerr << l_message.toStdString() << std::endl;
-        return;
-    }
-
-    // define language parameters
-        Sentence l_CCW, l_structure;
-        QStringList l_CCWList = m_languageParameters.m_CCW.split(" ");
-        for(int ii = 0; ii < l_CCWList.size(); ++ii)
-        {
-            l_CCW.push_back(l_CCWList[ii].toStdString());
-        }
-        QStringList l_structureList = m_languageParameters.m_structure.split(" ");
-        for(int ii = 0; ii < l_structureList.size(); ++ii)
-        {
-            l_structure.push_back(l_structureList[ii].toStdString());
-        }
-
-        m_model.setCCWAndStructure(l_CCW, l_structure);
-
-    // define all grid search parameters
-        m_gridSearch->deleteParameterValues();
-        m_gridSearch->setCudaParameters(m_reservoirParameters.m_useCuda, m_reservoirParameters.m_useCuda);
-
-        bool l_operationValid;
-        int l_OperationInvalid = 0;
-
-
-        bool l_onlyStartValue = m_reservoirParameters.m_useOnlyStartValue;
-
-        if(m_reservoirParameters.m_neuronsEnabled)
-        {
-            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::NEURONS_NB, m_reservoirParameters.m_neuronsStart, m_reservoirParameters.m_neuronsEnd,
-                                                                m_reservoirParameters.m_neuronsOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_neuronsNbOfUses);
-            emit displayValidityOperationSignal(l_operationValid, GridSearchQt::NEURONS_NB);
-            if(!l_operationValid)
-            {
-                ++l_OperationInvalid;
-            }
-        }
-        if(m_reservoirParameters.m_leakRateEnabled)
-        {
-            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::LEAK_RATE,m_reservoirParameters.m_leakRateStart, m_reservoirParameters.m_leakRateEnd,
-                                                                m_reservoirParameters.m_leakRateOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_leakRateNbOfUses);
-            emit displayValidityOperationSignal(l_operationValid, GridSearchQt::LEAK_RATE);
-            if(!l_operationValid)
-            {
-                ++l_OperationInvalid;
-            }
-        }
-        if(m_reservoirParameters.m_issEnabled)
-        {
-            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::INPUT_SCALING,m_reservoirParameters.m_issStart, m_reservoirParameters.m_issEnd,
-                                                                m_reservoirParameters.m_issOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_issNbOfUses);
-            emit displayValidityOperationSignal(l_operationValid, GridSearchQt::INPUT_SCALING);
-            if(!l_operationValid)
-            {
-                ++l_OperationInvalid;
-            }
-        }
-        if(m_reservoirParameters.m_spectralRadiusEnabled)
-        {
-            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::SPECTRAL_RADIUS,    m_reservoirParameters.m_spectralRadiusStart,  m_reservoirParameters.m_spectralRadiusEnd,
-                                                                m_reservoirParameters.m_spectralRadiusOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_spectralRadiusNbOfUses);
-            emit displayValidityOperationSignal(l_operationValid, GridSearchQt::SPECTRAL_RADIUS);
-            if(!l_operationValid)
-            {
-                ++l_OperationInvalid;
-            }
-        }
-        if(m_reservoirParameters.m_ridgeEnabled)
-        {
-            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::RIDGE,m_reservoirParameters.m_ridgeStart, m_reservoirParameters.m_ridgeEnd,
-                                                                m_reservoirParameters.m_ridgeOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_ridgeNbOfUses);
-            emit displayValidityOperationSignal(l_operationValid, GridSearchQt::RIDGE);
-            if(!l_operationValid)
-            {
-                ++l_OperationInvalid;
-            }
-        }
-        if(m_reservoirParameters.m_sparcityEnabled)
-        {
-            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::SPARCITY, m_reservoirParameters.m_sparcityStart,  m_reservoirParameters.m_sparcityEnd,
-                                                                m_reservoirParameters.m_sparcityOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_sparcityNbOfUses);
-            emit displayValidityOperationSignal(l_operationValid, GridSearchQt::SPARCITY);
-            if(!l_operationValid)
-            {
-                ++l_OperationInvalid;
-            }
-        }
-
-        if(l_OperationInvalid != 0)
-        {
-            QString l_message = "\nCannot start, " + QString::number(l_OperationInvalid) + " operation are invalid. (Displayed in red)\n";
-            sendLogInfo(l_message, QColor(Qt::red));
-            std::cerr << l_message.toStdString() << std::endl;
-            return;
-        }
-
-        bool l_doTrain, l_doTest;
-
-        switch(m_reservoirParameters.m_action)
-        {
-            case TRAINING_RES :
-                l_doTrain = true;
-                l_doTest = false;
-            break;
-            case TEST_RES :
-                l_doTrain = false;
-                l_doTest = true;
-            break;
-            case BOTH_RES :
-                l_doTrain = true;
-                l_doTest = true;
-            break;
-        }
-
-    QDateTime l_dateTime;
-    l_dateTime = l_dateTime.currentDateTime();
-    QDate l_date = l_dateTime.date();
-    QTime l_time = QTime::currentTime();
-    QString l_uniqueName = l_date.toString("dd_MM_yyyy") + "_" +  QString::number(l_time.hour()) + "h" + QString::number(l_time.minute()) + "m" + QString::number(l_time.second()) + "s.txt";
-    QString l_pathRes    =  "../data/Results/res_"  + l_uniqueName;
-    QString l_pathResRaw =  "../data/Results/raw/res_" + l_uniqueName;
-
-    if(m_reservoirParameters.m_useLoadedTraining)
-    {
-        if(m_parametersTrainingLoaded.size() > 0)
-        {
-            m_gridSearch->setParameterValues(GridSearchQt::NEURONS_NB,      m_parametersTrainingLoaded[0].toInt(),    m_parametersTrainingLoaded[0].toInt(),   "+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::SPARCITY,        m_parametersTrainingLoaded[1].toDouble(), m_parametersTrainingLoaded[1].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::SPECTRAL_RADIUS, m_parametersTrainingLoaded[2].toDouble(), m_parametersTrainingLoaded[2].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::INPUT_SCALING,   m_parametersTrainingLoaded[3].toDouble(), m_parametersTrainingLoaded[3].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::LEAK_RATE,       m_parametersTrainingLoaded[4].toDouble(), m_parametersTrainingLoaded[4].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::RIDGE,           m_parametersTrainingLoaded[5].toDouble(), m_parametersTrainingLoaded[5].toDouble(),"+0", true, 1);
-        }
-    }
-
-    if(m_reservoirParameters.m_useLoadedW && !m_reservoirParameters.m_useLoadedWIn)
-    {
-        if(m_parametersWLoaded.size() > 0)
-        {
-            m_gridSearch->setParameterValues(GridSearchQt::NEURONS_NB,      m_parametersWLoaded[0].toInt(),    m_parametersWLoaded[0].toInt(),   "+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::SPARCITY,        m_parametersWLoaded[1].toDouble(), m_parametersWLoaded[1].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::SPECTRAL_RADIUS, m_parametersWLoaded[2].toDouble(), m_parametersWLoaded[2].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::INPUT_SCALING,   m_parametersWLoaded[3].toDouble(), m_parametersWLoaded[3].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::LEAK_RATE,       m_parametersWLoaded[4].toDouble(), m_parametersWLoaded[4].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::RIDGE,           m_parametersWLoaded[5].toDouble(), m_parametersWLoaded[5].toDouble(),"+0", true, 1);
-        }
-    }
-    else if(m_reservoirParameters.m_useLoadedWIn & !m_reservoirParameters.m_useLoadedW)
-    {
-        if(m_parametersWInLoaded.size() > 0)
-        {
-            m_gridSearch->setParameterValues(GridSearchQt::NEURONS_NB,      m_parametersWInLoaded[0].toInt(),    m_parametersWInLoaded[0].toInt(),   "+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::SPARCITY,        m_parametersWInLoaded[1].toDouble(), m_parametersWInLoaded[1].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::SPECTRAL_RADIUS, m_parametersWInLoaded[2].toDouble(), m_parametersWInLoaded[2].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::INPUT_SCALING,   m_parametersWInLoaded[3].toDouble(), m_parametersWInLoaded[3].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::LEAK_RATE,       m_parametersWInLoaded[4].toDouble(), m_parametersWInLoaded[4].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::RIDGE,           m_parametersWInLoaded[5].toDouble(), m_parametersWInLoaded[5].toDouble(),"+0", true, 1);
-        }
-    }
-    else if(m_reservoirParameters.m_useLoadedW && m_reservoirParameters.m_useLoadedWIn)
-    {
-        bool l_paramValid = true;
-        if(m_parametersWLoaded.size() == m_parametersWInLoaded.size())
-        {
-            for(int ii = 0; ii < m_parametersWLoaded.size(); ++ii)
-            {
-                if(m_parametersWLoaded[ii] != m_parametersWInLoaded[ii])
-                {
-                    l_paramValid = false;
-                    break;
-                }
-            }
-        }
-        else
-        {
-            l_paramValid = false;
-        }
-
-        if(m_parametersWInLoaded.size() > 0 && l_paramValid)
-        {
-            m_gridSearch->setParameterValues(GridSearchQt::NEURONS_NB,      m_parametersWInLoaded[0].toInt(),    m_parametersWInLoaded[0].toInt(),   "+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::SPARCITY,        m_parametersWInLoaded[1].toDouble(), m_parametersWInLoaded[1].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::SPECTRAL_RADIUS, m_parametersWInLoaded[2].toDouble(), m_parametersWInLoaded[2].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::INPUT_SCALING,   m_parametersWInLoaded[3].toDouble(), m_parametersWInLoaded[3].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::LEAK_RATE,       m_parametersWInLoaded[4].toDouble(), m_parametersWInLoaded[4].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::RIDGE,           m_parametersWInLoaded[5].toDouble(), m_parametersWInLoaded[5].toDouble(),"+0", true, 1);
-        }
-
-        if(!l_paramValid)
-        {
-            QString l_message = "W and WIn doesn't have the same parameter file. \n";
-            emit sendLogInfo(l_message, QColor(Qt::red));
-            std::cerr << l_message.toStdString() << std::endl;
-            return;
-        }
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
     }
 
 
-    // launch reservoir computing
-    lockInterfaceSignal(true);
-        m_gridSearch->launchTrainWithAllParameters(l_pathRes.toStdString(), l_pathResRaw.toStdString(), l_doTrain, l_doTest, m_reservoirParameters.m_useLoadedTraining,
-                                                   m_reservoirParameters.m_useLoadedW, m_reservoirParameters.m_useLoadedWIn);
-    lockInterfaceSignal(false);
+    // reset plots
+    qDeleteAll(m_plotReplay.begin(), m_plotReplay.end());
+    m_plotReplay.clear();
 
-    emit endTrainingSignal(true);
-}
-
-void InterfaceWorker::stop()
-{
-    lockInterfaceSignal(false);
-}
-
-void InterfaceWorker::saveLastTraining(QString pathDirectory)
-{
-    if(pathDirectory.size() > 0)
+    QVector<double> l_xValues;
+    for(int ii = 0; ii < data[0].size(); ++ii)
     {
-        m_model.saveTraining(pathDirectory.toStdString());
-        sendLogInfo("Training saved in the directory : " + pathDirectory + "\n", QColor(0,0,255));
+        l_xValues.push_back(ii);
     }
-}
 
-void InterfaceWorker::saveLastReplay(QString pathDirectory)
-{
-    if(pathDirectory.size() > 0)
+    QVector<QString> l_labelsX;
+    for(int ii = 0; ii < sentencesId.size(); ++ii)
     {
-        m_model.saveReplay(pathDirectory.toStdString());
-        sendLogInfo("Replay saved in the directory : " + pathDirectory + "\n", QColor(0,0,255));
+        l_labelsX << "S" + QString::number(sentencesId[ii]);
     }
-}
 
-void InterfaceWorker::loadTraining(QString pathDirectory)
-{
-    if(pathDirectory.size() > 0)
+    for(int ii = 0; ii < data.size(); ++ii)
     {
-        m_model.loadTraining(pathDirectory.toStdString());
-        sendLogInfo("Training loaded in the directory : " + pathDirectory + "\n", QColor(Qt::blue));
-    }
-}
+        QCustomPlot *l_plot = new QCustomPlot(this);
+        l_plot->setFixedHeight(100);
+        l_plot->setFixedWidth(sentencesId.size()*100);
+        m_plotReplay << l_plot;
+        m_uiInterface->vlXPlot->addWidget(m_plotReplay.back());
+        m_plotReplay.back()->addGraph();
 
-void InterfaceWorker::loadW(QString pathDirectory)
-{
-    if(pathDirectory.size() > 0)
-    {
-        m_model.loadW(pathDirectory.toStdString());
-        sendLogInfo("W matrice loaded in the directory : " + pathDirectory + "\n", QColor(Qt::blue));
-    }
-}
+        m_plotReplay.back()->xAxis->setLabel("x");
+        m_plotReplay.back()->xAxis->setRange(0, data[0].size());
 
-void InterfaceWorker::loadWIn(QString pathDirectory)
-{
-    if(pathDirectory.size() > 0)
-    {
-        m_model.loadWIn(pathDirectory.toStdString());
-        sendLogInfo("WIn matrice loaded in the directory : " + pathDirectory + "\n", QColor(Qt::blue));
-    }
-}
+        m_plotReplay.back()->xAxis->setAutoTickStep(false);
+        m_plotReplay.back()->xAxis->setAutoTickLabels(false);
+        m_plotReplay.back()->xAxis->setTickVectorLabels(l_labelsX);
+        m_plotReplay.back()->xAxis->setTickStep(data[0].size()/sentencesId.size());
+        m_plotReplay.back()->xAxis->setLabel("Sentences");
 
-void InterfaceWorker::setLoadedTrainingParameters(QStringList loadedParams)
-{
-    m_parametersTrainingLoaded = loadedParams;
-}
+        m_plotReplay.back()->yAxis->setLabel("y");
+        m_plotReplay.back()->yAxis->setRange(-1, 1);
+        m_plotReplay.back()->yAxis->setAutoTickStep(false);
+        m_plotReplay.back()->yAxis->setAutoTickLabels(false);
+//        m_plotReplay.back()->yAxis->setTickVectorLabels(l_labelsY);
+        m_plotReplay.back()->yAxis->setTickStep(1.0);
+        m_plotReplay.back()->yAxis->setLabel("Neuron " + QString::number(neuronsId[ii]));
 
-void InterfaceWorker::setLoadedWParameters(QStringList loadedParams)
-{
-    m_parametersWLoaded = loadedParams;
-}
+        QPen l_pen(Qt::blue);
+        l_pen.setWidthF(2);
+        m_plotReplay.back()->graph(0)->setPen(l_pen);
+        m_plotReplay.back()->graph(0)->addData(l_xValues, data[ii]);
+        m_plotReplay.back()->replot();
 
-void InterfaceWorker::setLoadedWInParameters(QStringList loadedParams)
-{
-    m_parametersWInLoaded = loadedParams;
-}
+        m_uiInterface->pbComputing->setValue(100.0 * ii / data.size());
 
-void InterfaceWorker::loadReplay(QString pathReplay)
-{   
-    if(load3DMatrixFromNpPythonSaveTextF(pathReplay + "/xTot.txt", m_xTot))
-    {
-        sendLogInfo("Replay matrice xTot loaded in the directory : " + pathReplay + "\n", QColor(Qt::blue));
-        emit replayLoaded();
-    }
-}
-
-void InterfaceWorker::startReplay()
-{
-//    m_replayParameters.m_xTot
-    qDebug() << " start ";
-    qDebug() << m_xTot.size[0] << " " << m_xTot.size[1] << " " << m_xTot.size[2];
-
-    // mutex for openmp threads
-//        QMutex l_lockerMainThread;
-
-    // retrieve infos for displaying neurons activities
-//        bool l_displayEnabled   = m_displayEnabled;
-//        bool l_randomNeurons   = m_randomNeurons;
-        int l_startIdNeurons    = m_replayParameters.m_rangeNeuronsStart;
-        int l_endIdNeurons      = m_replayParameters.m_rangeNeuronsEnd;
-        int l_startIdSentences  = m_replayParameters.m_rangeSentencesStart;
-        int l_endIdSentences    = m_replayParameters.m_rangeSentencesEnd;
-
-        if(l_endIdNeurons >  m_xTot.size[1])
+        l_oDieTime = QTime::currentTime().addMSecs(10);
+        while( QTime::currentTime() < l_oDieTime)
         {
-            l_endIdNeurons =  m_xTot.size[1];
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
         }
+    }
 
-    // create id of the neurons activities to be displayed
-    QVector<int> l_idNeurons;
-    QVector<int> l_idSentences;
+    m_uiInterface->twSettings->setEnabled(true);
+    m_uiInterface->pbComputing->setValue(100);
+    m_uiInterface->laStateComputing->setText("End plotting");
 
-    if(m_replayParameters.m_randomNeurons)
-    {
-            while(l_idNeurons.size() < m_replayParameters.m_randomNeuronsNumber)
-            {
-                bool l_addId = true;
-                int l_idNeuron = rand()%m_xTot.size[1];
-
-                for(int ii = 0; ii < l_idNeurons.size(); ++ii)
-                {
-                    if(l_idNeuron == l_idNeurons[ii])
-                    {
-                        l_addId = false;
-                        break;
-                    }
-                }
-
-                if(l_addId)
-                {
-                    l_idNeurons << l_idNeuron;
-                }
-            }
-        }
-        else
-        {
-            if(l_endIdNeurons < l_startIdNeurons)
-            {
-                l_endIdNeurons = l_startIdNeurons;
-            }
-
-            for(int ii = l_startIdNeurons; ii <= l_endIdNeurons; ++ii)
-            {
-                l_idNeurons << ii;
-            }
-        }
-
-
-    // info for generating the real time plot
-//        emit sendInfoPlot(l_idNeurons.size(), meaningInputTrain.size[0], meaningInputTrain.size[1], QString("train"));
-
-    // send neurons activities to be displayed
-//                l_lockerMainThread.lock();
-
-//                if(l_displayEnabled)
-//                {
-//                    QVector<QVector<double> > *l_values = new QVector<QVector<double> >;
-
-//                    for(int jj = 0; jj < l_idNeurons.size(); ++jj)
-//                    {
-//                        QVector<double> l_line;
-
-//                        int l_idNeuron = l_idNeurons[jj] + 1 + meaningInputTrain.size[2];
-
-//                        for(int kk = 0; kk < l_X.cols; ++kk)
-//                        {
-//                            l_line << static_cast<double>(l_X.at<float>(l_idNeuron,kk));
-//                        }
-
-//                        (*l_values) << l_line;
-//                    }
-
-//                    emit sendXMatriceData(l_values, ii, meaningInputTrain.size[0]);
-//                }
-//                l_lockerMainThread.unlock();
 }
+
 
 
 
@@ -1838,160 +1459,160 @@ void InterfaceWorker::startReplay()
 
 // OLD
 
-void Interface::initPlot(int nbCurves, int sizeDim1Meaning, int sizeDim2Meaning, QString name)
-{
-    qDeleteAll(m_plotListX.begin(), m_plotListX.end());
-    m_plotListX.clear();
-    m_allValuesPlot.clear();
-    m_nbSentencesDisplayed = 0;
-
-    m_sizeDim1Meaning = sizeDim1Meaning;
-    m_sizeDim2Meaning = sizeDim2Meaning;
-
-    QVector<QString> l_labelsX;
-
-    for(int ii = 0; ii < m_sizeDim1Meaning; ++ii)
-    {
-        l_labelsX << "S" + QString::number(ii+1);
-    }
-
-    QVector<QString> l_labelsY;
-    l_labelsY << "-1" << "0" << "1";
-
-
-    LanguageParameters l_language  = m_pWInterface->languageParameters();
-    int l_nbCCW = l_language.m_CCW.split(" ").size();
-
-    for(int ii = 0; ii < nbCurves; ++ii)
-    {
-        QCustomPlot *l_plotDisplay = new QCustomPlot(this);
-
-        l_plotDisplay->setFixedHeight(100);
-//        l_plotDisplay->setFixedWidth(sizeDim1Meaning*l_nbCCW*35);
-        l_plotDisplay->setFixedWidth(sizeDim1Meaning*l_nbCCW*5);
-//        l_plotDisplay->setFixedWidth(m_nbMaxNeuronsSentenceDisplayed*l_nbCCW*10);
-        m_plotListX.push_back(l_plotDisplay);
-        m_uiInterface->vlXPlot->addWidget(m_plotListX.back());
-        m_plotListX.back()->addGraph();
-
-        m_plotListX.back()->xAxis->setLabel("x");
-        m_plotListX.back()->xAxis->setRange(0, sizeDim1Meaning);
-//        m_plotListX.back()->xAxis->setRange(0, m_nbMaxNeuronsSentenceDisplayed);
-
-        m_plotListX.back()->xAxis->setAutoTickStep(false);
-        m_plotListX.back()->xAxis->setAutoTickLabels(false);
-        m_plotListX.back()->xAxis->setTickVectorLabels(l_labelsX);
-        m_plotListX.back()->xAxis->setTickStep(1);
-        m_plotListX.back()->xAxis->setLabel("Sentences");
-
-
-        m_plotListX.back()->yAxis->setLabel("y");
-        m_plotListX.back()->yAxis->setRange(-1, 1);
-        m_plotListX.back()->yAxis->setAutoTickStep(false);
-        m_plotListX.back()->yAxis->setAutoTickLabels(false);
-        m_plotListX.back()->yAxis->setTickVectorLabels(l_labelsY);
-        m_plotListX.back()->yAxis->setTickStep(1.0);
-        m_plotListX.back()->yAxis->setLabel("Neuron value");
-
-
-//        m_plotListX.back()->graph(0)->setLineStyle(QCPGraph::lsLine);
-//        m_plotListX.back()->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 2));
-    }
-}
-
-
-//void Interface::displayNeuronsActivities(QVector<QVector<double> > valuesNeurons)
+//void Interface::initPlot(int nbCurves, int sizeDim1Meaning, int sizeDim2Meaning, QString name)
 //{
 //    qDeleteAll(m_plotListX.begin(), m_plotListX.end());
 //    m_plotListX.clear();
 //    m_allValuesPlot.clear();
+//    m_nbSentencesDisplayed = 0;
+
+//    m_sizeDim1Meaning = sizeDim1Meaning;
+//    m_sizeDim2Meaning = sizeDim2Meaning;
+
+//    QVector<QString> l_labelsX;
+
+//    for(int ii = 0; ii < m_sizeDim1Meaning; ++ii)
+//    {
+//        l_labelsX << "S" + QString::number(ii+1);
+//    }
+
+//    QVector<QString> l_labelsY;
+//    l_labelsY << "-1" << "0" << "1";
+
+
+//    LanguageParameters l_language  = m_pWInterface->languageParameters();
+//    int l_nbCCW = l_language.m_CCW.split(" ").size();
+
+//    for(int ii = 0; ii < nbCurves; ++ii)
+//    {
+//        QCustomPlot *l_plotDisplay = new QCustomPlot(this);
+
+//        l_plotDisplay->setFixedHeight(100);
+////        l_plotDisplay->setFixedWidth(sizeDim1Meaning*l_nbCCW*35);
+//        l_plotDisplay->setFixedWidth(sizeDim1Meaning*l_nbCCW*5);
+////        l_plotDisplay->setFixedWidth(m_nbMaxNeuronsSentenceDisplayed*l_nbCCW*10);
+//        m_plotListX.push_back(l_plotDisplay);
+//        m_uiInterface->vlXPlot->addWidget(m_plotListX.back());
+//        m_plotListX.back()->addGraph();
+
+//        m_plotListX.back()->xAxis->setLabel("x");
+//        m_plotListX.back()->xAxis->setRange(0, sizeDim1Meaning);
+////        m_plotListX.back()->xAxis->setRange(0, m_nbMaxNeuronsSentenceDisplayed);
+
+//        m_plotListX.back()->xAxis->setAutoTickStep(false);
+//        m_plotListX.back()->xAxis->setAutoTickLabels(false);
+//        m_plotListX.back()->xAxis->setTickVectorLabels(l_labelsX);
+//        m_plotListX.back()->xAxis->setTickStep(1);
+//        m_plotListX.back()->xAxis->setLabel("Sentences");
+
+
+//        m_plotListX.back()->yAxis->setLabel("y");
+//        m_plotListX.back()->yAxis->setRange(-1, 1);
+//        m_plotListX.back()->yAxis->setAutoTickStep(false);
+//        m_plotListX.back()->yAxis->setAutoTickLabels(false);
+//        m_plotListX.back()->yAxis->setTickVectorLabels(l_labelsY);
+//        m_plotListX.back()->yAxis->setTickStep(1.0);
+//        m_plotListX.back()->yAxis->setLabel("Neuron value");
+
+
+////        m_plotListX.back()->graph(0)->setLineStyle(QCPGraph::lsLine);
+////        m_plotListX.back()->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 2));
+//    }
 //}
 
-void Interface::displayXMatrix(QVector<QVector<double> > *values, int currentSentenceId, int nbSentences)
-{
-    // wait (necessary to get the events)
-//    QTime l_oDieTime = QTime::currentTime().addMSecs(10);
-//    while( QTime::currentTime() < l_oDieTime)
+
+////void Interface::displayNeuronsActivities(QVector<QVector<double> > valuesNeurons)
+////{
+////    qDeleteAll(m_plotListX.begin(), m_plotListX.end());
+////    m_plotListX.clear();
+////    m_allValuesPlot.clear();
+////}
+
+//void Interface::displayXMatrix(QVector<QVector<double> > *values, int currentSentenceId, int nbSentences)
+//{
+//    // wait (necessary to get the events)
+////    QTime l_oDieTime = QTime::currentTime().addMSecs(10);
+////    while( QTime::currentTime() < l_oDieTime)
+////    {
+////        QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+////    }
+
+//    if(m_allValuesPlot.size() == 0)
 //    {
-//        QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
-//    }
+//        m_timerDisplayNeurons.start();
 
-    if(m_allValuesPlot.size() == 0)
-    {
-        m_timerDisplayNeurons.start();
-
-        for(int ii = 0; ii < values->size(); ++ii)
-        {
-            QVector<double> l_init;
-            m_allValuesPlot.push_back(l_init);
-        }
-    }
-
-    for(int ii = 0; ii < values->size(); ++ii)
-    {
-        for(int jj = 0; jj < (*values)[ii].size(); ++jj)
-        {
-            m_allValuesPlot[ii].push_back((*values)[ii][jj]);
-//            m_allXPlot.push_back();
-        }
-    }
-
-
-//    int l_sizeS = (*values)[0].size();
-//    int l_lenghtX = l_sizeS * m_nbMaxNeuronsSentenceDisplayed;
-
-//    double l_startKey, l_endKey;
-//    if(currentSentenceId <= m_nbMaxNeuronsSentenceDisplayed)
-//    {
-//        l_startKey = 0.0;
-//        l_endKey = currentSentenceId;
-//    }
-//    else
-//    {
-//        l_startKey = currentSentenceId - m_nbMaxNeuronsSentenceDisplayed;
-//        l_endKey = currentSentenceId;
-//    }
-
-//    qDebug() << "info : " << l_startKey << " " << l_endKey << " " << m_nbMaxNeuronsSentenceDisplayed << " " << currentSentenceId << " " << l_sizeS << " " << l_lenghtX << " " << m_allValuesPlot.size() << " " << m_allValuesPlot[0].size();
-
-
-    if(m_timerDisplayNeurons.elapsed() > 250)// || ++m_nbSentencesDisplayed == nbSentences)
-    {
-        m_timerDisplayNeurons.restart();
-        QVector<double> l_xValues;
-        for(int ii = 0; ii < m_allValuesPlot[0].size(); ++ii)
-        {
-            l_xValues.push_back(ii/static_cast<double>(m_sizeDim2Meaning));
-        }
-//        for(int ii = 0; ii < l_lenghtX; ++ii)
+//        for(int ii = 0; ii < values->size(); ++ii)
 //        {
-//            l_xValues.push_back(ii/static_cast<double>(l_lenghtX));
+//            QVector<double> l_init;
+//            m_allValuesPlot.push_back(l_init);
 //        }
+//    }
 
-        for(int ii = 0; ii < m_plotListX.size(); ++ii)
-        {
+//    for(int ii = 0; ii < values->size(); ++ii)
+//    {
+//        for(int jj = 0; jj < (*values)[ii].size(); ++jj)
+//        {
+//            m_allValuesPlot[ii].push_back((*values)[ii][jj]);
+////            m_allXPlot.push_back();
+//        }
+//    }
 
-//            QVector<double> l_currentPart;
-//            for(int jj = l_startKey; jj < l_startKey + l_lenghtX; ++jj)
-//            {
-//                l_currentPart <<  m_allValuesPlot[ii][jj];
-//            }
 
-            QPen l_pen(Qt::blue);
-            l_pen.setWidthF(4);
-//            m_plotListX[ii]->xAxis->setRange(l_startKey, l_endKey);
-            m_plotListX[ii]->graph(0)->setPen(l_pen);
-//            m_plotListX[ii]->graph(0)->addData();
-            m_plotListX[ii]->graph(0)->setData(l_xValues, m_allValuesPlot[ii]);
-//            m_plotListX[ii]->graph(0)->setData(l_xValues,l_currentPart);
-//            m_plotListX[ii]->graph(0)->removeDataBefore(l_startKey);
-//            m_plotListX[ii]->graph(0)->removeDataAfter(l_endKey);
-            m_plotListX[ii]->replot();
+////    int l_sizeS = (*values)[0].size();
+////    int l_lenghtX = l_sizeS * m_nbMaxNeuronsSentenceDisplayed;
 
-        }
-    }
+////    double l_startKey, l_endKey;
+////    if(currentSentenceId <= m_nbMaxNeuronsSentenceDisplayed)
+////    {
+////        l_startKey = 0.0;
+////        l_endKey = currentSentenceId;
+////    }
+////    else
+////    {
+////        l_startKey = currentSentenceId - m_nbMaxNeuronsSentenceDisplayed;
+////        l_endKey = currentSentenceId;
+////    }
 
-    m_neuronDisplayMutex.unlock();
+////    qDebug() << "info : " << l_startKey << " " << l_endKey << " " << m_nbMaxNeuronsSentenceDisplayed << " " << currentSentenceId << " " << l_sizeS << " " << l_lenghtX << " " << m_allValuesPlot.size() << " " << m_allValuesPlot[0].size();
 
-    delete values;
-}
+
+//    if(m_timerDisplayNeurons.elapsed() > 250)// || ++m_nbSentencesDisplayed == nbSentences)
+//    {
+//        m_timerDisplayNeurons.restart();
+//        QVector<double> l_xValues;
+//        for(int ii = 0; ii < m_allValuesPlot[0].size(); ++ii)
+//        {
+//            l_xValues.push_back(ii/static_cast<double>(m_sizeDim2Meaning));
+//        }
+////        for(int ii = 0; ii < l_lenghtX; ++ii)
+////        {
+////            l_xValues.push_back(ii/static_cast<double>(l_lenghtX));
+////        }
+
+//        for(int ii = 0; ii < m_plotListX.size(); ++ii)
+//        {
+
+////            QVector<double> l_currentPart;
+////            for(int jj = l_startKey; jj < l_startKey + l_lenghtX; ++jj)
+////            {
+////                l_currentPart <<  m_allValuesPlot[ii][jj];
+////            }
+
+//            QPen l_pen(Qt::blue);
+//            l_pen.setWidthF(4);
+////            m_plotListX[ii]->xAxis->setRange(l_startKey, l_endKey);
+//            m_plotListX[ii]->graph(0)->setPen(l_pen);
+////            m_plotListX[ii]->graph(0)->addData();
+//            m_plotListX[ii]->graph(0)->setData(l_xValues, m_allValuesPlot[ii]);
+////            m_plotListX[ii]->graph(0)->setData(l_xValues,l_currentPart);
+////            m_plotListX[ii]->graph(0)->removeDataBefore(l_startKey);
+////            m_plotListX[ii]->graph(0)->removeDataAfter(l_endKey);
+//            m_plotListX[ii]->replot();
+
+//        }
+//    }
+
+//    m_neuronDisplayMutex.unlock();
+
+//    delete values;
+//}

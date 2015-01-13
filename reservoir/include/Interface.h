@@ -21,83 +21,12 @@
 #include "../genUI/UI_Interface.h"
 
 // reservoir
-#include "GridSearchQtObject.h"
+#include "InterfaceWorker.h"
 
 
 namespace Ui {
     class UI_Reservoir;
 }
-
-
-class InterfaceWorker;
-
-
-struct ReplayParameters
-{    
-    bool m_randomNeurons;
-    bool m_randomSentence;
-
-    int m_rangeNeuronsStart;
-    int m_rangeNeuronsEnd;
-    int m_randomNeuronsNumber;
-
-    int m_rangeSentencesStart;
-    int m_rangeSentencesEnd;
-    int m_randomSentencesNumber;
-};
-
-struct LanguageParameters
-{
-    QString m_structure;
-    QString m_CCW;
-};
-
-struct ReservoirParameters
-{
-    bool m_useCuda;
-
-    bool m_useLoadedTraining;
-    bool m_useLoadedW;
-    bool m_useLoadedWIn;
-    bool m_useOnlyStartValue;    
-
-    ActionToDo m_action;
-
-    int m_neuronsStart;
-    double m_leakRateStart;
-    double m_issStart;
-    double m_spectralRadiusStart;
-    double m_ridgeStart;
-    double m_sparcityStart;
-
-    int m_neuronsEnd;
-    double m_leakRateEnd;
-    double m_issEnd;
-    double m_spectralRadiusEnd;
-    double m_ridgeEnd;
-    double m_sparcityEnd;
-
-    int m_neuronsNbOfUses;
-    int m_leakRateNbOfUses;
-    int m_issNbOfUses;
-    int m_spectralRadiusNbOfUses;
-    int m_ridgeNbOfUses;
-    int m_sparcityNbOfUses;
-
-    bool m_neuronsEnabled;
-    bool m_leakRateEnabled;
-    bool m_issEnabled;
-    bool m_spectralRadiusEnabled;
-    bool m_ridgeEnabled;
-    bool m_sparcityEnabled;
-
-    QString m_neuronsOperation;
-    QString m_leakRateOperation;
-    QString m_issOperation;
-    QString m_spectralRadiusOperation;
-    QString m_ridgeOperation;
-    QString m_sparcityOperation;
-};
 
 
 /**
@@ -242,23 +171,23 @@ class Interface : public QMainWindow
          */
         void updateProgressBar(int currentValue, int valueMax, QString text);
 
-        /**
-         * @brief displayXMatrix
-         * @param values
-         * @param currentSentenceId
-         * @param nbSentences
-         */
-        void displayXMatrix(QVector<QVector<double> > *values, int currentSentenceId, int nbSentences);
+//        /**
+//         * @brief displayXMatrix
+//         * @param values
+//         * @param currentSentenceId
+//         * @param nbSentences
+//         */
+//        void displayXMatrix(QVector<QVector<double> > *values, int currentSentenceId, int nbSentences);
 
 
-        /**
-         * @brief initPlot
-         * @param nbCurves
-         * @param sizeDim1Meaning
-         * @param sizeDim2Meaning
-         * @param name
-         */
-        void initPlot(int nbCurves, int sizeDim1Meaning, int sizeDim2Meaning, QString name);
+//        /**
+//         * @brief initPlot
+//         * @param nbCurves
+//         * @param sizeDim1Meaning
+//         * @param sizeDim2Meaning
+//         * @param name
+//         */
+//        void initPlot(int nbCurves, int sizeDim1Meaning, int sizeDim2Meaning, QString name);
 
         /**
          * @brief cleanResultsDisplay
@@ -336,6 +265,20 @@ class Interface : public QMainWindow
          * @brief replayLoaded
          */
         void replayLoaded();
+
+        /**
+         * @brief updateDisplayReplay
+         * @param data
+         * @param neuronsId
+         * @param sentencesId
+         */
+        void updateDisplayReplay(QVector<QVector<double> > data, QVector<int> neuronsId, QVector<int> sentencesId);
+
+        /**
+         * @brief updateColorCCW
+         * @param params
+         */
+        void updateColorCCW(LanguageParameters params);
 
     signals:
 
@@ -431,8 +374,12 @@ class Interface : public QMainWindow
         QVector<QCustomPlot*> m_replayPlotList;
         QVector<double> m_replayData;
 
+        // replay
+        bool m_replayLoaded;
+        QVector<QCustomPlot*> m_plotReplay;
+
         // old
-        QVector<QCustomPlot*> m_plotListX;   // ?
+//        QVector<QCustomPlot*> m_plotListX;   // ?
         int m_sizeDim1Meaning; // ?
         int m_sizeDim2Meaning; // ?
         QVector<QVector<double> > m_allValuesPlot; // ?
@@ -440,198 +387,6 @@ class Interface : public QMainWindow
         int m_nbSentencesDisplayed; // ?
         QTime m_timerDisplayNeurons; // ?
         QMutex m_neuronDisplayMutex; // ?
-};
-
-
-
-/**
- * @brief The SWViewerWorker class
- */
-class InterfaceWorker : public QObject
-{
-    Q_OBJECT
-
-    public :
-
-        /**
-         * \brief constructor of InterfaceWorker
-         * @param absolutePath
-         */
-        InterfaceWorker(QString absolutePath);
-
-        /**
-         * \brief destructor of InterfaceWorker
-         */
-        ~InterfaceWorker();
-
-        /**
-         * @brief gridSearch
-         * @return
-         */
-        GridSearchQt *gridSearch() const;
-
-        /**
-         * @brief model
-         * @return
-         */
-        ModelQt *model();
-
-        /**
-         * @brief languageParameters
-         * @return
-         */
-        LanguageParameters languageParameters() const;
-
-    public slots:
-
-        /**
-         * @brief updateCorpus
-         * @param corpusPath
-         */
-        void addCorpus(QString corpusPath);
-
-        /**
-         * @brief removeCorpus
-         * @param index
-         */
-        void removeCorpus(int index);
-
-        /**
-         * @brief updateReservoirParameters
-         */
-        void updateReservoirParameters(ReservoirParameters newParams);
-
-        /**
-         * @brief updateLanguageParameters
-         * @param newParams
-         */
-        void updateLanguageParameters(LanguageParameters newParams);
-
-        /**
-         * @brief updateReplayParameters
-         * @param newParams
-         */
-        void updateReplayParameters(ReplayParameters newParams);
-
-        /**
-         * @brief start
-         */
-        void start();
-
-        /**
-         * @brief stop
-         */
-        void stop();
-
-        /**
-         * @brief saveLastTraining
-         * @param pathDirectory
-         */
-        void saveLastTraining(QString pathDirectory);
-
-        /**
-         * @brief saveLastReplay
-         * @param pathDirectory
-         */
-        void saveLastReplay(QString pathDirectory);
-
-
-        /**
-         * @brief loadTraining
-         * @param pathDirectory
-         */
-        void loadTraining(QString pathDirectory);
-
-        /**
-         * @brief loadW
-         * @param pathDirectory
-         */
-        void loadW(QString pathDirectory);
-
-        /**
-         * @brief loadWIn
-         * @param pathDirectory
-         */
-        void loadWIn(QString pathDirectory);
-
-
-        /**
-         * @brief setLoadedTrainingParameters
-         * @param loadedParams
-         */
-        void setLoadedTrainingParameters(QStringList loadedParams);
-
-        /**
-         * @brief setLoadedWParameters
-         * @param loadedParams
-         */
-        void setLoadedWParameters(QStringList loadedParams);
-
-        /**
-         * @brief setLoadedWInParameters
-         * @param loadedParams
-         */
-        void setLoadedWInParameters(QStringList loadedParams);
-
-        /**
-         * @brief loadReplay
-         * @param pathReplay
-         */
-        void loadReplay(QString pathReplay);
-
-        /**
-         * @brief startReplay
-         */
-        void startReplay();
-
-    signals:
-
-        /**
-         * @brief lockInterfaceSignal
-         */
-        void lockInterfaceSignal(bool);
-
-        /**
-         * @brief displayValidityOperation
-         */
-        void displayValidityOperationSignal(bool, int);
-
-
-        /**
-         * @brief endTrainingSignal
-         */
-        void endTrainingSignal(bool);
-
-        /**
-         * @brief sendLogInfo
-         */
-        void sendLogInfo(QString, QColor);
-
-        /**
-         * @brief replayLoaded
-         */
-        void replayLoaded();
-
-    private :
-
-        cv::Mat m_xTot;
-
-        int m_nbOfCorpus;
-
-        QString m_absolutePath;
-
-        QStringList m_parametersTrainingLoaded;
-        QStringList m_parametersWLoaded;
-        QStringList m_parametersWInLoaded;
-
-        ReservoirParameters m_reservoirParameters;
-        LanguageParameters m_languageParameters;
-        ReplayParameters m_replayParameters;
-
-        ModelQt m_model;
-        GridSearchQt *m_gridSearch;
-
-        QStringList m_corpusList;
 };
 
 
