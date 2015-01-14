@@ -63,7 +63,7 @@ class Interface : public QMainWindow
          * @brief closeEvent
          * @param event
          */
-        void closeEvent(QCloseEvent *event);
+//        void closeEvent(QCloseEvent *event);
 
         /**
          * @brief Add a corpus in the list
@@ -155,7 +155,7 @@ class Interface : public QMainWindow
         /**
          * @brief displayCurrentParameters
          */
-        void displayCurrentParameters(ModelParametersQt params);
+        void displayCurrentParameters(ModelParameters params);
 
         /**
          * @brief displayCurrentResults

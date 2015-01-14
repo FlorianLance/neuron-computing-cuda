@@ -1,11 +1,9 @@
-
 /**
  * \file Model.h
  * \brief defines Model
  * \author Florian Lance
- * \date 01/10/14
+ * \date 02/12/14
  */
-
 
 #ifndef MODEL_H
 #define MODEL_H
@@ -77,6 +75,8 @@ struct ModelParameters
     }
 
     bool m_useLoadedTraining;
+    bool m_useLoadedW;
+    bool m_useLoadedWIn;
 
     // cuda
     bool m_useCudaInv;              /**< uses the cuda inversion ? */
@@ -98,8 +98,10 @@ struct ModelParameters
 /**
  * @brief The Model class
  */
-class Model
+class Model : public QObject
 {
+    Q_OBJECT
+
     public :
 
         /**
@@ -111,7 +113,10 @@ class Model
          * @brief Model constructor.
          * @param [in] parameters : parameters used for initializeing the reservoirs and the pathes
          */
-        Model(const ModelParameters &parameters);                       
+        Model(const ModelParameters &parameters);
+
+
+        ~Model();
 
         /**
          * @brief return the parameters of the model.
@@ -127,11 +132,11 @@ class Model
         void resetModelParameters(const ModelParameters &newParameters, cbool verbose);
 
         /**
-         * @brief setGrammar
-         * @param [in] grammar   : gramar to be used
+         * @brief setCCWAndStructure
+         * @param [in] CCW       : CCW to be used
          * @param [in] structure : structure to be used
          */
-        void setGrammar(const Sentence &grammar, const Sentence &structure);
+        void setCCWAndStructure(const Sentence &CCW, const Sentence &structure);
 
         /**
          * @brief launchTraining
@@ -145,10 +150,6 @@ class Model
          */
         bool launchTests(const std::string &corpusTestFilePath = "");
 
-        /**
-         * @brief retrieveTrainSentences
-         */
-        void retrieveTrainSentences();
 
         /**
          * @brief retrieveTestsSentences
@@ -213,15 +214,71 @@ class Model
         void saveTraining(const std::string &pathDirectory);
 
         /**
+         * @brief saveReplay
+         * @param pathDirectory
+         */
+        void saveReplay(const std::string &pathDirectory);
+
+        /**
          * @brief loadTraining
          * @param pathDirectory
          */
         void loadTraining(const std::string &pathDirectory);
 
+        /**
+         * @brief loadW
+         * @param pathDirectory
+         */
+        void loadW(const std::string &pathDirectory);
+
+        /**
+         * @brief loadWIn
+         * @param pathDirectory
+         */
+        void loadWIn(const std::string &pathDirectory);
+
+        /**
+         * @brief reservoir
+         * @return
+         */
+        Reservoir *reservoir();
+
+        /**
+         * @brief xTotMatrice
+         * @return
+         */
+        cv::Mat *xTotMatrice();
+
 
         Sentences m_recoveredSentencesTrain;    /**< ... */
         Sentences m_recoveredSentencesTest;     /**< ... */
         Sentences m_testSentence;               /**< corpus test sentence */
+
+
+    signals :
+
+        /**
+         * @brief sendTrainInputMatrixSignal
+         */
+        void sendTrainInputMatrixSignal(cv::Mat, cv::Mat, Sentences);
+
+        /**
+         * @brief sendLogInfo
+         */
+        void sendLogInfo(QString, QColor);
+
+        /**
+         * @brief sendOutputMatrix
+         */
+        void sendOutputMatrix(cv::Mat, Sentences);
+
+    private :
+
+        /**
+         * @brief retrieveTrainSentences
+         */
+        void retrieveTrainSentences();
+
 
     private :
 
@@ -229,7 +286,7 @@ class Model
         bool m_verbose;                         /**< display infos during the processing */
         bool m_trainingSuccess;                 /**< is the training successful */
 
-        Sentence m_grammar;                     /**< grammar used in the corpus */
+        Sentence m_CCW;                         /**< CCW used in the corpus */
         Sentence m_structure;                   /**< structure used in the corpus */
         Sentence m_closedClassWords;            /**< closed class words */
 
@@ -246,6 +303,7 @@ class Model
         // results of the reservoir
         cv::Mat m_3DMatSentencesOutputTrain;                /**< ... */
         cv::Mat m_3DMatSentencesOutputTest;                 /**< ... */
+        cv::Mat m_internalStatesTrain;                      /**< ... */
         std::vector<cv::Mat> m_3DVMatSentencesOutputTrain;  /**< ... */
         std::vector<cv::Mat> m_3DVMatSentencesOutputTest;   /**< ... */
 
@@ -256,9 +314,7 @@ class Model
         ModelParameters m_parameters;           /**< reservoir parameters and corpus pathes */
 
         // reservoir
-        Reservoir m_reservoir;                  /**< reservoir structure */
-        Reservoir2<float> m_res1;
-        Reservoir2<double> m_res2;
+        Reservoir *m_reservoir;                  /**< reservoir structure */
 };
 
 #endif

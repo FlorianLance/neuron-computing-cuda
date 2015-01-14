@@ -8,12 +8,8 @@
 
 #include "Generalization.h"
 
-
-
-Generalization::Generalization(ModelQt &model) : m_model(&model)
+Generalization::Generalization(Model &model) : m_model(&model)
 {}
-
-
 
 void Generalization::retrieveRandomSentenceList(cint sizeCorpus, cint nbSentence, std::vector<int> &randomSentenceList)
 {
@@ -252,7 +248,7 @@ void Generalization::startXVerification(const std::string &xCheckTrainPath, cons
     QVector<QStringList> l_inused;
     extractAllDataFromCorpusFile(m_model->parameters().m_corpusFilePath.c_str(), m_trainMeaning,m_trainInfo,m_trainSentence, l_inused,l_inused,l_inused);
 
-    ModelParametersQt l_currentParameters  = m_model->parameters();
+    ModelParameters l_currentParameters  = m_model->parameters();
     l_currentParameters.m_corpusFilePath = "../data/input/Corpus/XCheck.txt";
 
     l_currentParameters.display();    

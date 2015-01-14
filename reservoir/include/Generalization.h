@@ -9,7 +9,7 @@
 #ifndef GENERALIZATION_H
 #define GENERALIZATION_H
 
-#include <ModelQtObject.h>
+#include <Model.h>
 
 /**
  * @brief The Generalization class
@@ -26,14 +26,11 @@ class Generalization
          * @brief Generalization constructor.
          * @param [in] model : model to be used for the generation.
          */
-        Generalization(ModelQt &model);
+        Generalization(Model &model);
 
 
         /**
-         * @brief retrieveRandomSentenceList
-         * @param sizeCorpus
-         * @param nbSentence
-         * @param randomSentenceList
+         * @brief Build an id random list sentences.
          */
         void retrieveRandomSentenceList(cint sizeCorpus, cint nbSentence, std::vector<int> &randomSentenceList);
 
@@ -88,9 +85,11 @@ class Generalization
 
     private :
 
-        ModelQt *m_model;  /**< pointer to the model */
+        Model *m_model;  /**< pointer to the model */
 
-        QVector<QStringList> m_trainMeaning,m_trainInfo,m_trainSentence;
+        QVector<QStringList> m_trainMeaning;    /**< train meaning data */
+        QVector<QStringList> m_trainInfo;       /**< train info data */
+        QVector<QStringList> m_trainSentence;   /**< train sentence data */
 };
 
 #endif

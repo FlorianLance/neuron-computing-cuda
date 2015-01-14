@@ -19,7 +19,7 @@ LINK=link
 ############################################################################## OBJ LISTS
 
 RESERVOIR_OBJ=\
-    $(LIBDIR)/Generalization.obj $(LIBDIR)/ReservoirQtObject.obj $(LIBDIR)/ModelQtObject.obj $(LIBDIR)/inversions.obj $(LIBDIR)/multiplications.obj $(LIBDIR)/GridSearchQtObject.obj $(LIBDIR)/main.obj\
+    $(LIBDIR)/Generalization.obj $(LIBDIR)/Reservoir.obj $(LIBDIR)/Model.obj $(LIBDIR)/inversions.obj $(LIBDIR)/multiplications.obj $(LIBDIR)/GridSearch.obj $(LIBDIR)/main.obj\
 
 RESERVOIR_RFMODULE=\
     $(RESERVOIR_OBJ)
@@ -28,13 +28,13 @@ RESERVOIR_COMMAND=\
     $(RESERVOIR_OBJ)
 
 RESERVOIR_QT_INTERFACE_OBJ=\
-    $(LIBDIR)/ReservoirQtObject.obj $(LIBDIR)/ModelQtObject.obj $(LIBDIR)/inversions.obj $(LIBDIR)/multiplications.obj\
-    $(LIBDIR)/qcustomplot.obj $(LIBDIR)/GridSearchQtObject.obj $(LIBDIR)/Interface.obj $(LIBDIR)/InterfaceWorker.obj\
+    $(LIBDIR)/Reservoir.obj $(LIBDIR)/Model.obj $(LIBDIR)/inversions.obj $(LIBDIR)/multiplications.obj\
+    $(LIBDIR)/qcustomplot.obj $(LIBDIR)/GridSearch.obj $(LIBDIR)/Interface.obj $(LIBDIR)/InterfaceWorker.obj\
 
 ############################################################################## MOC LIST
 
 RESERVOIR_MOC=\
-    $(MOCDIR)/moc_Interface.cpp $(MOCDIR)/moc_InterfaceWorker.cpp $(MOCDIR)/moc_ReservoirQtObject.cpp $(MOCDIR)/moc_ModelQtObject.cpp $(MOCDIR)/moc_GridSearchQtObject.cpp\
+    $(MOCDIR)/moc_Interface.cpp $(MOCDIR)/moc_InterfaceWorker.cpp $(MOCDIR)/moc_Reservoir.cpp $(MOCDIR)/moc_Model.cpp $(MOCDIR)/moc_GridSearch.cpp\
     $(MOCDIR)/moc_qcustomplot.cpp\
 
 ############################################################################## Makefile commands
@@ -67,14 +67,14 @@ $(BINDIR)/reservoir-x64.exe: $(RESERVOIR_COMMAND) $(LIBS_RESERVOIR)
 
 ##################################################### sources files
 
-$(LIBDIR)/ReservoirQtObject.obj: ./src/ReservoirQtObject.cpp
-        $(CC) -c ./src/ReservoirQtObject.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/ReservoirQtObject.obj"
+$(LIBDIR)/Reservoir.obj: ./src/Reservoir.cpp
+        $(CC) -c ./src/Reservoir.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/Reservoir.obj"
 
-$(LIBDIR)/ModelQtObject.obj: ./src/ModelQtObject.cpp
-        $(CC) -c ./src/ModelQtObject.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/ModelQtObject.obj"
+$(LIBDIR)/Model.obj: ./src/Model.cpp
+        $(CC) -c ./src/Model.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/Model.obj"
 
-$(LIBDIR)/GridSearchQtObject.obj: ./src/GridSearchQtObject.cpp
-        $(CC) -c ./src/GridSearchQtObject.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/GridSearchQtObject.obj"
+$(LIBDIR)/GridSearch.obj: ./src/GridSearch.cpp
+        $(CC) -c ./src/GridSearch.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/GridSearch.obj"
 
 $(LIBDIR)/Generalization.obj: ./src/Generalization.cpp
         $(CC) -c ./src/Generalization.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/Generalization.obj"
@@ -105,14 +105,14 @@ $(MOCDIR)/moc_Interface.cpp: ./include/Interface.h
 $(MOCDIR)/moc_InterfaceWorker.cpp: ./include/InterfaceWorker.h
          moc  ./include/InterfaceWorker.h -o $@
 
-$(MOCDIR)/moc_ReservoirQtObject.cpp: ./include/ReservoirQtObject.h
-         moc  ./include/ReservoirQtObject.h -o $@
+$(MOCDIR)/moc_Reservoir.cpp: ./include/Reservoir.h
+         moc  ./include/Reservoir.h -o $@
 
-$(MOCDIR)/moc_ModelQtObject.cpp: ./include/ModelQtObject.h
-         moc  ./include/ModelQtObject.h -o $@
+$(MOCDIR)/moc_Model.cpp: ./include/Model.h
+         moc  ./include/Model.h -o $@
 
-$(MOCDIR)/moc_GridSearchQtObject.cpp: ./include/GridSearchQtObject.h
-         moc  ./include/GridSearchQtObject.h -o $@
+$(MOCDIR)/moc_GridSearch.cpp: ./include/GridSearch.h
+         moc  ./include/GridSearch.h -o $@
 
 $(MOCDIR)/moc_qcustomplot.cpp: ./include/qcustomplot.h
          moc  ./include/qcustomplot.h -o $@

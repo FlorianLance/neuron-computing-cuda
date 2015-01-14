@@ -12,20 +12,15 @@
 #include "Utility.h"
 
 
-//void extractAllDataFromCorpusFile(const QString pathFileCorpus, QVector<QStringList> &dataTrain, QVector<QStringList> &sendFormInfoTrain, QVector<QStringList> &meaningTrain,
-//                                                                QVector<QStringList> &dataTest,  QVector<QStringList> &sendFormInfoTest,  QVector<QStringList> &meaningTest);
-
-
 /**
- * @brief closedClassWords
- * @param constructionWords
- * @param endStringToAdd
+ * @brief return a default list of closed class words
+ * @param [out] constructionWords : CCW list to be returned
+ * @param [in]  endStringToAdd    : word to add at the end of the CCW list
  */
 static void closedClassWords(Sentence &constructionWords, const std::string endStringToAdd = "")
 {
     constructionWords.clear();
     std::string l_words[] ={"and","is","of","the","to",".","-ed","-ing","-s","by","it","that","was","did",",","from"};
-//    std::string l_words[] ={"-ga","-ni","-wo","-yotte","-o","-te","sore"};
     constructionWords = Sentence(l_words, l_words + sizeof(l_words) / sizeof(std::string));
 
     if(endStringToAdd.size() > 0)
@@ -35,13 +30,7 @@ static void closedClassWords(Sentence &constructionWords, const std::string endS
 }
 
 /**
- * @brief generateCorpus
- * @param pathFileNewCorpus
- * @param trainData
- * @param trainInfo
- * @param trainMeaning
- * @param testData
- * @param testInfo
+ * @brief Generate a corpus file with input data vectors
  */
 static void generateCorpus(const QString pathFileNewCorpus, const QVector<QStringList> &trainData, const QVector<QStringList> &trainInfo, const QVector<QStringList> &trainMeaning,
                                                             const QVector<QStringList> &testData, const QVector<QStringList> &testInfo)
@@ -78,10 +67,9 @@ static void generateCorpus(const QString pathFileNewCorpus, const QVector<QStrin
 
 
 /**
- * @brief extractDataFromSettingFile
- * @param pathFileSettings
- * @param CCW
- * @param structure
+ * @brief Extract the CCW and the structure from a setting file.
+ * ex : and s of the to . -ed -ing -s by it that was did , from -> CCW to be extracted
+ *      P0 A1 O2 R3 -> structure to be extracted
  */
 static void extractDataFromSettingFile(const QString pathFileSettings, QStringList &CCW, QStringList &structure)
 {
@@ -104,14 +92,7 @@ static void extractDataFromSettingFile(const QString pathFileSettings, QStringLi
 }
 
 /**
- * @brief extractAllDataFromCorpusFile
- * @param pathFileCorpus
- * @param dataTrain
- * @param sendFormInfoTrain
- * @param meaningTrain
- * @param dataTest
- * @param sendFormInfoTest
- * @param meaningTest
+ * @brief Parse a corpus file and save the data in the inputs vectors.
  */
 static void extractAllDataFromCorpusFile(const QString pathFileCorpus,
                                          QVector<QStringList> &dataTrain, QVector<QStringList> &sendFormInfoTrain, QVector<QStringList> &meaningTrain,
@@ -215,11 +196,7 @@ static void extractAllDataFromCorpusFile(const QString pathFileCorpus,
 }
 
 /**
- * @brief extractAllDataFromCorpusFile
- * @param pathFileCorpus
- * @param data
- * @param sendFormInfo
- * @param meaning
+ * @brief Parse a corpus file and save the data in the inputs vectors.
  */
 static void extractAllDataFromCorpusFile(const QString pathFileCorpus, QVector<QStringList> &data, QVector<QStringList> &sendFormInfo, QVector<QStringList> &meaning)
 {
@@ -312,10 +289,7 @@ static void extractAllDataFromCorpusFile(const QString pathFileCorpus, QVector<Q
 
 
 /**
- * @brief generateOCWArray
- * @param dataArray
- * @param infoPAORArray
- * @param OCWArray
+ * @brief Generate an OCW array with computed results and the list of words (OCW)
  */
 static void generateOCWArray(const Sentences &dataArray, const Sentences &infoPAORArray, Sentences &OCWArray)
 {
@@ -452,11 +426,7 @@ static void generateOCWArray(const Sentences &dataArray, const Sentences &infoPA
 
 template<typename T>
 /**
- * @brief convertOutputActivityInSignalIdxMax
- * @param outAct
- * @param signalIndicesMax
- * @param thres
- * @param eps
+ * @brief Convert the output activity of the reservoir in a signal.
  */
 static void convertOutputActivityInSignalIdxMax(cv::Mat &outAct, cv::Mat &signalIndicesMax, const T thres = 0.4, const T eps = 1e-12)
 {
@@ -513,10 +483,6 @@ static void convertOutputActivityInSignalIdxMax(cv::Mat &outAct, cv::Mat &signal
 template<typename T>
 /**
  * @brief convertOneOutputActivityInConstruction
- * @param outAct
- * @param constructionWords
- * @param sent
- * @param minNbValUpperThres
  */
 static void convertOneOutputActivityInConstruction(cv::Mat &outAct, const Sentence &constructionWords, Sentence &sent, cint minNbValUpperThres = 1)
 {
@@ -564,10 +530,6 @@ static void convertOneOutputActivityInConstruction(cv::Mat &outAct, const Senten
 
 /**
  * @brief convertLOutputActivityInConstruction
- * @param outAct
- * @param constructionWords
- * @param sent
- * @param minNbValUpperThres
  */
 static void convertLOutputActivityInConstruction(cv::Mat &outAct, const Sentence &constructionWords, Sentences &sent, cint minNbValUpperThres = 1)
 {
@@ -612,10 +574,7 @@ static void convertLOutputActivityInConstruction(cv::Mat &outAct, const Sentence
 }
 
 /**
- * @brief nbOCWInConstruction
- * @param construction
- * @param _OCW
- * @return
+ * @brief Return the number of OCW in a construction sentence.
  */
 static int nbOCWInConstruction(const Sentence &construction, const std::string _OCW)
 {
@@ -634,11 +593,7 @@ static int nbOCWInConstruction(const Sentence &construction, const std::string _
 
 
 /**
- * @brief attributeOcwToConstructions
- * @param constructions
- * @param OCW
- * @param sent
- * @param _OCW
+ * @brief Attribute openc class words to constructions.
  */
 static void attributeOcwToConstructions(const Sentences &constructions, const Sentences &OCW,
                                            Sentences &sent, const std::string _OCW = "X")
@@ -684,10 +639,6 @@ static void attributeOcwToConstructions(const Sentences &constructions, const Se
 
 /**
  * @brief convertLineCorpusInfo
- * @param data
- * @param infoTrain
- * @param trainMeaning
- * @param newLineCorpusTrain
  */
 static void convertLineCorpusInfo(const QStringList &data, const QStringList &infoTrain, const QStringList &trainMeaning, QString &newLineCorpusTrain)
 {    
@@ -802,95 +753,6 @@ static void convertLineCorpusInfo(const QStringList &data, const QStringList &in
         }
     }
 
-    // indentifying the sentence where are the words
-//    std::vector<bool> l_wordsInSentence1, l_wordsInSentence2;
-//    for(int ii = 0; ii < l_newTrainMeaning.size(); ++ii)
-//    {
-//        bool l_sentence1 = false, l_sentence2 = false;
-//        if(l_data2.size() == 0)
-//        {
-//            l_sentence1 = true;
-//            l_sentence2 = false;
-//        }
-//        else
-//        {
-//            for(int jj = 0; jj < l_data1.size(); ++jj)
-//            {
-//                if(l_newTrainMeaning[ii] == l_data1[jj])
-//                {
-//                    l_sentence1 = true;
-//                    break;
-//                }
-//            }
-
-//            for(int jj = 0; jj < l_data2.size(); ++jj)
-//            {
-//                if(l_newTrainMeaning[ii] == l_data2[jj])
-//                {
-//                    l_sentence2 = true;
-//                    break;
-//                }
-//            }
-//        }
-
-//        l_wordsInSentence1.push_back(l_sentence1);
-//        l_wordsInSentence2.push_back(l_sentence2);
-//    }
-
-
-    // generating new info
-//    QString l_newInfoTrain1 = "[", l_newInfoTrain2 = "[";
-//    QStringList l_wordsAdded;
-//    for(int ii = 0; ii < infoTrain.size(); ++ii)
-//    {
-//        QStringList l_infos = infoTrain[ii].split("-");
-
-//        for(int jj = 0; jj < l_infos.size(); ++jj)
-//        {
-//            QString l_item =  l_infos[jj][0];
-
-//            bool l_wordAlreadyAdded = false;
-//            for(int kk = 0; kk < l_wordsAdded.size(); ++kk)
-//            {
-//                if(l_wordsAdded[kk] == l_newTrainMeaning[jj])
-//                {
-//                    l_wordAlreadyAdded = true;
-//                    break;
-//                }
-//            }
-
-//            l_wordsAdded << l_newTrainMeaning[jj];
-
-//            if(l_wordsInSentence1[jj] && !l_wordsInSentence2[jj])
-//            {
-//                l_newInfoTrain1 += (l_item + "-");
-//                l_newInfoTrain2 += "_-";
-//            }
-//            else if(!l_wordsInSentence1[jj] && l_wordsInSentence2[jj])
-//            {
-//                l_newInfoTrain1 += "_-";
-//                l_newInfoTrain2 += (l_item + "-");
-//            }
-//            else if(l_wordsInSentence1[jj] && l_wordsInSentence2[jj])
-//            {
-//                if(!l_wordAlreadyAdded)
-//                {
-//                    l_newInfoTrain1 += (l_item + "-");
-//                    l_newInfoTrain2 += (l_item + "-");
-//                }
-//            }
-//        }
-
-//        if(l_infos.size() < 8)
-//        {
-//            for(int jj = 0; jj < 9 - l_infos.size(); ++jj)
-//            {
-//                l_newInfoTrain1 += "_-";
-//                l_newInfoTrain2 += "_-";
-//            }
-//        }
-//    }
-
     l_newInfoTrain1[l_newInfoTrain1.size()-1] = ']';
     l_newInfoTrain2[l_newInfoTrain2.size()-1] = ']';
 
@@ -929,9 +791,6 @@ static void convertCorpus(QString pathCorpusOldFormat, QString pathCorpusNewForm
 
 /**
  * @brief generateSubRandomCorpus
- * @param pathFileCorpus
- * @param pathFileNewCorpus
- * @param nbOfSentencesToKeepRandomly
  */
 static void generateSubRandomCorpus(const QString pathFileCorpus, const QString pathFileNewCorpus, const int nbOfSentencesToKeepRandomly)
 {

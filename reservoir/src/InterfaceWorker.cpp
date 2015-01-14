@@ -12,12 +12,12 @@
 #include "../moc/moc_InterfaceWorker.cpp"
 
 
-InterfaceWorker::InterfaceWorker(QString absolutePath) : m_gridSearch(new GridSearchQt(m_model)), m_nbOfCorpus(0), m_absolutePath(absolutePath)
+InterfaceWorker::InterfaceWorker(QString absolutePath) : m_gridSearch(new GridSearch(m_model)), m_nbOfCorpus(0), m_absolutePath(absolutePath)
 {
     qRegisterMetaType<ReplayParameters>("ReplayParameters");
     qRegisterMetaType<ReservoirParameters>("ReservoirParameters");
     qRegisterMetaType<LanguageParameters>("LanguageParameters");
-    qRegisterMetaType<ModelParametersQt>("ModelParametersQt");
+    qRegisterMetaType<ModelParameters>("ModelParametersQt");
     qRegisterMetaType<ResultsDisplayReservoir>("ResultsDisplayReservoir");
     qRegisterMetaType<QVector<QVector<double> > >("QVector<QVector<double> >");
     qRegisterMetaType<QVector<int> >("QVector<int>");
@@ -30,12 +30,12 @@ InterfaceWorker::~InterfaceWorker()
     delete m_gridSearch;
 }
 
-GridSearchQt *InterfaceWorker::gridSearch() const
+GridSearch *InterfaceWorker::gridSearch() const
 {
     return m_gridSearch;
 }
 
-ModelQt *InterfaceWorker::model()
+Model *InterfaceWorker::model()
 {
     return &m_model;
 }
@@ -142,9 +142,9 @@ void InterfaceWorker::start()
 
         if(m_reservoirParameters.m_neuronsEnabled)
         {
-            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::NEURONS_NB, m_reservoirParameters.m_neuronsStart, m_reservoirParameters.m_neuronsEnd,
+            l_operationValid = m_gridSearch->setParameterValues(GridSearch::NEURONS_NB, m_reservoirParameters.m_neuronsStart, m_reservoirParameters.m_neuronsEnd,
                                                                 m_reservoirParameters.m_neuronsOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_neuronsNbOfUses);
-            emit displayValidityOperationSignal(l_operationValid, GridSearchQt::NEURONS_NB);
+            emit displayValidityOperationSignal(l_operationValid, GridSearch::NEURONS_NB);
             if(!l_operationValid)
             {
                 ++l_OperationInvalid;
@@ -152,9 +152,9 @@ void InterfaceWorker::start()
         }
         if(m_reservoirParameters.m_leakRateEnabled)
         {
-            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::LEAK_RATE,m_reservoirParameters.m_leakRateStart, m_reservoirParameters.m_leakRateEnd,
+            l_operationValid = m_gridSearch->setParameterValues(GridSearch::LEAK_RATE,m_reservoirParameters.m_leakRateStart, m_reservoirParameters.m_leakRateEnd,
                                                                 m_reservoirParameters.m_leakRateOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_leakRateNbOfUses);
-            emit displayValidityOperationSignal(l_operationValid, GridSearchQt::LEAK_RATE);
+            emit displayValidityOperationSignal(l_operationValid, GridSearch::LEAK_RATE);
             if(!l_operationValid)
             {
                 ++l_OperationInvalid;
@@ -162,9 +162,9 @@ void InterfaceWorker::start()
         }
         if(m_reservoirParameters.m_issEnabled)
         {
-            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::INPUT_SCALING,m_reservoirParameters.m_issStart, m_reservoirParameters.m_issEnd,
+            l_operationValid = m_gridSearch->setParameterValues(GridSearch::INPUT_SCALING,m_reservoirParameters.m_issStart, m_reservoirParameters.m_issEnd,
                                                                 m_reservoirParameters.m_issOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_issNbOfUses);
-            emit displayValidityOperationSignal(l_operationValid, GridSearchQt::INPUT_SCALING);
+            emit displayValidityOperationSignal(l_operationValid, GridSearch::INPUT_SCALING);
             if(!l_operationValid)
             {
                 ++l_OperationInvalid;
@@ -172,9 +172,9 @@ void InterfaceWorker::start()
         }
         if(m_reservoirParameters.m_spectralRadiusEnabled)
         {
-            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::SPECTRAL_RADIUS,    m_reservoirParameters.m_spectralRadiusStart,  m_reservoirParameters.m_spectralRadiusEnd,
+            l_operationValid = m_gridSearch->setParameterValues(GridSearch::SPECTRAL_RADIUS,    m_reservoirParameters.m_spectralRadiusStart,  m_reservoirParameters.m_spectralRadiusEnd,
                                                                 m_reservoirParameters.m_spectralRadiusOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_spectralRadiusNbOfUses);
-            emit displayValidityOperationSignal(l_operationValid, GridSearchQt::SPECTRAL_RADIUS);
+            emit displayValidityOperationSignal(l_operationValid, GridSearch::SPECTRAL_RADIUS);
             if(!l_operationValid)
             {
                 ++l_OperationInvalid;
@@ -182,9 +182,9 @@ void InterfaceWorker::start()
         }
         if(m_reservoirParameters.m_ridgeEnabled)
         {
-            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::RIDGE,m_reservoirParameters.m_ridgeStart, m_reservoirParameters.m_ridgeEnd,
+            l_operationValid = m_gridSearch->setParameterValues(GridSearch::RIDGE,m_reservoirParameters.m_ridgeStart, m_reservoirParameters.m_ridgeEnd,
                                                                 m_reservoirParameters.m_ridgeOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_ridgeNbOfUses);
-            emit displayValidityOperationSignal(l_operationValid, GridSearchQt::RIDGE);
+            emit displayValidityOperationSignal(l_operationValid, GridSearch::RIDGE);
             if(!l_operationValid)
             {
                 ++l_OperationInvalid;
@@ -192,9 +192,9 @@ void InterfaceWorker::start()
         }
         if(m_reservoirParameters.m_sparcityEnabled)
         {
-            l_operationValid = m_gridSearch->setParameterValues(GridSearchQt::SPARCITY, m_reservoirParameters.m_sparcityStart,  m_reservoirParameters.m_sparcityEnd,
+            l_operationValid = m_gridSearch->setParameterValues(GridSearch::SPARCITY, m_reservoirParameters.m_sparcityStart,  m_reservoirParameters.m_sparcityEnd,
                                                                 m_reservoirParameters.m_sparcityOperation.toStdString(), l_onlyStartValue, m_reservoirParameters.m_sparcityNbOfUses);
-            emit displayValidityOperationSignal(l_operationValid, GridSearchQt::SPARCITY);
+            emit displayValidityOperationSignal(l_operationValid, GridSearch::SPARCITY);
             if(!l_operationValid)
             {
                 ++l_OperationInvalid;
@@ -239,12 +239,12 @@ void InterfaceWorker::start()
     {
         if(m_parametersTrainingLoaded.size() > 0)
         {
-            m_gridSearch->setParameterValues(GridSearchQt::NEURONS_NB,      m_parametersTrainingLoaded[0].toInt(),    m_parametersTrainingLoaded[0].toInt(),   "+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::SPARCITY,        m_parametersTrainingLoaded[1].toDouble(), m_parametersTrainingLoaded[1].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::SPECTRAL_RADIUS, m_parametersTrainingLoaded[2].toDouble(), m_parametersTrainingLoaded[2].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::INPUT_SCALING,   m_parametersTrainingLoaded[3].toDouble(), m_parametersTrainingLoaded[3].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::LEAK_RATE,       m_parametersTrainingLoaded[4].toDouble(), m_parametersTrainingLoaded[4].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::RIDGE,           m_parametersTrainingLoaded[5].toDouble(), m_parametersTrainingLoaded[5].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearch::NEURONS_NB,      m_parametersTrainingLoaded[0].toInt(),    m_parametersTrainingLoaded[0].toInt(),   "+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearch::SPARCITY,        m_parametersTrainingLoaded[1].toDouble(), m_parametersTrainingLoaded[1].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearch::SPECTRAL_RADIUS, m_parametersTrainingLoaded[2].toDouble(), m_parametersTrainingLoaded[2].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearch::INPUT_SCALING,   m_parametersTrainingLoaded[3].toDouble(), m_parametersTrainingLoaded[3].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearch::LEAK_RATE,       m_parametersTrainingLoaded[4].toDouble(), m_parametersTrainingLoaded[4].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearch::RIDGE,           m_parametersTrainingLoaded[5].toDouble(), m_parametersTrainingLoaded[5].toDouble(),"+0", true, 1);
         }
     }
 
@@ -252,24 +252,24 @@ void InterfaceWorker::start()
     {
         if(m_parametersWLoaded.size() > 0)
         {
-            m_gridSearch->setParameterValues(GridSearchQt::NEURONS_NB,      m_parametersWLoaded[0].toInt(),    m_parametersWLoaded[0].toInt(),   "+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::SPARCITY,        m_parametersWLoaded[1].toDouble(), m_parametersWLoaded[1].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::SPECTRAL_RADIUS, m_parametersWLoaded[2].toDouble(), m_parametersWLoaded[2].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::INPUT_SCALING,   m_parametersWLoaded[3].toDouble(), m_parametersWLoaded[3].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::LEAK_RATE,       m_parametersWLoaded[4].toDouble(), m_parametersWLoaded[4].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::RIDGE,           m_parametersWLoaded[5].toDouble(), m_parametersWLoaded[5].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearch::NEURONS_NB,      m_parametersWLoaded[0].toInt(),    m_parametersWLoaded[0].toInt(),   "+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearch::SPARCITY,        m_parametersWLoaded[1].toDouble(), m_parametersWLoaded[1].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearch::SPECTRAL_RADIUS, m_parametersWLoaded[2].toDouble(), m_parametersWLoaded[2].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearch::INPUT_SCALING,   m_parametersWLoaded[3].toDouble(), m_parametersWLoaded[3].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearch::LEAK_RATE,       m_parametersWLoaded[4].toDouble(), m_parametersWLoaded[4].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearch::RIDGE,           m_parametersWLoaded[5].toDouble(), m_parametersWLoaded[5].toDouble(),"+0", true, 1);
         }
     }
     else if(m_reservoirParameters.m_useLoadedWIn & !m_reservoirParameters.m_useLoadedW)
     {
         if(m_parametersWInLoaded.size() > 0)
         {
-            m_gridSearch->setParameterValues(GridSearchQt::NEURONS_NB,      m_parametersWInLoaded[0].toInt(),    m_parametersWInLoaded[0].toInt(),   "+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::SPARCITY,        m_parametersWInLoaded[1].toDouble(), m_parametersWInLoaded[1].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::SPECTRAL_RADIUS, m_parametersWInLoaded[2].toDouble(), m_parametersWInLoaded[2].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::INPUT_SCALING,   m_parametersWInLoaded[3].toDouble(), m_parametersWInLoaded[3].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::LEAK_RATE,       m_parametersWInLoaded[4].toDouble(), m_parametersWInLoaded[4].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::RIDGE,           m_parametersWInLoaded[5].toDouble(), m_parametersWInLoaded[5].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearch::NEURONS_NB,      m_parametersWInLoaded[0].toInt(),    m_parametersWInLoaded[0].toInt(),   "+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearch::SPARCITY,        m_parametersWInLoaded[1].toDouble(), m_parametersWInLoaded[1].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearch::SPECTRAL_RADIUS, m_parametersWInLoaded[2].toDouble(), m_parametersWInLoaded[2].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearch::INPUT_SCALING,   m_parametersWInLoaded[3].toDouble(), m_parametersWInLoaded[3].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearch::LEAK_RATE,       m_parametersWInLoaded[4].toDouble(), m_parametersWInLoaded[4].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearch::RIDGE,           m_parametersWInLoaded[5].toDouble(), m_parametersWInLoaded[5].toDouble(),"+0", true, 1);
         }
     }
     else if(m_reservoirParameters.m_useLoadedW && m_reservoirParameters.m_useLoadedWIn)
@@ -293,12 +293,12 @@ void InterfaceWorker::start()
 
         if(m_parametersWInLoaded.size() > 0 && l_paramValid)
         {
-            m_gridSearch->setParameterValues(GridSearchQt::NEURONS_NB,      m_parametersWInLoaded[0].toInt(),    m_parametersWInLoaded[0].toInt(),   "+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::SPARCITY,        m_parametersWInLoaded[1].toDouble(), m_parametersWInLoaded[1].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::SPECTRAL_RADIUS, m_parametersWInLoaded[2].toDouble(), m_parametersWInLoaded[2].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::INPUT_SCALING,   m_parametersWInLoaded[3].toDouble(), m_parametersWInLoaded[3].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::LEAK_RATE,       m_parametersWInLoaded[4].toDouble(), m_parametersWInLoaded[4].toDouble(),"+0", true, 1);
-            m_gridSearch->setParameterValues(GridSearchQt::RIDGE,           m_parametersWInLoaded[5].toDouble(), m_parametersWInLoaded[5].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearch::NEURONS_NB,      m_parametersWInLoaded[0].toInt(),    m_parametersWInLoaded[0].toInt(),   "+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearch::SPARCITY,        m_parametersWInLoaded[1].toDouble(), m_parametersWInLoaded[1].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearch::SPECTRAL_RADIUS, m_parametersWInLoaded[2].toDouble(), m_parametersWInLoaded[2].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearch::INPUT_SCALING,   m_parametersWInLoaded[3].toDouble(), m_parametersWInLoaded[3].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearch::LEAK_RATE,       m_parametersWInLoaded[4].toDouble(), m_parametersWInLoaded[4].toDouble(),"+0", true, 1);
+            m_gridSearch->setParameterValues(GridSearch::RIDGE,           m_parametersWInLoaded[5].toDouble(), m_parametersWInLoaded[5].toDouble(),"+0", true, 1);
         }
 
         if(!l_paramValid)

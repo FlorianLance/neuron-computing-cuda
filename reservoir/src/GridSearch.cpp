@@ -1,12 +1,16 @@
 
+
 /**
  * \file GridSearch.cpp
- * \brief defines Generalization
+ * \brief defines GridSearch
  * \author Florian Lance
- * \date 01/10/14
+ * \date 04/12/14
  */
 
 #include "GridSearch.h"
+
+
+#include "../moc/moc_GridSearch.cpp"
 
 GridSearch::GridSearch(Model &model) : m_model(&model), m_useCudaInv(true), m_useCudaMult(false)
 {}
@@ -17,41 +21,48 @@ void GridSearch::setCudaParameters(cbool useCudaInversion, cbool useCudaMultipli
     m_useCudaMult   = useCudaMultiplication;
 }
 
-void GridSearch::launchTrainWithAllParameters(const std::string resultsFilePath, const std::string resultsRawFilePath, cbool doTraining, cbool doTest, cbool loadTraining)
+void GridSearch::launchTrainWithAllParameters(const std::string resultsFilePath, const std::string resultsRawFilePath, cbool doTraining, cbool doTest, cbool loadTraining, cbool loadW, cbool loadWIn)
 {
     if(m_corpusList.size() == 0)
     {
         std::cerr << "-ERROR : at least one corpus must be defined. Grid Search aborted. " << std::endl;
+        emit sendLogInfo("-ERROR : at least one corpus must be defined. Grid Search aborted.  \n", QColor(Qt::red));
         return;
     }
     if(m_nbNeuronsValues.size() == 0)
     {
         std::cout << "No neuron nb value found, 1 default value set. " << std::endl;
+        emit sendLogInfo("No neuron nb value found, 1 default value set.  \n", QColor(Qt::blue));
         m_nbNeuronsValues.push_back(800);
     }
     if(m_leakRateValues.size() == 0)
     {
         std::cout << "No leak rate value found, 1 default value set. " << std::endl;
+        emit sendLogInfo("No leak rate value found, 1 default value set.  \n", QColor(Qt::blue));
         m_leakRateValues.push_back(0.1);
     }
     if(m_sparcityValues.size() == 0)
     {
         std::cout << "No sparcity value found, automatic value set. " << std::endl;
+        emit sendLogInfo("No sparcity value found, automatic value set.  \n", QColor(Qt::blue));
         m_sparcityValues.push_back(-1);
     }
     if(m_inputScalingValues.size() == 0)
     {
         std::cout << "No input scaling value found, 1 default value set. " << std::endl;
+        emit sendLogInfo("No input scaling value found, 1 default value set.  \n", QColor(Qt::blue));
         m_inputScalingValues.push_back(0.1);
     }
     if(m_spectralRadiusValues.size() == 0)
     {
         std::cout << "No spectral radius value found, 1 default value set. " << std::endl;
+        emit sendLogInfo("No spectral radius value found, 1 default value set.  \n", QColor(Qt::blue));
         m_spectralRadiusValues.push_back(3);
     }
     if(m_ridgeValues.size() == 0)
     {
         std::cout << "No ridge value found, 1 default value set. " << std::endl;
+        emit sendLogInfo("No ridge value found, 1 default value set.  \n", QColor(Qt::blue));
         m_ridgeValues.push_back(1e-5);
     }
 
@@ -63,16 +74,20 @@ void GridSearch::launchTrainWithAllParameters(const std::string resultsFilePath,
     std::cout << "Number of trains/tests to be done : " << l_nbTrain << std::endl;
     std::cout << "#################################\n" << std::endl;
 
+    emit sendLogInfo("Start Grid search for training :  \nNumber of trains/tests to be done : " + QString::number(l_nbTrain) +"\n\n", QColor(Qt::blue));
+
     std::ofstream l_flowResFileReadableData(resultsFilePath), l_flowResFileRawData(resultsRawFilePath);
 
     if(!l_flowResFileReadableData)
     {
         std::cerr << "-ERROR : can not write the results in the file " << resultsFilePath << std::endl;
+        emit sendLogInfo("-ERROR : can not write the results in the file. \n", QColor(Qt::red));
         return;
     }
     if(!l_flowResFileRawData)
     {
         std::cerr << "-ERROR : can not write the results in the file " << resultsRawFilePath << std::endl;
+        emit sendLogInfo("-ERROR : can not write the results in the file.  \n", QColor(Qt::red));
         return;
     }
 
@@ -133,21 +148,28 @@ void GridSearch::launchTrainWithAllParameters(const std::string resultsFilePath,
                                 l_currentParameters.m_useCudaMult       = m_useCudaMult;
 
                                 l_currentParameters.m_useLoadedTraining = loadTraining;
+                                l_currentParameters.m_useLoadedW        = loadW;
+                                l_currentParameters.m_useLoadedWIn      = loadWIn;
+
+                                emit sendCurrentParametersSignal(l_currentParameters);
 
                                 std::cout << "############################################################## " << std::endl;
 
                                 m_model->resetModelParameters(l_currentParameters, false);
 
-                                clock_t l_timeTraining = clock();                               
+                                clock_t l_timeTraining = clock();
                                 std::vector<double> l_diffSizeOCW, l_absoluteCorrectPositionAndWordCCW, l_correctPositionAndWordCCW, l_absoluteCorrectPositionAndWordAll, l_correctPositionAndWordAll;
                                 double l_meanDiffSizeOCW, l_meanCorrectPositionAndWordCCW, l_meanAbsoluteCorrectPositionAndWordCCW, l_meanCorrectPositionAndWordAll, l_meanAbsoluteCorrectPositionAndWordAll;
 
                                 // launch the training part
                                 if(doTraining && !loadTraining)
                                 {
-                                    std::cout << "########## Start the training number : " << l_currentTrain++ << " / " << l_nbTrain << std::endl << std::endl;m_model->launchTraining();
+                                    emit sendLogInfo("# Start the training number : " +  QString::number(l_currentTrain) + " / " + QString::number(l_nbTrain) + " \n", QColor(Qt::blue));
+                                    std::cout << "########## Start the training number : " << l_currentTrain++ << " / " << l_nbTrain << std::endl << std::endl;
+                                    m_model->launchTraining();
+
                                     double l_time = static_cast<double>((clock() - l_timeTraining)) / CLOCKS_PER_SEC;
-                                    m_model->retrieveTrainSentences();
+
                                     m_model->displayResults(true,false);
 
                                     m_model->computeResultsData(true,"../data/Results/test.txt", l_diffSizeOCW,
@@ -165,31 +187,51 @@ void GridSearch::launchTrainWithAllParameters(const std::string resultsFilePath,
                                     l_results.push_back(l_meanCorrectPositionAndWordAll);
 
                                     addResultsInStream(&l_flowResFileReadableData, &l_flowResFileRawData, l_results, aa, l_time, l_currentParameters, l_nbCharParams);
-
-
                                 }
 
                                 // launch the test part
                                 if(doTest && (doTraining || loadTraining))
                                 {
-                                    std::cout << "########## Start the test number : " << l_currentTest++ << " / " << l_nbTrain << std::endl << std::endl;
+                                    emit sendLogInfo("# Start the test number : " +  QString::number(l_currentTest) + " / " + QString::number(l_nbTrain) + " \n", QColor(Qt::blue));
+                                    std::cout << "########## Start the test number : " << l_currentTest++ << " / " << l_nbTrain << std::endl << std::endl;                                    
 
                                     if(m_model->launchTests())
-                                    {
-                                        m_model->retrieveTestsSentences();
+                                    {                                        
                                         m_model->displayResults(false,true);
                                     }
-
                                 }
+
+                                // send results to be displayed in the ui
+                                    ResultsDisplayReservoir l_resultsToDisplay;
+                                    m_model->sentences(l_resultsToDisplay.m_trainSentences, l_resultsToDisplay.m_trainResults, l_resultsToDisplay.m_testResults);
+                                    l_resultsToDisplay.m_absoluteCCW = l_absoluteCorrectPositionAndWordCCW;
+                                    l_resultsToDisplay.m_absoluteAll = l_absoluteCorrectPositionAndWordAll;
+                                    if(doTraining && doTest)
+                                    {
+                                        l_resultsToDisplay.m_action = BOTH_RES;
+                                    }
+                                    else if(doTraining)
+                                    {
+                                        l_resultsToDisplay.m_action = TRAINING_RES;
+                                    }
+                                    else
+                                    {
+                                        l_resultsToDisplay.m_action = TEST_RES;
+                                    }
+
+
+                                    emit sendResultsReservoirSignal(l_resultsToDisplay);
 
                                 if(!doTest && !doTraining)
                                 {
                                     std::cerr << "Training and test deactivated, nothing to done. " << std::endl;
+                                    emit sendLogInfo("Training and test deactivated, nothing to done. \n", QColor(Qt::red));
                                 }
 
                                 if(doTest && !loadTraining && !doTraining)
                                 {
                                     std::cerr << "Test can't be done, training is deactivated and not loaded. " << std::endl;
+                                    emit sendLogInfo("Test can't be done, training is deactivated and not loaded. \n", QColor(Qt::red));
                                 }
 
 
@@ -248,7 +290,7 @@ bool GridSearch::setParameterValues(const GridSearch::ReservoirParameter paramet
 
     int l_loopStop = 0;
     if(startValue <= endValue && !useOnlyStartValue)
-    {        
+    {
         while(l_value <= endValue)
         {
             if(parameterId != NEURONS_NB)
@@ -267,6 +309,7 @@ bool GridSearch::setParameterValues(const GridSearch::ReservoirParameter paramet
             if(++l_loopStop > 500)
             {
                 std::cerr << "Bad operation for parameter : " << parameterId << std::endl;
+                emit sendLogInfo("Bad operation for parameter : " +  QString::number(parameterId) + " \n", QColor(Qt::red));
                 l_operationValid = false;
                 break;
             }
@@ -292,6 +335,7 @@ bool GridSearch::setParameterValues(const GridSearch::ReservoirParameter paramet
             if(++l_loopStop > 500)
             {
                 std::cerr << "Bad operation for parameter : " << parameterId << std::endl;
+                emit sendLogInfo("Bad operation for parameter : " +  QString::number(parameterId) + " \n", QColor(Qt::red));
                 l_operationValid = false;
                 break;
             }

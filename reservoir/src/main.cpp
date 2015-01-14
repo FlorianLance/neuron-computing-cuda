@@ -1,6 +1,6 @@
 
 
-#include "GridSearchQtObject.h"
+#include "GridSearch.h"
 #include "Generalization.h"
 
 #include "gpuMat/cudaMultiplications.h"

@@ -1,15 +1,16 @@
 
 /**
  * \file GridSearch.h
- * \brief defines Generalization
+ * \brief defines GridSearch
  * \author Florian Lance
- * \date 01/10/14
+ * \date 04/12/14
  */
 
 #ifndef GRIDSEARCH_H
 #define GRIDSEARCH_H
 
 #include <Model.h>
+
 
 template <typename T>
 /**
@@ -26,11 +27,37 @@ static void display(std::vector<T> vec)
 }
 
 /**
- * @brief The GridSearch class
+ * @brief actions that can be done : TRAINING_RES -> only training / TEST_RES -> only doing the tests / BOTH_RES -> the both
  */
-class GridSearch
+enum ActionToDo
 {
-    public :   
+    TRAINING_RES,TEST_RES,BOTH_RES
+};
+
+/**
+ * @brief The ResultsDisplayReservoir struct
+ */
+struct ResultsDisplayReservoir
+{
+    std::vector<double> m_absoluteCCW;
+    std::vector<double> m_absoluteAll;
+
+    Sentences m_trainSentences;
+    Sentences m_trainResults;
+    Sentences m_testResults;
+
+    ActionToDo m_action;
+};
+
+
+/**
+ * @brief The GridSearchQt class
+ */
+class GridSearch : public QObject
+{
+    Q_OBJECT
+
+    public :
 
         /**
          * @brief Enum of the parameters used by the grid search.
@@ -41,7 +68,7 @@ class GridSearch
         };
 
         /**
-         * @brief GridSearch constructor.
+         * @brief GridSearchQt constructor.
          * @param [in] model : model to be used for the generation.
          */
         GridSearch(Model &model);
@@ -53,7 +80,6 @@ class GridSearch
          */
         void setCudaParameters(cbool useCudaInversion, cbool useCudaMultiplication);
 
-
         /**
          * @brief Start the training with all the parameters defined.
          * @param [in] resultsFilePath      : result file path (readable data)
@@ -61,8 +87,11 @@ class GridSearch
          * @param doTraining
          * @param doTest
          * @param loadTraining
+         * @param loadW
+         * @param loadWIn
          */
-        void launchTrainWithAllParameters(const std::string resultsFilePath, const std::string resultsRawFilePath, cbool doTraining = true, cbool doTest = false, cbool loadTraining = false);
+        void launchTrainWithAllParameters(const std::string resultsFilePath, const std::string resultsRawFilePath, cbool doTraining = true, cbool doTest = false, cbool loadTraining = false
+                , cbool loadW = false, cbool loadWIn = false);
 
         /**
          * @brief Define the range of values for a parameter to be used.
@@ -86,17 +115,27 @@ class GridSearch
          */
         void setCorpusList(const std::vector<std::string> &corpusList);
 
+    signals :
+
+        /**
+         * @brief sendCurrentParametersSignal
+         */
+        void sendCurrentParametersSignal(ModelParameters);
+
+        /**
+         * @brief sendResultsReservoirSignal
+         */
+        void sendResultsReservoirSignal(ResultsDisplayReservoir);
+
+        /**
+         * @brief sendLogInfo
+         */
+        void sendLogInfo(QString, QColor);
+
     private :
 
         /**
          * @brief addResultsInStream
-         * @param streamReadableData
-         * @param streamRawData
-         * @param results
-         * @param numCorpus
-         * @param time
-         * @param parameters
-         * @param nbCharParams
          */
         void addResultsInStream(std::ofstream *streamReadableData, std::ofstream *streamRawData, const std::vector<double> &results, cint numCorpus, const double time, const ModelParameters parameters, int *nbCharParams);
 

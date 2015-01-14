@@ -10,7 +10,7 @@
 #define _INTERFACEWORKER_
 
 // reservoir
-#include "GridSearchQtObject.h"
+#include "GridSearch.h"
 
 /**
  * @brief The ReplayParameters struct
@@ -115,13 +115,13 @@ class InterfaceWorker : public QObject
          * @brief gridSearch
          * @return
          */
-        GridSearchQt *gridSearch() const;
+        GridSearch *gridSearch() const;
 
         /**
          * @brief model
          * @return
          */
-        ModelQt *model();
+        Model *model();
 
         /**
          * @brief languageParameters
@@ -280,8 +280,8 @@ class InterfaceWorker : public QObject
         LanguageParameters m_languageParameters;    /**< ... */
         ReplayParameters m_replayParameters;        /**< ... */
 
-        ModelQt m_model;                /**< ... */
-        GridSearchQt *m_gridSearch;     /**< ... */
+        Model m_model;                /**< ... */
+        GridSearch *m_gridSearch;     /**< ... */
 
         QStringList m_corpusList;   /**< ... */
 };
