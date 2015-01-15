@@ -19,32 +19,32 @@ LINK=link
 ############################################################################## OBJ LISTS
 
 RESERVOIR_OBJ=\
-    $(LIBDIR)/Generalization.obj $(LIBDIR)/Reservoir.obj $(LIBDIR)/Model.obj $(LIBDIR)/inversions.obj $(LIBDIR)/multiplications.obj $(LIBDIR)/GridSearch.obj $(LIBDIR)/main.obj\
+    $(LIBDIR)/Generalization.obj $(LIBDIR)/Reservoir.obj $(LIBDIR)/Model.obj $(LIBDIR)/inversions.obj $(LIBDIR)/multiplications.obj $(LIBDIR)/GridSearch.obj\
 
-RESERVOIR_RFMODULE=\
-    $(RESERVOIR_OBJ)
+RESERVOIR_COMMAND_OBJ=\
+    $(RESERVOIR_OBJ) $(LIBDIR)/main.obj\
 
-RESERVOIR_COMMAND=\
-    $(RESERVOIR_OBJ)
+RESERVOIR_YARP_OBJ=\
+    $(RESERVOIR_OBJ) $(LIBDIR)/YarpInterface.obj\
 
 RESERVOIR_QT_INTERFACE_OBJ=\
-    $(LIBDIR)/Reservoir.obj $(LIBDIR)/Model.obj $(LIBDIR)/inversions.obj $(LIBDIR)/multiplications.obj\
-    $(LIBDIR)/qcustomplot.obj $(LIBDIR)/GridSearch.obj $(LIBDIR)/Interface.obj $(LIBDIR)/InterfaceWorker.obj\
+    $(RESERVOIR_OBJ) $(LIBDIR)/qcustomplot.obj $(LIBDIR)/Interface.obj $(LIBDIR)/InterfaceWorker.obj\
+
 
 ############################################################################## MOC LIST
 
 RESERVOIR_MOC=\
     $(MOCDIR)/moc_Interface.cpp $(MOCDIR)/moc_InterfaceWorker.cpp $(MOCDIR)/moc_Reservoir.cpp $(MOCDIR)/moc_Model.cpp $(MOCDIR)/moc_GridSearch.cpp\
-    $(MOCDIR)/moc_qcustomplot.cpp\
+    $(MOCDIR)/moc_qcustomplot.cpp $(MOCDIR)/moc_YarpInterface.cpp\
 
 ############################################################################## Makefile commands
 
 !if "$(ARCH)" == "x86"
-all: $(QTGENW)/UI_Interface.h $(RESERVOIR_MOC) $(BINDIR)/reservoir-interface.exe $(BINDIR)/reservoir.exe
+all: $(QTGENW)/UI_Interface.h $(RESERVOIR_MOC) $(BINDIR)/reservoir-interface.exe $(BINDIR)/reservoir.exe $(BINDIR)/reservoir-yarp.exe
 !endif
 
 !if "$(ARCH)" == "amd64"
-all: $(QTGENW)/UI_Interface.h $(RESERVOIR_MOC) $(BINDIR)/reservoir-interface-x64.exe $(BINDIR)/reservoir-x64.exe
+all: $(QTGENW)/UI_Interface.h $(RESERVOIR_MOC) $(BINDIR)/reservoir-interface-x64.exe $(BINDIR)/reservoir-x64.exe $(BINDIR)/reservoir-yarp-x64.exe
 !endif
 
 ############################################################################## exe files
@@ -59,11 +59,18 @@ $(BINDIR)/reservoir-interface-x64.exe: $(RESERVOIR_QT_INTERFACE_OBJ) $(LIBS_RESE
         $(LINK) /OUT:$(BINDIR)/reservoir-interface-x64.exe $(LFLAGS_RESERVOIR) $(RESERVOIR_QT_INTERFACE_OBJ) $(LIBS_RESERVOIR) $(WIN_CONFIG)
 
 # exec files to be generated
-$(BINDIR)/reservoir.exe: $(RESERVOIR_COMMAND) $(LIBS_RESERVOIR)
-        $(LINK) /OUT:$(BINDIR)/reservoir.exe $(LFLAGS_RESERVOIR) $(RESERVOIR_COMMAND) $(LIBS_RESERVOIR) $(WIN_CONFIG)
+$(BINDIR)/reservoir.exe: $(RESERVOIR_COMMAND_OBJ) $(LIBS_RESERVOIR)
+        $(LINK) /OUT:$(BINDIR)/reservoir.exe $(LFLAGS_RESERVOIR) $(RESERVOIR_COMMAND_OBJ) $(LIBS_RESERVOIR) $(WIN_CONFIG)
 
-$(BINDIR)/reservoir-x64.exe: $(RESERVOIR_COMMAND) $(LIBS_RESERVOIR)
-        $(LINK) /OUT:$(BINDIR)/reservoir-x64.exe $(LFLAGS_RESERVOIR) $(RESERVOIR_COMMAND) $(LIBS_RESERVOIR) $(WIN_CONFIG)
+$(BINDIR)/reservoir-x64.exe: $(RESERVOIR_COMMAND_OBJ) $(LIBS_RESERVOIR)
+        $(LINK) /OUT:$(BINDIR)/reservoir-x64.exe $(LFLAGS_RESERVOIR) $(RESERVOIR_COMMAND_OBJ) $(LIBS_RESERVOIR) $(WIN_CONFIG)
+
+# exec files to be generated
+$(BINDIR)/reservoir-yarp.exe: $(RESERVOIR_YARP_OBJ) $(LIBS_RESERVOIR_YARP)
+        $(LINK) /OUT:$(BINDIR)/reservoir-yarp.exe $(LFLAGS_RESERVOIR) $(RESERVOIR_YARP_OBJ) $(LIBS_RESERVOIR_YARP) $(WIN_CONFIG)
+
+$(BINDIR)/reservoir-yarp-x64.exe: $(RESERVOIR_YARP_OBJ) $(LIBS_RESERVOIR_YARP)
+        $(LINK) /OUT:$(BINDIR)/reservoir-yarp-x64.exe $(LFLAGS_RESERVOIR) $(RESERVOIR_YARP_OBJ) $(LIBS_RESERVOIR_YARP) $(WIN_CONFIG)
 
 ##################################################### sources files
 
@@ -87,6 +94,9 @@ $(LIBDIR)/Interface.obj: ./src/Interface.cpp
 
 $(LIBDIR)/InterfaceWorker.obj: ./src/InterfaceWorker.cpp
         $(CC) -c ./src/InterfaceWorker.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/InterfaceWorker.obj"
+
+$(LIBDIR)/YarpInterface.obj: ./src/YarpInterface.cpp
+        $(CC) -c ./src/YarpInterface.cpp $(CFLAGS_DYN) $(RESERVOIR_YARP) -Fo"$(LIBDIR)/YarpInterface.obj"
 
 $(LIBDIR)/qcustomplot.obj: ./src/qcustomplot.cpp
         $(CC) -c ./src/qcustomplot.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/qcustomplot.obj"
@@ -113,6 +123,9 @@ $(MOCDIR)/moc_Model.cpp: ./include/Model.h
 
 $(MOCDIR)/moc_GridSearch.cpp: ./include/GridSearch.h
          moc  ./include/GridSearch.h -o $@
+
+$(MOCDIR)/moc_YarpInterface.cpp: ./include/YarpInterface.h
+         moc  ./include/YarpInterface.h -o $@
 
 $(MOCDIR)/moc_qcustomplot.cpp: ./include/qcustomplot.h
          moc  ./include/qcustomplot.h -o $@

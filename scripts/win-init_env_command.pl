@@ -53,6 +53,8 @@ my @ExecScriptParams = (# reservoir
                         "reservoir-x64",   "amd64",  "reservoir-x64.exe",
                         "reservoir-interface",       "x86",  "reservoir-interface.exe",
                         "reservoir-interface-x64",   "amd64",  "reservoir-interface-x64.exe",
+                        "reservoir-yarp",  "x86",   "reservoir-yarp.exe",
+                        "resrvoir-yarp-x64", "amd64", "reservoir-yarp-x64.exe"
 );
 
 sub executablesNumber {
@@ -84,11 +86,11 @@ $ENV{THIRD_PARTY_TOBII}   = $PThird_party . "tobii/";
 ##################### FACELAB
 $ENV{THIRD_PARTY_FACELAB}   = $PThird_party . "facelab/coredata-3.2.1.65799_vc10/";
 ##################### YARP
-$ENV{THIRD_PARTY_YARP}   = $PThird_party . "yarp/yarp-2.3.60/";
-$ENV{THIRD_PARTY_YARP_64}= $PThird_party . "yarp/amd64/yarp-2.3.60/";
+$ENV{THIRD_PARTY_YARP}   = $PLocalThird_party . "yarp/yarp-2.3.60/";
+$ENV{THIRD_PARTY_YARP_64}= $PLocalThird_party . "yarp/amd64/yarp-2.3.60/";
 ##################### ACE
-$ENV{THIRD_PARTY_ACE}   = $PThird_party . "ace/ace-6.1.0/";
-$ENV{THIRD_PARTY_ACE_64}= $PThird_party . "ace/amd64/Ace642/";
+$ENV{THIRD_PARTY_ACE}   = $PLocalThird_party . "ace/ace-6.1.0/";
+$ENV{THIRD_PARTY_ACE_64}= $PLocalThird_party . "ace/amd64/ace-6.1.0/";
 ##################### OPENNI
 $ENV{THIRD_PARTY_OPENNI}    = $PThird_party . "openni/openni-1.5.4.0/";
 $ENV{THIRD_PARTY_OPENNI2_64}= $PThird_party . "openni/amd64/openni-2.1.0.4-64/";

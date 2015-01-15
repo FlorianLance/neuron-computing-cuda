@@ -88,6 +88,8 @@ THIRD_PARTY_CUDA        = $(THIRD_PARTY_CUDA_64)
 THIRD_PARTY_QT          = $(THIRD_PARTY_QT_64)
 THIRD_PARTY_CLAPACK     = $(THIRD_PARTY_CLAPACK_64)
 THIRD_PARTY_PYTHON     = $(THIRD_PARTY_PYTHON_64)
+THIRD_PARTY_YARP        = $(THIRD_PARTY_YARP_64)
+THIRD_PARTY_ACE         = $(THIRD_PARTY_ACE_64)
 
 !ENDIF
 
@@ -113,6 +115,7 @@ INC_QT      = -I"$(THIRD_PARTY_QT)"/include/QtOpenGL -I"$(THIRD_PARTY_QT)"/inclu
 
 #INC_QT      = -I"$(THIRD_PARTY_QT)"/include/QtOpenGL -I"$(THIRD_PARTY_QT)"/include/QtGui -I"$(THIRD_PARTY_QT)"/include/QtCore -I"$(THIRD_PARTY_QT)"/include/QtWidgets -I"$(THIRD_PARTY_QT)"/include\
 
+INC_YARP    = -I"$(THIRD_PARTY_YARP)/include"\
 
 INC_CV      = -I"$(THIRD_PARTY_OPENCV)"\modules/core/include -I"$(THIRD_PARTY_OPENCV)"\modules/imgproc/include\
                   -I"$(THIRD_PARTY_OPENCV)"\modules/objdetect/include -I"$(THIRD_PARTY_OPENCV)"\modules/features2d/include\
@@ -128,6 +131,8 @@ INC_ARMADILLO = -I"$(THIRD_PARTY_ARMADILLO)"\
 COMMON        = $(INC_RES) $(INC_OTHERS) $(INC_VS)
 
 RESERVOIR_INC = $(COMMON) $(INC_UI) $(INC_MOC) $(INC_CV) $(INC_CULA) $(INC_QT)
+
+RESERVOIR_YARP = $(RESERVOIR_INC) $(INC_YARP)
 
 #$(INC_EIGEN) $(INC_ARMADILLO) $(INC_BOOST)
 
@@ -178,6 +183,17 @@ LIBS_CV         = $(THIRD_PARTY_OPENCV)/build/lib/Release/opencv_highgui248.lib 
 !ENDIF
 
 
+LIBS_YARP       = $(THIRD_PARTY_YARP)/lib/YARP_OS.lib\
+                  $(THIRD_PARTY_YARP)/lib/YARP_init.lib\
+                  $(THIRD_PARTY_YARP)/lib/YARP_sig.lib\
+                  $(THIRD_PARTY_YARP)/lib/YARP_dev.lib\
+                  $(THIRD_PARTY_YARP)/lib/YARP_math.lib\
+                  $(THIRD_PARTY_YARP)/lib/yarpcar.lib\
+                  $(THIRD_PARTY_YARP)/lib/yarpmod.lib\
+                  $(THIRD_PARTY_YARP)/lib/yarp_bayer.lib\
+
+LIBS_ACE        = $(THIRD_PARTY_ACE)/lib/ACE.lib\
+
 LIBS_BOOST      = $(THIRD_PARTY_BOOST)/lib/boost_python-vc100-mt-1_56.lib
 
 LIBS_CLA	= $(THIRD_PARTY_CLAPACK)/lib/lapack.lib $(THIRD_PARTY_CLAPACK)/lib/blas.lib $(THIRD_PARTY_CLAPACK)/lib/libf2c.lib\
@@ -189,8 +205,9 @@ LIBS_CULA       = $(THIRD_PARTY_CULA)\lib\cula_lapack_basic.lib\
 LIBS_PYTHON     = "$(THIRD_PARTY_PYTHON)lib/python27.lib"\
 
 LIBS_RESERVOIR  = $(LIBS_QT) $(LIBS_CV) $(LIBS_CULA) $(LIBS_CUDA) $(LIBS_CLA)
-#$(LIBS_BOOST) $(LIBS_PYTHON)
 
+LIBS_RESERVOIR_YARP = $(LIBS_RESERVOIR) $(LIBS_YARP) $(LIBS_ACE)
+#
 
 !ENDIF
 
