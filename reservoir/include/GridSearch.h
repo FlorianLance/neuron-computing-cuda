@@ -41,6 +41,8 @@ struct ResultsDisplayReservoir
 {
     std::vector<double> m_absoluteCCW;
     std::vector<double> m_absoluteAll;
+    std::vector<double> m_continuousCCW;
+    std::vector<double> m_continuousAll;
 
     Sentences m_trainSentences;
     Sentences m_trainResults;

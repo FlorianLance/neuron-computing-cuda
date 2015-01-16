@@ -67,7 +67,7 @@ class YarpInterfaceWorker : public QObject
         /**
          * \brief Constructor of YarpInterfaceWorker
          */
-        YarpInterfaceWorker();
+        YarpInterfaceWorker(QString absolutePath);
 
         ~YarpInterfaceWorker();
 
@@ -89,6 +89,9 @@ class YarpInterfaceWorker : public QObject
     signals :
 
 
+        void sendDataToReservoirSignal(ModelParameters, Sentence, Sentence);
+
+
     private :
 
         bool m_doLoop;
@@ -97,13 +100,18 @@ class YarpInterfaceWorker : public QObject
         bool m_reservoirIsRunning;
         bool m_startReservoir;
 
+        QString m_absolutePath;
+
         QReadWriteLock m_loopLock;
+        QReadWriteLock m_reservoirLock;
 
         yarp::os::BufferedPort<yarp::os::Bottle> m_controlPort;
         yarp::os::BufferedPort<yarp::os::Bottle> m_dataPort;
         yarp::os::BufferedPort<yarp::os::Bottle> m_parametersPort;
 
         ModelParameters m_currentModelParameters;
+        Sentence m_CCWSentence, m_structureSentence;
+
         cv::Mat m_W;
         cv::Mat m_WIn;
         cv::Mat m_WOut;

@@ -1164,6 +1164,9 @@
                     <height>16777215</height>
                    </size>
                   </property>
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
                   <property name="maximum">
                    <number>500000</number>
                   </property>
@@ -1174,6 +1177,9 @@
                 </item>
                 <item row="1" column="7">
                  <widget class="QSpinBox" name="sbNbRandomNeurons">
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
                   <property name="maximum">
                    <number>1000</number>
                   </property>
@@ -1300,8 +1306,11 @@
                 </item>
                 <item row="0" column="4">
                  <widget class="QSpinBox" name="sbEndRangeSentencesDisplay">
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
                   <property name="value">
-                   <number>10</number>
+                   <number>5</number>
                   </property>
                  </widget>
                 </item>
@@ -1314,11 +1323,14 @@
                 </item>
                 <item row="1" column="2">
                  <widget class="QSpinBox" name="sbNbRandomSentences">
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
                   <property name="maximum">
                    <number>1000</number>
                   </property>
                   <property name="value">
-                   <number>10</number>
+                   <number>5</number>
                   </property>
                  </widget>
                 </item>
@@ -1389,7 +1401,7 @@
                </layout>
               </widget>
              </item>
-             <item row="6" column="3">
+             <item row="7" column="3">
               <spacer name="verticalSpacer">
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
@@ -1402,7 +1414,7 @@
                </property>
               </spacer>
              </item>
-             <item row="5" column="6">
+             <item row="6" column="6">
               <widget class="QPushButton" name="pbStartReplay">
                <property name="enabled">
                 <bool>false</bool>
@@ -1422,6 +1434,216 @@
                <property name="text">
                 <string>PLOT</string>
                </property>
+              </widget>
+             </item>
+             <item row="5" column="0" colspan="7">
+              <widget class="QGroupBox" name="groupBox_4">
+               <property name="title">
+                <string>DISPLAY SETTINGS</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_19">
+                <item row="2" column="0" colspan="3">
+                 <widget class="Line" name="line_19">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="1">
+                 <widget class="QSpinBox" name="sbLineWidth">
+                  <property name="minimumSize">
+                   <size>
+                    <width>50</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>50</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="value">
+                   <number>2</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="0" colspan="3">
+                 <widget class="Line" name="line_22">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="0">
+                 <widget class="QLabel" name="laLineColor">
+                  <property name="text">
+                   <string>Line color :</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="0">
+                 <widget class="QLabel" name="laLineWidth">
+                  <property name="text">
+                   <string>Line width :</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="1" colspan="2">
+                 <widget class="QPushButton" name="pbColor">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>50</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">background-color: rgb(0, 17, 255);</string>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0" colspan="3">
+                 <widget class="QFrame" name="frame">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>50</height>
+                   </size>
+                  </property>
+                  <property name="frameShape">
+                   <enum>QFrame::StyledPanel</enum>
+                  </property>
+                  <property name="frameShadow">
+                   <enum>QFrame::Raised</enum>
+                  </property>
+                  <layout class="QGridLayout" name="gridLayout_20">
+                   <item row="0" column="1">
+                    <widget class="QSpinBox" name="sbWidthSentence">
+                     <property name="minimum">
+                      <number>10</number>
+                     </property>
+                     <property name="maximum">
+                      <number>2000</number>
+                     </property>
+                     <property name="value">
+                      <number>200</number>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="0">
+                    <widget class="QRadioButton" name="rbFixedWidth">
+                     <property name="text">
+                      <string>Fixed width sentence :</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QRadioButton" name="rbAutomaticWidth">
+                     <property name="text">
+                      <string>Automatic width sentence</string>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="2">
+                    <spacer name="horizontalSpacer_7">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item row="3" column="0" colspan="3">
+                 <widget class="QFrame" name="frame_2">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>50</height>
+                   </size>
+                  </property>
+                  <property name="frameShape">
+                   <enum>QFrame::StyledPanel</enum>
+                  </property>
+                  <property name="frameShadow">
+                   <enum>QFrame::Raised</enum>
+                  </property>
+                  <layout class="QGridLayout" name="gridLayout_21">
+                   <item row="0" column="1">
+                    <widget class="QSpinBox" name="sbHeightSentence">
+                     <property name="minimum">
+                      <number>25</number>
+                     </property>
+                     <property name="maximum">
+                      <number>5000</number>
+                     </property>
+                     <property name="value">
+                      <number>100</number>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="0">
+                    <widget class="QRadioButton" name="rbFixedHeight">
+                     <property name="text">
+                      <string>Fixed height sentence :</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QRadioButton" name="rbAutomaticHeight">
+                     <property name="text">
+                      <string>Automatic height sentence :</string>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="2">
+                    <spacer name="horizontalSpacer_8">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item row="5" column="2">
+                 <spacer name="horizontalSpacer_9">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
               </widget>
              </item>
             </layout>
@@ -1479,7 +1701,30 @@
                 <string>PLOT</string>
                </property>
                <layout class="QGridLayout" name="gridLayout_16">
-                <item row="0" column="1">
+                <item row="1" column="1">
+                 <widget class="QPushButton" name="pbSaveX">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="text">
+                   <string>Save to image</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="2">
+                 <spacer name="horizontalSpacer_5">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="0" column="1" colspan="2">
                  <widget class="QScrollArea" name="scrollAreaPlotX">
                   <property name="widgetResizable">
                    <bool>false</bool>
@@ -1549,11 +1794,31 @@
                <property name="title">
                 <string>PLOT</string>
                </property>
-               <layout class="QVBoxLayout" name="verticalLayout_4">
-                <item>
-                 <layout class="QHBoxLayout" name="hlLabelsOutputPlot"/>
+               <layout class="QGridLayout" name="gridLayout_14">
+                <item row="2" column="0">
+                 <widget class="QPushButton" name="pbSaveOutput">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="text">
+                   <string>Save to image</string>
+                  </property>
+                 </widget>
                 </item>
-                <item>
+                <item row="2" column="1">
+                 <spacer name="horizontalSpacer_6">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="1" column="0" colspan="2">
                  <widget class="QScrollArea" name="scrollAreaPlotOutput">
                   <property name="widgetResizable">
                    <bool>false</bool>
@@ -1570,6 +1835,9 @@
                    <layout class="QVBoxLayout" name="vlOutputPlot"/>
                   </widget>
                  </widget>
+                </item>
+                <item row="0" column="0" colspan="2">
+                 <layout class="QHBoxLayout" name="hlLabelsOutputPlot"/>
                 </item>
                </layout>
               </widget>

@@ -280,6 +280,21 @@ class Interface : public QMainWindow
          */
         void updateColorCCW(LanguageParameters params);
 
+        /**
+         * @brief setColorLine
+         */
+        void setColorLine();
+
+        /**
+         * @brief saveXPlot
+         */
+        void saveXPlot();
+
+        /**
+         * @brief saveOutput
+         */
+        void saveOutput();
+
     signals:
 
         /**
@@ -376,6 +391,7 @@ class Interface : public QMainWindow
 
         // replay
         bool m_replayLoaded;
+        QColor m_colorLine;
         QVector<QCustomPlot*> m_plotReplay;
 
         // old

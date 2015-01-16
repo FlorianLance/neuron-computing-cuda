@@ -17,7 +17,7 @@ InterfaceWorker::InterfaceWorker(QString absolutePath) : m_gridSearch(new GridSe
     qRegisterMetaType<ReplayParameters>("ReplayParameters");
     qRegisterMetaType<ReservoirParameters>("ReservoirParameters");
     qRegisterMetaType<LanguageParameters>("LanguageParameters");
-    qRegisterMetaType<ModelParameters>("ModelParametersQt");
+    qRegisterMetaType<ModelParameters>("ModelParameters");
     qRegisterMetaType<ResultsDisplayReservoir>("ResultsDisplayReservoir");
     qRegisterMetaType<QVector<QVector<double> > >("QVector<QVector<double> >");
     qRegisterMetaType<QVector<int> >("QVector<int>");

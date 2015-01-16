@@ -100,10 +100,10 @@ void GridSearch::launchTrainWithAllParameters(const std::string resultsFilePath,
         l_flowResFileReadableData << m_corpusList[ii] << " " << ii << "\n";
     }
 
-    l_flowResFileReadableData << "\nRES 1 : CCW correct position and word ABSOLUTE (0% or 100%) -> ex : goal : the , the  that -s -ed it | res : that, the the -s -ed it\n";
-    l_flowResFileReadableData << "RES 2 : CCW correct position and word (between 0% and 100%) \n";
-    l_flowResFileReadableData << "RES 3 : ALL correct position and word ABSOLUTE (0% or 100%) -> ex : goal : the X , the X that X -s X -ed it | res : the X X X, the the that X -s X X -ed it \n";
-    l_flowResFileReadableData << "RES 4 : ALL correct position and word (between 0% and 100%) \n";
+    l_flowResFileReadableData << "\nRES 1 : CCW pairwise absolute (0% or 100%) -> ex : goal : the , the  that -s -ed it | res : that, the the -s -ed it\n";
+    l_flowResFileReadableData << "RES 2 : CCW pairwise continuous (between 0% and 100%) \n";
+    l_flowResFileReadableData << "RES 3 : ALL pariwise absolute (0% or 100%) -> ex : goal : the X , the X that X -s X -ed it | res : the X X X, the the that X -s X X -ed it \n";
+    l_flowResFileReadableData << "RES 4 : ALL pairwise continuous (between 0% and 100%) \n";
     l_flowResFileReadableData << "\n CORPUS ID | NEURONS | LEAK RATE | SPARCITY | INPUT SCALING |  RIDGE  | SPECTRAL RADIUS |   TIME   |   RES 1   |   RES 2   |   RES 3   |   RES 4   |\n";
 
     int l_nbCharParams[] = {11,9,11,10,15,9,17,10,11,11,11,11};
@@ -158,8 +158,8 @@ void GridSearch::launchTrainWithAllParameters(const std::string resultsFilePath,
                                 m_model->resetModelParameters(l_currentParameters, false);
 
                                 clock_t l_timeTraining = clock();
-                                std::vector<double> l_diffSizeOCW, l_absoluteCorrectPositionAndWordCCW, l_correctPositionAndWordCCW, l_absoluteCorrectPositionAndWordAll, l_correctPositionAndWordAll;
-                                double l_meanDiffSizeOCW, l_meanCorrectPositionAndWordCCW, l_meanAbsoluteCorrectPositionAndWordCCW, l_meanCorrectPositionAndWordAll, l_meanAbsoluteCorrectPositionAndWordAll;
+                                std::vector<double> l_diffSizeOCW, l_absoluteCCW, l_continuousCCW, l_absoluteAll, l_continuousAll;
+                                double l_meanDiffSizeOCW, l_meanContinuousCCW, l_meanAbsoluteCCW, l_meanContinuousAll, l_meanAbsoluteAll;
 
                                 // launch the training part
                                 if(doTraining && !loadTraining)
@@ -173,18 +173,18 @@ void GridSearch::launchTrainWithAllParameters(const std::string resultsFilePath,
                                     m_model->displayResults(true,false);
 
                                     m_model->computeResultsData(true,"../data/Results/test.txt", l_diffSizeOCW,
-                                                                l_absoluteCorrectPositionAndWordCCW, l_correctPositionAndWordCCW,
-                                                                l_absoluteCorrectPositionAndWordAll, l_correctPositionAndWordAll,
+                                                                l_absoluteCCW, l_continuousCCW,
+                                                                l_absoluteAll, l_continuousAll,
                                                                 l_meanDiffSizeOCW,
-                                                                l_meanAbsoluteCorrectPositionAndWordCCW, l_meanCorrectPositionAndWordCCW,
-                                                                l_meanAbsoluteCorrectPositionAndWordAll, l_meanCorrectPositionAndWordAll
+                                                                l_meanAbsoluteCCW, l_meanContinuousCCW,
+                                                                l_meanAbsoluteAll, l_meanContinuousAll
                                                                 );
 
                                     std::vector<double> l_results;
-                                    l_results.push_back(l_meanAbsoluteCorrectPositionAndWordCCW);
-                                    l_results.push_back(l_meanCorrectPositionAndWordCCW);
-                                    l_results.push_back(l_meanAbsoluteCorrectPositionAndWordAll);
-                                    l_results.push_back(l_meanCorrectPositionAndWordAll);
+                                    l_results.push_back(l_meanAbsoluteCCW);
+                                    l_results.push_back(l_meanContinuousCCW);
+                                    l_results.push_back(l_meanAbsoluteAll);
+                                    l_results.push_back(l_meanContinuousAll);
 
                                     addResultsInStream(&l_flowResFileReadableData, &l_flowResFileRawData, l_results, aa, l_time, l_currentParameters, l_nbCharParams);
                                 }
@@ -204,8 +204,11 @@ void GridSearch::launchTrainWithAllParameters(const std::string resultsFilePath,
                                 // send results to be displayed in the ui
                                     ResultsDisplayReservoir l_resultsToDisplay;
                                     m_model->sentences(l_resultsToDisplay.m_trainSentences, l_resultsToDisplay.m_trainResults, l_resultsToDisplay.m_testResults);
-                                    l_resultsToDisplay.m_absoluteCCW = l_absoluteCorrectPositionAndWordCCW;
-                                    l_resultsToDisplay.m_absoluteAll = l_absoluteCorrectPositionAndWordAll;
+                                    l_resultsToDisplay.m_absoluteCCW = l_absoluteCCW;
+                                    l_resultsToDisplay.m_absoluteAll = l_absoluteAll;
+                                    l_resultsToDisplay.m_continuousAll = l_continuousAll;
+                                    l_resultsToDisplay.m_continuousCCW = l_continuousCCW;
+
                                     if(doTraining && doTest)
                                     {
                                         l_resultsToDisplay.m_action = BOTH_RES;

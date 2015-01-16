@@ -30,6 +30,8 @@ RESERVOIR_YARP_OBJ=\
 RESERVOIR_QT_INTERFACE_OBJ=\
     $(RESERVOIR_OBJ) $(LIBDIR)/qcustomplot.obj $(LIBDIR)/Interface.obj $(LIBDIR)/InterfaceWorker.obj\
 
+RESERVOIR_YARP_TEST_OBJ=\
+    $(RESERVOIR_OBJ) $(LIBDIR)/TestYarp.obj\
 
 ############################################################################## MOC LIST
 
@@ -44,33 +46,34 @@ all: $(QTGENW)/UI_Interface.h $(RESERVOIR_MOC) $(BINDIR)/reservoir-interface.exe
 !endif
 
 !if "$(ARCH)" == "amd64"
-all: $(QTGENW)/UI_Interface.h $(RESERVOIR_MOC) $(BINDIR)/reservoir-interface-x64.exe $(BINDIR)/reservoir-x64.exe $(BINDIR)/reservoir-yarp-x64.exe
+all: $(QTGENW)/UI_Interface.h $(RESERVOIR_MOC) $(BINDIR)/reservoir-interface-x64.exe $(BINDIR)/reservoir-x64.exe $(BINDIR)/reservoir-yarp-x64.exe $(BINDIR)/test-yarp-x64.exe
 !endif
 
 ############################################################################## exe files
 
 WIN_CONFIG = $(SETARGV) $(BINMODE) $(WINLIBS)
 
-# exec files to be generated
+
 $(BINDIR)/reservoir-interface.exe: $(RESERVOIR_QT_INTERFACE_OBJ) $(LIBS_RESERVOIR)
         $(LINK) /OUT:$(BINDIR)/reservoir-interface.exe $(LFLAGS_RESERVOIR) $(RESERVOIR_QT_INTERFACE_OBJ) $(LIBS_RESERVOIR) $(WIN_CONFIG)
 
 $(BINDIR)/reservoir-interface-x64.exe: $(RESERVOIR_QT_INTERFACE_OBJ) $(LIBS_RESERVOIR)
         $(LINK) /OUT:$(BINDIR)/reservoir-interface-x64.exe $(LFLAGS_RESERVOIR) $(RESERVOIR_QT_INTERFACE_OBJ) $(LIBS_RESERVOIR) $(WIN_CONFIG)
 
-# exec files to be generated
 $(BINDIR)/reservoir.exe: $(RESERVOIR_COMMAND_OBJ) $(LIBS_RESERVOIR)
         $(LINK) /OUT:$(BINDIR)/reservoir.exe $(LFLAGS_RESERVOIR) $(RESERVOIR_COMMAND_OBJ) $(LIBS_RESERVOIR) $(WIN_CONFIG)
 
 $(BINDIR)/reservoir-x64.exe: $(RESERVOIR_COMMAND_OBJ) $(LIBS_RESERVOIR)
         $(LINK) /OUT:$(BINDIR)/reservoir-x64.exe $(LFLAGS_RESERVOIR) $(RESERVOIR_COMMAND_OBJ) $(LIBS_RESERVOIR) $(WIN_CONFIG)
 
-# exec files to be generated
 $(BINDIR)/reservoir-yarp.exe: $(RESERVOIR_YARP_OBJ) $(LIBS_RESERVOIR_YARP)
         $(LINK) /OUT:$(BINDIR)/reservoir-yarp.exe $(LFLAGS_RESERVOIR) $(RESERVOIR_YARP_OBJ) $(LIBS_RESERVOIR_YARP) $(WIN_CONFIG)
 
 $(BINDIR)/reservoir-yarp-x64.exe: $(RESERVOIR_YARP_OBJ) $(LIBS_RESERVOIR_YARP)
         $(LINK) /OUT:$(BINDIR)/reservoir-yarp-x64.exe $(LFLAGS_RESERVOIR) $(RESERVOIR_YARP_OBJ) $(LIBS_RESERVOIR_YARP) $(WIN_CONFIG)
+
+$(BINDIR)/test-yarp-x64.exe: $(RESERVOIR_YARP_TEST_OBJ) $(LIBS_RESERVOIR_YARP)
+        $(LINK) /OUT:$(BINDIR)/test-yarp-x64.exe $(LFLAGS_RESERVOIR) $(RESERVOIR_YARP_TEST_OBJ) $(LIBS_RESERVOIR_YARP) $(WIN_CONFIG)
 
 ##################################################### sources files
 
@@ -101,6 +104,8 @@ $(LIBDIR)/YarpInterface.obj: ./src/YarpInterface.cpp
 $(LIBDIR)/qcustomplot.obj: ./src/qcustomplot.cpp
         $(CC) -c ./src/qcustomplot.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/qcustomplot.obj"
 
+$(LIBDIR)/TestYarp.obj: ./src/TestYarp.cpp
+        $(CC) -c ./src/TestYarp.cpp $(CFLAGS_DYN) $(RESERVOIR_YARP) -Fo"$(LIBDIR)/TestYarp.obj"
 
 ############################################################################## Qt ui files
 

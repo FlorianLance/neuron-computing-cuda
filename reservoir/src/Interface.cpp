@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
 }
 
 
-Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir), m_replayLoaded(false)
+Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir), m_replayLoaded(false), m_colorLine(QColor(Qt::blue))
 {    
     // set absolute path
         m_absolutePath = QDir::currentPath() + "/";
@@ -85,7 +85,10 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         // push button
         QObject::connect(m_uiInterface->pbStart,                SIGNAL(clicked()), m_pWInterface,   SLOT(start()));        
         QObject::connect(m_uiInterface->pbStop,                 SIGNAL(clicked()), m_pWInterface,   SLOT(stop()));
-        QObject::connect(m_uiInterface->pbStartReplay,          SIGNAL(clicked()), m_pWInterface,   SLOT(startReplay()));
+        QObject::connect(m_uiInterface->pbStartReplay,          SIGNAL(clicked()), m_pWInterface,   SLOT(startReplay()));                
+        QObject::connect(m_uiInterface->pbColor,                SIGNAL(clicked()), this,            SLOT(setColorLine()));
+        QObject::connect(m_uiInterface->pbSaveX,                SIGNAL(clicked()), this,            SLOT(saveXPlot()));
+        QObject::connect(m_uiInterface->pbSaveOutput,           SIGNAL(clicked()), this,            SLOT(saveOutput()));
         QObject::connect(m_uiInterface->pbStart,                SIGNAL(clicked()), this,            SLOT(resetLoadingBar()));
         QObject::connect(m_uiInterface->pbAddCorpus,            SIGNAL(clicked()), this,            SLOT(addCorpus()));
         QObject::connect(m_uiInterface->pbRemoveCorpus,         SIGNAL(clicked()), this,            SLOT(removeCorpus()));
@@ -232,6 +235,7 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         updateReplayParameters();
 }
 
+
 Interface::~Interface()
 {
     m_TInterface.quit();
@@ -240,16 +244,7 @@ Interface::~Interface()
     delete m_pWInterface;
 }
 
-//void Interface::closeEvent(QCloseEvent *event)
-//{
-////    emit stopLoop();
 
-//    QTime l_oDieTime = QTime::currentTime().addMSecs(200);
-//    while( QTime::currentTime() < l_oDieTime)
-//    {
-//        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-//    }
-//}
 
 void Interface::addCorpus()
 {        
@@ -726,8 +721,8 @@ void Interface::displayCurrentResults(ResultsDisplayReservoir results)
 
             if(results.m_absoluteCCW.size() == results.m_trainSentences.size())
             {
-                int l_nbCCW = results.m_absoluteCCW[ii];
-                int l_nbAll = results.m_absoluteAll[ii];
+                int l_nbCCW = results.m_continuousCCW[ii];
+                int l_nbAll = results.m_continuousAll[ii];
 
                 if(l_nbCCW != 100 && l_nbAll != 100)
                 {
@@ -962,6 +957,8 @@ void Interface::displayOutputMatrix(cv::Mat output, Sentences sentences)
             m_plotListTrainSentenceOutput.back()->yAxis->setRange(l_minY,l_maxY);
             m_plotListTrainSentenceOutput.back()->replot();
         }
+
+    m_uiInterface->pbSaveOutput->setEnabled(true);
 }
 
 void Interface::displayTrainInputMatrix(cv::Mat trainMeaning, cv::Mat trainSentence, Sentences sentences)
@@ -1255,6 +1252,14 @@ void Interface::updateColorCCW(LanguageParameters params)
     }
 }
 
+void Interface::setColorLine()
+{
+   m_colorLine = QColorDialog::getColor(Qt::blue, this);
+   QRgb l_colorRGB = m_colorLine.rgb();
+   m_uiInterface->pbColor->setStyleSheet("background-color: rgb("+ QString::number(m_colorLine.red()) +
+                                         ", " + QString::number(m_colorLine.green()) + ", " + QString::number(m_colorLine.blue()) +");");
+}
+
 void Interface::loadSettings()
 {
     QString l_sPathSettings = QFileDialog::getOpenFileName(this, "Load settings file", m_absolutePath + "../data/input/Settings", "Corpus file (*.txt)");
@@ -1365,6 +1370,27 @@ void Interface::replayLoaded()
 
 void Interface::updateDisplayReplay(QVector<QVector<double> > data, QVector<int> neuronsId, QVector<int> sentencesId)
 {
+    // define size of the sentences :
+    double l_sentenceWidth;
+    if(m_uiInterface->rbFixedWidth->isChecked())
+    {
+        l_sentenceWidth = m_uiInterface->sbWidthSentence->value();
+    }
+    else
+    {
+        l_sentenceWidth = (m_uiInterface->twDisplay->size().width()-90)*1.0/sentencesId.size();
+    }
+    double l_sentenceHeight;
+    if(m_uiInterface->rbFixedHeight->isChecked())
+    {
+        l_sentenceHeight = m_uiInterface->sbHeightSentence->value();
+    }
+    else
+    {
+        l_sentenceHeight = (m_uiInterface->twDisplay->size().height()-200)*1.0/neuronsId.size();
+    }
+
+
     m_uiInterface->twSettings->setEnabled(false);
     m_uiInterface->pbComputing->setValue(0);
     m_uiInterface->laStateComputing->setText("Plotting...");
@@ -1402,8 +1428,8 @@ void Interface::updateDisplayReplay(QVector<QVector<double> > data, QVector<int>
     for(int ii = 0; ii < data.size(); ++ii)
     {
         QCustomPlot *l_plot = new QCustomPlot(this);
-        l_plot->setFixedHeight(100);
-        l_plot->setFixedWidth(sentencesId.size()*100);
+        l_plot->setFixedHeight(l_sentenceHeight);
+        l_plot->setFixedWidth(sentencesId.size()*l_sentenceWidth);
         m_plotReplay << l_plot;
         m_uiInterface->vlXPlot->addWidget(m_plotReplay.back());
         m_plotReplay.back()->addGraph();
@@ -1432,8 +1458,8 @@ void Interface::updateDisplayReplay(QVector<QVector<double> > data, QVector<int>
             m_plotReplay.back()->yAxis->setLabel("N_" + QString::number(neuronsId[ii]));
         }
 
-        QPen l_pen(Qt::blue);
-        l_pen.setWidthF(2);
+        QPen l_pen(m_colorLine);
+        l_pen.setWidthF(m_uiInterface->sbLineWidth->value());
         m_plotReplay.back()->graph(0)->setPen(l_pen);
         m_plotReplay.back()->graph(0)->addData(l_xValues, data[ii]);
         m_plotReplay.back()->replot();
@@ -1447,63 +1473,73 @@ void Interface::updateDisplayReplay(QVector<QVector<double> > data, QVector<int>
         }
     }
 
-//    m_plotReplay[0]->savePng("../data/images/plots/test.png");
-
-    //    if(m_plotReplay.size() > 0)
-    //    {
-    //        QSize l_sizePlot = m_plotReplay[0]->size();
-    //        QSize l_sizeImage = l_sizePlot;
-    //        l_sizeImage.setHeight(l_sizeImage.height()*m_plotReplay.size());
-
-
-    //        int l_number = static_cast<int>(sqrt(1.0* m_plotReplay.size())) + 1;
-    //        qDebug() << "number : " << l_number;
-    //        float l_ratioLW = 1.f*l_sizePlot.width() / l_sizePlot.height();
-    //        qDebug() << "l_ratioLW : " << l_ratioLW;
-    //        qDebug() << "l_ratioLW : " << sqrt(l_ratioLW);
-
-    //        float l_multW,l_multH;
-    //        if(l_sizePlot.width() > l_sizePlot.height())
-    //        {
-    //            l_multW = l_sizePlot.width()/sqrt(l_ratioLW);
-    //            l_multH = l_sizePlot.height()*sqrt(l_ratioLW);
-    //        }
-    //        else
-    //        {
-    //            l_multW = l_sizePlot.width()*sqrt(l_ratioLW);
-    //            l_multH = l_sizePlot.height()/sqrt(l_ratioLW);
-    //        }
-
-    //        qDebug() << l_multW << " " << l_multH;
-
-
-
-    //        qDebug() << l_sizePlot;
-    //        qDebug() << l_sizeImage;
-
-    //        QPixmap test(l_sizeImage);
-    //        test.fill();
-
-
-//        QPainter painter(&test);
-
-//        for(int ii = 0; ii< m_plotReplay.size(); ++ii)
-//        {
-//            qDebug() << QRectF(QPointF(0,ii*l_sizePlot.height()),QPointF(l_sizePlot.width(),(ii+1)*l_sizePlot.height()));
-//            painter.drawPixmap(QRectF(QPointF(0,ii*l_sizePlot.height()),QPointF(l_sizePlot.width(),(ii+1)*l_sizePlot.height())),m_plotReplay[ii]->toPixmap(),
-//                               QRectF(QPointF(0,0),                     QPointF(l_sizePlot.width(),       l_sizePlot.height())));
-//        }
-//        test.save("../data/images/plots/test.png");
-//    }
-//    QPixmap test = m_plotReplay[0]->toPixmap();
-//    QPixmap test2 = m_plotReplay[1]->toPixmap();
-//    test2.
-
-//    savePng
-
     m_uiInterface->twSettings->setEnabled(true);
     m_uiInterface->pbComputing->setValue(100);
     m_uiInterface->laStateComputing->setText("End plotting");
 
+    m_uiInterface->pbSaveX->setEnabled(true);
+
 }
 
+
+void Interface::saveXPlot()
+{
+    if(m_plotReplay.size() > 0)
+    {
+        QString l_pathPlot = QFileDialog::getSaveFileName(this, "Save plot image", m_absolutePath + "../data/images/plots", "Plot image (*.png)");
+
+        QSize l_sizePlot = m_plotReplay[0]->size();
+        QSize l_sizeImage = l_sizePlot;
+        l_sizeImage.setHeight(l_sizeImage.height()*m_plotReplay.size());
+
+        QPixmap l_plotImage(l_sizeImage);
+        l_plotImage.fill();
+
+        QPainter l_painter(&l_plotImage);
+
+        for(int ii = 0; ii< m_plotReplay.size(); ++ii)
+        {
+            l_painter.drawPixmap(QRectF(QPointF(0,ii*l_sizePlot.height()),QPointF(l_sizePlot.width(),(ii+1)*l_sizePlot.height())),m_plotReplay[ii]->toPixmap(),
+                               QRectF(QPointF(0,0),                     QPointF(l_sizePlot.width(),       l_sizePlot.height())));
+        }
+        l_plotImage.save(l_pathPlot);
+
+        displayLogInfo(QString("Plot : " + l_pathPlot + " saved. "), QColor(Qt::blue));
+    }
+    else
+    {
+        displayLogInfo(QString("The plot must be done before the saving. "), QColor(Qt::red));
+    }
+}
+
+void Interface::saveOutput()
+{
+    if(m_plotListTrainSentenceOutput.size() > 0)
+    {
+        QString l_pathPlot = QFileDialog::getSaveFileName(this, "Save output plot image", m_absolutePath + "../data/images/plots", "Plot image (*.png)");
+
+        QSize l_sizePlot = m_plotListTrainSentenceOutput[0]->size();
+        QSize l_sizeImage = l_sizePlot;
+        l_sizeImage.setHeight(l_sizeImage.height()*m_plotListTrainSentenceOutput.size());
+
+        QPixmap l_plotImage(l_sizeImage);
+        l_plotImage.fill();
+
+        QPainter l_painter(&l_plotImage);
+
+        for(int ii = 0; ii< m_plotListTrainSentenceOutput.size(); ++ii)
+        {
+            l_painter.drawPixmap(QRectF(QPointF(0,ii*l_sizePlot.height()),QPointF(l_sizePlot.width(),(ii+1)*l_sizePlot.height())),m_plotListTrainSentenceOutput[ii]->toPixmap(),
+                               QRectF(QPointF(0,0),                     QPointF(l_sizePlot.width(),       l_sizePlot.height())));
+
+//            l_painter.drawText(QRectF(QPointF(0,ii*l_sizePlot.height()),QPointF(l_sizePlot.width(),(ii+1)*l_sizePlot.height())), m_labelListInputSentences[ii]->text());
+        }
+        l_plotImage.save(l_pathPlot);
+
+        displayLogInfo(QString("Output plot : " + l_pathPlot + " saved. "), QColor(Qt::blue));
+    }
+    else
+    {
+        displayLogInfo(QString("The computing must be done before the saving. "), QColor(Qt::red));
+    }
+}

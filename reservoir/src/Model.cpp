@@ -180,11 +180,11 @@ void Model::setResultsTestToCompare(const std::string &resultsTestFilePath)
 
 void Model::computeResultsData(cbool trainResults, const std::string &pathSaveAllSentenceRest,
                         std::vector<double> &diffSizeOCW,
-                        std::vector<double> &absoluteCorrectPositionAndWordCCW, std::vector<double> &correctPositionAndWordCCW,
-                        std::vector<double> &absoluteCorrectPositionAndWordAll, std::vector<double> &correctPositionAndWordAll,
+                        std::vector<double> &absoluteCCW, std::vector<double> &continuousCCW,
+                        std::vector<double> &absoluteAll, std::vector<double> &continuousAll,
                         double &meanDiffSizeOCW,
-                        double &meanAbsoluteCorrectPositionAndWordCCW, double &meanCorrectPositionAndWordCCW,
-                        double &meanAbsoluteCorrectPositionAndWordAll, double &meanCorrectPositionAndWordAll
+                        double &meanAbsoluteCCW, double &meanContinuousCCW,
+                        double &meanAbsoluteAll, double &meanContinuousAll
                         )
 {
     if(m_verbose)
@@ -300,21 +300,21 @@ void Model::computeResultsData(cbool trainResults, const std::string &pathSaveAl
         // OCW
         meanDiffSizeOCW = 0.0;
         // CCW
-        meanAbsoluteCorrectPositionAndWordCCW = 0.0;
-        meanCorrectPositionAndWordCCW = 0.0;
+        meanAbsoluteCCW = 0.0;
+        meanContinuousCCW = 0.0;
         // all
-        meanAbsoluteCorrectPositionAndWordAll = 0.0;
-        meanCorrectPositionAndWordAll = 0.0;
+        meanAbsoluteAll = 0.0;
+        meanContinuousAll = 0.0;
 
     // reset results arrays
         // OCW
         diffSizeOCW.clear();
         // CCW
-        absoluteCorrectPositionAndWordCCW.clear();
-        correctPositionAndWordCCW.clear();
+        absoluteCCW.clear();
+        continuousCCW.clear();
         // all
-        absoluteCorrectPositionAndWordAll.clear();
-        correctPositionAndWordAll.clear();
+        absoluteAll.clear();
+        continuousAll.clear();
 
     std::ofstream l_flowResFile(pathSaveAllSentenceRest);
 
@@ -381,13 +381,13 @@ void Model::computeResultsData(cbool trainResults, const std::string &pathSaveAl
 
         // mean
             // CCW
-            meanAbsoluteCorrectPositionAndWordCCW += l_percentAbsoluteCCWOnly;
-            meanCorrectPositionAndWordCCW         += l_percentCorrectPositionAndWordCCWOnly;
+            meanAbsoluteCCW += l_percentAbsoluteCCWOnly;
+            meanContinuousCCW         += l_percentCorrectPositionAndWordCCWOnly;
             // OCW
             meanDiffSizeOCW                       += sqrt(static_cast<double>(l_diffSizesOCW[ii]*l_diffSizesOCW[ii]));
             // all
-            meanAbsoluteCorrectPositionAndWordAll += l_percentAbsoluteAll;
-            meanCorrectPositionAndWordAll         += l_percentCorrectPositionAndWordAll;
+            meanAbsoluteAll += l_percentAbsoluteAll;
+            meanContinuousAll         += l_percentCorrectPositionAndWordAll;
 
         // display
             std::ostringstream l_os1,l_os2,l_os3, l_os4, l_os5;
@@ -402,11 +402,11 @@ void Model::computeResultsData(cbool trainResults, const std::string &pathSaveAl
             // OCW
             diffSizeOCW.push_back(l_diffSizesOCW[ii]);
             // CCW
-            absoluteCorrectPositionAndWordCCW.push_back(l_percentAbsoluteCCWOnly);
-            correctPositionAndWordCCW.push_back(l_percentCorrectPositionAndWordCCWOnly);
+            absoluteCCW.push_back(l_percentAbsoluteCCWOnly);
+            continuousCCW.push_back(l_percentCorrectPositionAndWordCCWOnly);
             // all
-            absoluteCorrectPositionAndWordAll.push_back(l_percentAbsoluteAll);
-            correctPositionAndWordAll.push_back(l_percentCorrectPositionAndWordAll);
+            absoluteAll.push_back(l_percentAbsoluteAll);
+            continuousAll.push_back(l_percentCorrectPositionAndWordAll);
 
         std::cout.precision(5);
         if(m_verbose)
@@ -419,11 +419,11 @@ void Model::computeResultsData(cbool trainResults, const std::string &pathSaveAl
         // OCW
         meanDiffSizeOCW /= l_goalCCWOnly.size();
         // CCW
-        meanCorrectPositionAndWordCCW /= l_goalCCWOnly.size();
-        meanAbsoluteCorrectPositionAndWordCCW /= l_goalCCWOnly.size();
+        meanContinuousCCW /= l_goalCCWOnly.size();
+        meanAbsoluteCCW /= l_goalCCWOnly.size();
         // all
-        meanCorrectPositionAndWordAll /= l_goalAll.size();
-        meanAbsoluteCorrectPositionAndWordAll /= l_goalAll.size();
+        meanContinuousAll /= l_goalAll.size();
+        meanAbsoluteAll /= l_goalAll.size();
 }
 
 void Model::saveTraining(const std::string &pathDirectory)

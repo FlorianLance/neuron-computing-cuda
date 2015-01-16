@@ -182,25 +182,24 @@ class Model : public QObject
          * @param trainResults
          * @param pathSaveAllSentenceRest
          * @param diffSizeOCW
-         * @param absoluteCorrectPositionAndWordCCW
-         * @param correctPositionAndWordCCW
-         * @param absoluteCorrectPositionAndWordAll
-         * @param correctPositionAndWordAll
+         * @param absoluteCCW
+         * @param continuousCCW
+         * @param absoluteAll
+         * @param continuousAll
          * @param meanDiffSizeOCW
-         * @param meanAbsoluteCorrectPositionAndWordCCW
-         * @param meanCorrectPositionAndWordCCW
-         * @param meanAbsoluteCorrectPositionAndWordAll
-         * @param meanCorrectPositionAndWordAll
+         * @param meanAbsoluteCCW
+         * @param meanContinuousCCW
+         * @param meanAbsoluteAll
+         * @param meanContinuousAll
          */
         void computeResultsData(cbool trainResults, const std::string &pathSaveAllSentenceRest,
                                 std::vector<double> &diffSizeOCW,
-                                std::vector<double> &absoluteCorrectPositionAndWordCCW, std::vector<double> &correctPositionAndWordCCW,
-                                std::vector<double> &absoluteCorrectPositionAndWordAll, std::vector<double> &correctPositionAndWordAll,
+                                std::vector<double> &absoluteCCW, std::vector<double> &continuousCCW,
+                                std::vector<double> &absoluteAll, std::vector<double> &continuousAll,
                                 double &meanDiffSizeOCW,
-                                double &meanAbsoluteCorrectPositionAndWordCCW, double &meanCorrectPositionAndWordCCW,
-                                double &meanAbsoluteCorrectPositionAndWordAll, double &meanCorrectPositionAndWordAll
+                                double &meanAbsoluteCCW, double &meanContinuousCCW,
+                                double &meanAbsoluteAll, double &meanContinuousAll
                                 );
-
 
         /**
          * @brief saveResults

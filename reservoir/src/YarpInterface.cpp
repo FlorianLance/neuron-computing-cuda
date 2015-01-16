@@ -23,9 +23,6 @@ int main(int argc, char* argv[])
     QCoreApplication l_oApp(argc, argv);
     ReservoirInterface l_interface(&l_oApp);
     return l_oApp.exec();
-
-
-    return 0;
 }
 
 
@@ -59,7 +56,7 @@ ReservoirInterface::ReservoirInterface(QCoreApplication *parent)
         }
 
     // init worker
-    m_yarpWorker = new YarpInterfaceWorker();
+    m_yarpWorker = new YarpInterfaceWorker(m_absolutePath);
 
     // init connections
     QObject::connect(this, SIGNAL(start()), m_yarpWorker, SLOT(doLoop()));
@@ -98,12 +95,12 @@ void ReservoirInterface::updateParameters(ModelParameters parameters)
 
 
 
-YarpInterfaceWorker::YarpInterfaceWorker() : m_doLoop(true), m_reservoirIsRunning(false), m_isParameters(false), m_isData(false)
+YarpInterfaceWorker::YarpInterfaceWorker(QString absolutePath) : m_doLoop(true), m_reservoirIsRunning(false), m_isParameters(false), m_isData(false), m_absolutePath(absolutePath)
 {
      // init yarp ports
-    m_dataPort.open("/reservoir/data");
-    m_parametersPort.open("/reservoir/parameters");
-    m_controlPort.open("/reservoir/control");
+    m_dataPort.open("/reservoir/data/in");
+    m_parametersPort.open("/reservoir/parameters/in");
+    m_controlPort.open("/reservoir/control/in");
 }
 
 YarpInterfaceWorker::~YarpInterfaceWorker()
@@ -145,13 +142,36 @@ void YarpInterfaceWorker::doLoop()
         l_controlBottle = m_controlPort.read(false);
         if(l_controlBottle)
         {
-            m_startReservoir = l_controlBottle->get(0).asBool(); // 0 -> START RESERVOIR (bool)
+            m_startReservoir = (l_controlBottle->get(0).asInt()==1); // 0 -> START RESERVOIR (int) (if 1 start, else do nothing)
         }
 
-        // start the reservoir
-        if(m_startReservoir && m_isData && m_isParameters)
+        // check if reservoir is busy
+        m_reservoirLock.lockForRead();
+            bool l_reservoirIsRunning = m_reservoirIsRunning;
+        m_reservoirLock.unlock();
+
+        if(!l_reservoirIsRunning)
         {
-            // ...
+            if(m_startReservoir && m_isParameters)
+            {
+                if(m_isData)
+                {
+                    if(m_currentModelParameters.m_useLoadedTraining && !m_currentModelParameters.m_useLoadedW && !m_currentModelParameters.m_useLoadedWIn)
+                    {
+                        // ...
+                    }
+                    if(m_currentModelParameters.m_useLoadedW && !m_currentModelParameters.m_useLoadedTraining)
+                    {
+                        // ...
+                    }
+                    if(m_currentModelParameters.m_useLoadedWIn && !m_currentModelParameters.m_useLoadedTraining)
+                    {
+                        // ...
+                    }
+                }
+
+                emit sendDataToReservoirSignal(m_currentModelParameters, m_CCWSentence, m_structureSentence);
+            }
         }
 
         // check results
@@ -184,21 +204,51 @@ void YarpInterfaceWorker::readParameters(yarp::os::Bottle *parametersBottle)
     m_currentModelParameters.m_spectralRadius    = parametersBottle->get(6).asDouble(); // 6 -> SPECTRAL RADIUS (double) (if -1 -> default value)
     m_currentModelParameters.m_ridge             = parametersBottle->get(7).asDouble(); // 7 -> RIDGE(double)(if -1 -> default value)
     m_currentModelParameters.m_sparcity          = parametersBottle->get(8).asDouble(); // 8 -> SPARCITY (double)   (if -1 -> automatic recommanded value )
-    bool l_useCuda                               = parametersBottle->get(9).asBool();   // 9 -> USE CUDA (bool)
+    bool l_useCuda                               = (parametersBottle->get(9).asInt()==1);   // 9 -> USE CUDA (int) (1 -> true / else false)
     m_currentModelParameters.m_useCudaInv  = l_useCuda;
     m_currentModelParameters.m_useCudaMult = l_useCuda;
-    m_currentModelParameters.m_useLoadedTraining = parametersBottle->get(10).asBool();  // 10 -> use training file from the data port (bool)
-    m_currentModelParameters.m_useLoadedW        = parametersBottle->get(11).asBool();  // 11 -> use loaded w file from the data port (bool)
-    m_currentModelParameters.m_useLoadedWIn      = parametersBottle->get(12).asBool();  // 12 -> use loaded wIn file from the data port (bool)
-    m_isParameters = true;
+    m_currentModelParameters.m_useLoadedTraining = (parametersBottle->get(10).asInt()==1);  // 10 -> use training file from the data port (int) (1 -> true / else false)
+    m_currentModelParameters.m_useLoadedW        = (parametersBottle->get(11).asInt()==1);  // 11 -> use loaded w file from the data port (int) (1 -> true / else false)
+    m_currentModelParameters.m_useLoadedWIn      = (parametersBottle->get(12).asInt()==1);  // 12 -> use loaded wIn file from the data port (int) (1 -> true / else false)
+
+
+    // display :
+    qDebug() << l_corpus << " " << l_structure << " " << l_CCW;
+    qDebug() << m_currentModelParameters.m_nbNeurons << " " << m_currentModelParameters.m_leakRate << " " << m_currentModelParameters.m_inputScaling;
+    qDebug() << m_currentModelParameters.m_spectralRadius << " " << m_currentModelParameters.m_ridge << " " << m_currentModelParameters.m_sparcity;
+    qDebug() << m_currentModelParameters.m_spectralRadius << " " << m_currentModelParameters.m_ridge << " " << m_currentModelParameters.m_sparcity;
+    qDebug() << m_currentModelParameters.m_useCudaInv << " " << m_currentModelParameters.m_useCudaMult << " " << m_currentModelParameters.m_useLoadedTraining;
+    qDebug() << m_currentModelParameters.m_useLoadedW << " " << m_currentModelParameters.m_useLoadedWIn;
+
 
     // transform strings
-    QFile l_fileCorpus;
+    QFile l_fileCorpus(m_absolutePath + "../data/input/Corpus/received.txt");
+    if(l_fileCorpus.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QTextStream in(&l_fileCorpus);
+        in << l_corpus;
+        m_currentModelParameters.m_corpusFilePath = (m_absolutePath + "../data/input/Corpus/received.txt").toStdString();
+    }
+
+    QStringList l_CCWList = l_CCW.split(" ");
+    QStringList l_structureList = l_structure.split(" ");
 
 
-    // send parameters to the reservoir
+    for(QStringList::iterator ii = l_CCWList.begin(); ii != l_CCWList.end(); ++ii)
+    {
+        m_CCWSentence.push_back((*ii).toStdString());
+    }
+    for(QStringList::iterator ii = l_structureList.begin(); ii != l_structureList.end(); ++ii)
+    {
+        m_structureSentence.push_back((*ii).toStdString());
+    }
 
-    // ...
+    qDebug() << "display sentences";
+    displaySentence(m_CCWSentence);
+    displaySentence(m_structureSentence);
+
+
+    m_isParameters = true;
 }
 
 void YarpInterfaceWorker::readData(yarp::os::Bottle *dataBottle)
