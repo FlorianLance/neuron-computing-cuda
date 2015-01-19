@@ -152,11 +152,6 @@ class Model : public QObject
 
 
         /**
-         * @brief retrieveTestsSentences
-         */
-        void retrieveTestsSentences();
-
-        /**
          * @brief sentences
          * @param trainSentences
          * @param trainResults
@@ -175,12 +170,12 @@ class Model : public QObject
          * @brief setResultsTestToCompare
          * @param resultsTestFilePath
          */
-        void setResultsTestToCompare(const std::string &resultsTestFilePath);
+//        void setResultsTestToCompare(const std::string &resultsTestFilePath);
 
         /**
          * @brief computeResultsData
          * @param trainResults
-         * @param pathSaveAllSentenceRest
+         * @param pathSaveAllSentenceRes
          * @param diffSizeOCW
          * @param absoluteCCW
          * @param continuousCCW
@@ -192,7 +187,7 @@ class Model : public QObject
          * @param meanAbsoluteAll
          * @param meanContinuousAll
          */
-        void computeResultsData(cbool trainResults, const std::string &pathSaveAllSentenceRest,
+        void computeResultsData(cbool trainResults,
                                 std::vector<double> &diffSizeOCW,
                                 std::vector<double> &absoluteCCW, std::vector<double> &continuousCCW,
                                 std::vector<double> &absoluteAll, std::vector<double> &continuousAll,
@@ -277,6 +272,11 @@ class Model : public QObject
          * @brief retrieveTrainSentences
          */
         void retrieveTrainSentences();
+
+        /**
+         * @brief retrieveTestsSentences
+         */
+        void retrieveTestsSentences();
 
 
     private :

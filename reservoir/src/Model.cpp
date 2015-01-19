@@ -144,41 +144,7 @@ void Model::displayResults(const bool trainResults, const bool testResults)
 }
 
 
-void Model::setResultsTestToCompare(const std::string &resultsTestFilePath)
-{
-    QFile l_file(resultsTestFilePath.c_str());
-    if(l_file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        m_desiredSentencesTest.clear();
-
-        QTextStream in(&l_file), inLine;
-
-        while (!in.atEnd())
-        {
-            QString l_line = in.readLine();
-            inLine.setString(&l_line);
-
-            Sentence l_sentenceTest;
-
-            while(!inLine.atEnd())
-            {
-                QString l_value;
-                inLine >> l_value;
-                l_sentenceTest.push_back(l_value.toStdString());
-            }
-
-            m_desiredSentencesTest.push_back(l_sentenceTest);
-        }
-    }
-    else
-    {
-        std::cerr << "Error loading results test file. " << std::endl;
-        sendLogInfo("Error loading results test file. \n", QColor(Qt::red));
-    }
-}
-
-
-void Model::computeResultsData(cbool trainResults, const std::string &pathSaveAllSentenceRest,
+void Model::computeResultsData(cbool trainResults,
                         std::vector<double> &diffSizeOCW,
                         std::vector<double> &absoluteCCW, std::vector<double> &continuousCCW,
                         std::vector<double> &absoluteAll, std::vector<double> &continuousAll,
@@ -316,14 +282,6 @@ void Model::computeResultsData(cbool trainResults, const std::string &pathSaveAl
         absoluteAll.clear();
         continuousAll.clear();
 
-    std::ofstream l_flowResFile(pathSaveAllSentenceRest);
-
-    if(!l_flowResFile)
-    {
-        std::cerr << "Error log file. " << std::endl;
-        sendLogInfo("Error log file. \n", QColor(Qt::red));
-    }
-
     // compute the stats
     for(int ii = 0; ii < l_goalCCWOnly.size(); ++ii)
     {
@@ -388,15 +346,6 @@ void Model::computeResultsData(cbool trainResults, const std::string &pathSaveAl
             // all
             meanAbsoluteAll += l_percentAbsoluteAll;
             meanContinuousAll         += l_percentCorrectPositionAndWordAll;
-
-        // display
-            std::ostringstream l_os1,l_os2,l_os3, l_os4, l_os5;
-            l_os1 << l_percentCorrectPositionAndWordCCWOnly;
-            l_os2 << l_percentAbsoluteCCWOnly;
-            l_os3 << l_diffSizesOCW[ii];
-            l_os4 << l_percentCorrectPositionAndWordCCWOnly;
-            l_os5 << l_percentAbsoluteAll;
-            l_flowResFile << l_os1.str() << " " << l_os2.str() << " " << l_os3.str() << " " << l_os4.str() << " " << l_os5.str() << std::endl;
 
         // add results to array
             // OCW
@@ -535,6 +484,7 @@ void Model::launchTraining()
         sendLogInfo(QString::fromStdString(displayTime("End reservoir training ", l_trainingTime, true, m_verbose)), QColor(Qt::black));
 
         retrieveTrainSentences();
+
         m_trainingSuccess = true;
 
     // send output matrix for displaying CCW in the interface
@@ -553,7 +503,7 @@ bool Model::launchTests(const std::string &corpusTestFilePath)
         {
             std::cerr << "The training must be done before the tests. " << std::endl;
             sendLogInfo("The training must be done before the tests. \n", QColor(Qt::red));
-            return true;
+            return false;
         }
 
     // check corpus path input
@@ -640,104 +590,3 @@ bool Model::launchTests(const std::string &corpusTestFilePath)
 
     return true;
 }
-
-
-
-
-
-//// save matrices
-//    cv::Mat l_subRes(m_3DMatSentencesOutputTrain.size[1], m_3DMatSentencesOutputTrain.size[0]*m_3DMatSentencesOutputTrain.size[2], CV_32FC3);
-
-//        for(int ii = 0; ii < m_3DMatSentencesOutputTrain.size[0]; ++ii)
-//        {
-//            for(int jj = 0; jj < m_3DMatSentencesOutputTrain.size[1]; ++jj)
-//            {
-//                for(int kk = 0; kk < m_3DMatSentencesOutputTrain.size[2]; ++kk)
-//                {
-//                    cv::Vec3f l_value;
-
-//                    if(ii % 3 == 0)
-//                    {
-//                        l_value = cv::Vec3f(m_3DMatSentencesOutputTrain.at<float>(ii,jj,kk),0,m_3DMatSentencesOutputTrain.at<float>(ii,jj,kk));
-//                    }
-//                    else if(ii % 3 == 1)
-//                    {
-//                        l_value = cv::Vec3f(0,m_3DMatSentencesOutputTrain.at<float>(ii,jj,kk),0);
-//                    }
-//                    else
-//                    {
-//                        l_value = cv::Vec3f(m_3DMatSentencesOutputTrain.at<float>(ii,jj,kk),0,0);
-//                    }
-
-
-//                    l_subRes.at<cv::Vec3f>(jj, kk + ii*m_3DMatSentencesOutputTrain.size[2]) = l_value;
-//                }
-//            }
-//        }
-
-//    std::ostringstream l_os1;
-//    l_os1 << s_numImage;
-
-//    double min, max;
-//    cv::minMaxLoc(l_subRes, &min, &max);
-//    save3Channel2DMatrixToTextStd("../data/Results/mat_out/img_before_" + l_os1.str() + ".txt", l_subRes);
-
-//    for(int ii = 0; ii < l_subRes.rows * l_subRes.cols; ++ii)
-//    {
-////            if(l_subRes.at<cv::Vec3f>(ii) != cv::Vec3f(0,0,0))
-//        {
-//            l_subRes.at<cv::Vec3f>(ii) += cv::Vec3f(-min,-min,-min);
-//        }
-////            else
-//        {
-////                l_subRes.at<cv::Vec3f>(ii) = cv::Vec3f(0,0,0);
-//        }
-
-//        cv::Vec3f l_value = l_subRes.at<cv::Vec3f>(ii);
-//        l_value[0] *= 255./max;
-//        l_value[1] *= 255./max;
-//        l_value[2] *= 255./max;
-
-//        l_subRes.at<cv::Vec3f>(ii) = l_value;
-//    }
-
-//    save3Channel2DMatrixToTextStd("../data/Results/mat_out/img_color_" + l_os1.str() + ".txt", l_subRes);
-
-//    cv::imwrite("../data/Results/mat_out/sentence_output_color.png_" + l_os1.str() + ".png", l_subRes);
-//    cv::cvtColor(l_subRes, l_subRes, CV_BGR2GRAY );
-//    cv::imwrite("../data/Results/mat_out/sentence_output_gray.png_" + l_os1.str() + ".png", l_subRes);
-
-//    ++s_numImage;
-
-
-//// save data for creating curves
-//    cv::Mat l_curve(m_3DMatSentencesOutputTrain.size[0]*m_3DMatSentencesOutputTrain.size[1], m_3DMatSentencesOutputTrain.size[2]+2, CV_32FC1);
-
-//    for(int ii = 0; ii < m_3DMatSentencesOutputTrain.size[0]; ++ii)
-//    {
-//        for(int jj = 0; jj < m_3DMatSentencesOutputTrain.size[1]; ++jj)
-//        {
-//            l_curve.at<float>(ii*m_3DMatSentencesOutputTrain.size[1] + jj, 1) = jj;
-
-//            for(int kk = 0; kk < m_3DMatSentencesOutputTrain.size[2]; ++kk)
-//            {
-//                l_curve.at<float>(ii*m_3DMatSentencesOutputTrain.size[1] + jj,kk+2) = m_3DMatSentencesOutputTrain.at<float>(ii,jj,kk);
-//            }
-//        }
-//    }
-
-//    for(int ii = 0; ii < l_curve.rows; ++ii)
-//    {
-//        l_curve.at<float>(ii,0) = ii / m_3DMatSentencesOutputTrain.size[1];
-//    }
-
-//    save2DMatrixToTextStd("../data/Results/mat_out/curve_" +  l_os1.str() + ".txt", l_curve);
-
-
-////        cv::imshow("reservoir_display",l_subRes);
-////        cv::waitKey(5000);
-
-
-////        cvtColor( l_subRes, l_subRes, CV_GRAY2RGB);
-////        cv::imshow("reservoir_display",l_subRes);
-////        cv::waitKey(5000);

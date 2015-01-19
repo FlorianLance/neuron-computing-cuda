@@ -1416,7 +1416,7 @@ void Interface::updateDisplayReplay(QVector<QVector<double> > data, QVector<int>
     for(int ii = 0; ii < sentencesId.size(); ++ii)
     {
         if(ii == 0)
-        {
+        {            
             l_labelsX << "Sentence " + QString::number(sentencesId[ii]);
         }
         else
@@ -1451,7 +1451,7 @@ void Interface::updateDisplayReplay(QVector<QVector<double> > data, QVector<int>
 
         if(ii == 0)
         {
-            m_plotReplay.back()->yAxis->setLabel("Neuron " + QString::number(neuronsId[ii]));
+            m_plotReplay.back()->yAxis->setLabel("Neuron " + QString::number(neuronsId[ii]));                        
         }
         else
         {

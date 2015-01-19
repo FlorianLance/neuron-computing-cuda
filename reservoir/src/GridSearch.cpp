@@ -172,7 +172,7 @@ void GridSearch::launchTrainWithAllParameters(const std::string resultsFilePath,
 
                                     m_model->displayResults(true,false);
 
-                                    m_model->computeResultsData(true,"../data/Results/test.txt", l_diffSizeOCW,
+                                    m_model->computeResultsData(true, l_diffSizeOCW,
                                                                 l_absoluteCCW, l_continuousCCW,
                                                                 l_absoluteAll, l_continuousAll,
                                                                 l_meanDiffSizeOCW,

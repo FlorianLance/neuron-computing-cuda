@@ -54,7 +54,7 @@ my @ExecScriptParams = (# reservoir
                         "reservoir-interface",       "x86",  "reservoir-interface.exe",
                         "reservoir-interface-x64",   "amd64",  "reservoir-interface-x64.exe",
                         "reservoir-yarp",  "x86",   "reservoir-yarp.exe",
-                        "resrvoir-yarp-x64", "amd64", "reservoir-yarp-x64.exe",
+                        "reservoir-yarp-x64", "amd64", "reservoir-yarp-x64.exe",
                         "test-yarp-x64", "amd64", "test-yarp-x64.exe"
 );
 

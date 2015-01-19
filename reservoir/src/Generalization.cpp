@@ -316,7 +316,7 @@ void Generalization::startXVerification(const std::string &xCheckTrainPath, cons
             std::vector<double> l_diffSizeOCW, l_absoluteCorrectPositionAndWordCCW, l_correctPositionAndWordCCW, l_absoluteCorrectPositionAndWordAll, l_correctPositionAndWordAll;
             double l_meanDiffSizeOCW, l_meanCorrectPositionAndWordCCW, l_meanAbsoluteCorrectPositionAndWordCCW, l_meanCorrectPositionAndWordAll, l_meanAbsoluteCorrectPositionAndWordAll;
 
-            m_model->computeResultsData(true,"../data/Results/generalization_train.txt", l_diffSizeOCW,
+            m_model->computeResultsData(true, l_diffSizeOCW,
                                         l_absoluteCorrectPositionAndWordCCW, l_correctPositionAndWordCCW,
                                         l_absoluteCorrectPositionAndWordAll, l_correctPositionAndWordAll,
                                         l_meanDiffSizeOCW,
@@ -365,9 +365,8 @@ void Generalization::startXVerification(const std::string &xCheckTrainPath, cons
 
             // create test stats
                 m_model->launchTests();
-                m_model->retrieveTestsSentences();
 
-                m_model->computeResultsData(false,"../data/Results/generalization_test.txt", l_diffSizeOCW,
+                m_model->computeResultsData(false, l_diffSizeOCW,
                                             l_absoluteCorrectPositionAndWordCCW, l_correctPositionAndWordCCW,
                                             l_absoluteCorrectPositionAndWordAll, l_correctPositionAndWordAll,
                                             l_meanDiffSizeOCW,
