@@ -454,9 +454,22 @@ void Model::launchTraining()
             }
         }
 
-    // call python for generating new stim files
-        std::string l_pythonCmd("python ../generate_stim.py ");
-        std::string l_pythonCall = l_pythonCmd + m_parameters.m_corpusFilePath + " train " + l_CCWPythonArg + " " + l_structurePythonArg;
+        std::string l_corpusFilePath;
+        for(int ii = 0; ii < m_parameters.m_corpusFilePath.size(); ++ii)
+        {
+            if(m_parameters.m_corpusFilePath[ii] != ' ')
+            {
+                l_corpusFilePath.push_back(m_parameters.m_corpusFilePath[ii]);
+            }
+            else
+            {
+                l_corpusFilePath.push_back('$');
+            }
+        }
+
+    // call python for generating new stim files                        
+        std::string l_pythonCmd("python ../../scripts/python/generate_stim.py ");
+        std::string l_pythonCall = l_pythonCmd + l_corpusFilePath + " train " + l_CCWPythonArg + " " + l_structurePythonArg;
         sendLogInfo(QString::fromStdString(displayTime("Generate stim files with Python ", l_trainingTime, false, m_verbose)), QColor(Qt::black));
             system(l_pythonCall.c_str());
         sendLogInfo(QString::fromStdString(displayTime("End generation ", l_trainingTime, true, m_verbose)), QColor(Qt::black));
@@ -492,7 +505,7 @@ void Model::launchTraining()
 }
 
 
-bool Model::launchTests(const std::string &corpusTestFilePath)
+bool Model::launchTests()
 {
     // init time
         clock_t l_testTime = clock();
@@ -504,13 +517,6 @@ bool Model::launchTests(const std::string &corpusTestFilePath)
             std::cerr << "The training must be done before the tests. " << std::endl;
             sendLogInfo("The training must be done before the tests. \n", QColor(Qt::red));
             return false;
-        }
-
-    // check corpus path input
-        std::string l_corpusFilePath = m_parameters.m_corpusFilePath;
-        if(corpusTestFilePath.size() > 0)
-        {
-            l_corpusFilePath = corpusTestFilePath;
         }
 
     // generate close class word arrays
@@ -527,7 +533,7 @@ bool Model::launchTests(const std::string &corpusTestFilePath)
 
     // retrieve corpus test data
         QVector<QStringList> l_testMeaning,l_testInfo, l_inused;
-        extractAllDataFromCorpusFile(l_corpusFilePath.c_str(), l_inused,l_inused,l_inused, l_testMeaning,l_testInfo,l_inused);
+        extractAllDataFromCorpusFile(m_parameters.m_corpusFilePath.c_str(), l_inused,l_inused,l_inused, l_testMeaning,l_testInfo,l_inused);
         convQt2DString2Std2DString(l_testMeaning, m_testMeaning);
         convQt2DString2Std2DString(l_testInfo, m_testInfo);
 
@@ -537,7 +543,6 @@ bool Model::launchTests(const std::string &corpusTestFilePath)
             sendLogInfo("Corpus test is empty. \n", QColor(Qt::red));
             return false;
         }
-
 
     // generate CCW python argument
         std::string l_CCWPythonArg;
@@ -563,8 +568,21 @@ bool Model::launchTests(const std::string &corpusTestFilePath)
             }
         }
 
+        std::string l_corpusFilePath;
+        for(int ii = 0; ii < m_parameters.m_corpusFilePath.size(); ++ii)
+        {
+            if(m_parameters.m_corpusFilePath[ii] != ' ')
+            {
+                l_corpusFilePath.push_back(m_parameters.m_corpusFilePath[ii]);
+            }
+            else
+            {
+                l_corpusFilePath.push_back('$');
+            }
+        }
+
     // call python for generating new stim files
-        std::string l_pythonCmd("python ../generate_stim.py ");
+        std::string l_pythonCmd("python ../../scripts/python/generate_stim.py ");
         std::string l_pythonCall;
         l_pythonCall = l_pythonCmd + l_corpusFilePath + " test " + l_CCWPythonArg + " " + l_structurePythonArg;
 

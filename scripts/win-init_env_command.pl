@@ -49,11 +49,8 @@ sub buildOrder {
 
 # executables scripts to be generated for each project
 my @ExecScriptParams = (# reservoir
-                        "reservoir",       "x86",  "reservoir.exe",
                         "reservoir-x64",   "amd64",  "reservoir-x64.exe",
-                        "reservoir-interface",       "x86",  "reservoir-interface.exe",
                         "reservoir-interface-x64",   "amd64",  "reservoir-interface-x64.exe",
-                        "reservoir-yarp",  "x86",   "reservoir-yarp.exe",
                         "reservoir-yarp-x64", "amd64", "reservoir-yarp-x64.exe",
                         "test-yarp-x64", "amd64", "test-yarp-x64.exe"
 );
@@ -97,9 +94,11 @@ $ENV{THIRD_PARTY_OPENNI}    = $PThird_party . "openni/openni-1.5.4.0/";
 $ENV{THIRD_PARTY_OPENNI2_64}= $PThird_party . "openni/amd64/openni-2.1.0.4-64/";
 ##################### OPENCV
 $ENV{THIRD_PARTY_OPENCV}   = $PThird_party . "opencv/opencv-2.49/";
-$ENV{THIRD_PARTY_OPENCV_64}= $PThird_party . "opencv/amd64/opencv-2.48/";
+$ENV{THIRD_PARTY_OPENCV_64}= $PThird_party . "opencv/amd64/opencv-2.49/";
 ##################### FREEGLUT
 $ENV{THIRD_PARTY_FREEGLUT}   = $PThird_party . "freeglut/";
+##################### CUBLAS
+$ENV{THIRD_PARTY_CUBLAS_64}  = $PLocalThird_party . "cublas/amd64/";
 ##################### QT
 $ENV{THIRD_PARTY_QT}    = $PThird_party . "Qt/4.8.3/";
 $ENV{THIRD_PARTY_QT_64} = $PThird_party . "Qt/amd64/4.8.3/";
@@ -212,6 +211,9 @@ if($ARG eq "amd64")
     $PathsToAdd = $ENV{THIRD_PARTY_QT_64} . "bin/;" . $PathsToAdd;
 
     $PathsToAdd = $ENV{THIRD_PARTY_CLAPACK_64} . "lib/;" . $PathsToAdd;
+
+    $PathsToAdd = $ENV{THIRD_PARTY_CUBLAS_64} . "bin/;" . $PathsToAdd;
+
 }
 
 ####################################################################################### UPDATE GLOBAL PATH

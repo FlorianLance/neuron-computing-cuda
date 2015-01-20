@@ -595,6 +595,8 @@ if __name__ == '__main__':
     #print 'Number of arguments:', len(sys.argv), 'arguments.'
     #print 'Argument List:', str(sys.argv)
 
+    corpusFilePath = sys.argv[1]
+    corpusFilePath = corpusFilePath.replace('$',' ')
     ccwSplited = re.split('_', sys.argv[3])
     structureSplited = re.split('_', sys.argv[4])
 
@@ -604,6 +606,6 @@ if __name__ == '__main__':
         structureLetters.append(ii[0])
         structureValues.append(ii[1])
 
-    main(path_file_in= sys.argv[1], generate = sys.argv[2], ccw = ccwSplited, sLetters = structureLetters, sValues = structureValues)
+    main(path_file_in= corpusFilePath, generate = sys.argv[2], ccw = ccwSplited, sLetters = structureLetters, sValues = structureValues)
 
 

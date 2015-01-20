@@ -145,10 +145,9 @@ class Model : public QObject
 
         /**
          * @brief launchTests
-         * @param corpusTestFilePath
          * @return
          */
-        bool launchTests(const std::string &corpusTestFilePath = "");
+        bool launchTests();
 
 
         /**
