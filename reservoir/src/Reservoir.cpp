@@ -617,12 +617,8 @@ void Reservoir::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTeac
     emit sendLogInfo(QString::fromStdString(displayTime("END : tikhonovRegularization ", m_oTime, false, m_verbose)), QColor(Qt::black));
 }
 
-void Reservoir::saveTraining(const string &path)
+void Reservoir::saveParamFile(const std::string &path)
 {
-    save2DMatrixToTextStd(path + "/wOut.txt", m_wOut);
-    save2DMatrixToTextStd(path + "/wIn.txt", m_wIn);
-    save2DMatrixToTextStd(path + "/w.txt", m_w);    
-
     QFile l_paramFile(QString::fromStdString(path) + "/param.txt");
     if(l_paramFile.open(QIODevice::WriteOnly | QIODevice::Text))
     {
@@ -642,27 +638,18 @@ void Reservoir::saveTraining(const string &path)
     }
 }
 
-void Reservoir::loadTraining(const std::string &path)
+void Reservoir::saveWIn(const std::string &path)
 {
-    load2DMatrixStd<float>(path + "/wOut.txt", m_wOutLoaded);
-    load2DMatrixStd<float>(path + "/wIn.txt", m_wInLoaded);
-    load2DMatrixStd<float>(path + "/w.txt", m_wLoaded);
-
-    QFile l_paramFile(QString::fromStdString(path) + "/param.txt");
-    if(l_paramFile.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        QStringList parameters;
-        QTextStream l_stream(&l_paramFile);
-        QString l_content = l_stream.readAll();
-        parameters = l_content.split(' ');
-        sendLoadedTrainingParameters(parameters);
-    }
+    save2DMatrixToTextStd(path + "/wIn.txt", m_wIn);
 }
 
-void Reservoir::loadW(const string &path)
+void Reservoir::saveW(const std::string &path)
 {
-    load2DMatrixStd<float>(path + "/w.txt", m_wLoaded);
+    save2DMatrixToTextStd(path + "/w.txt", m_w);
+}
 
+void Reservoir::loadParam(const std::string &path)
+{
     QFile l_paramFile(QString::fromStdString(path) + "/param.txt");
     if(l_paramFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
@@ -674,19 +661,32 @@ void Reservoir::loadW(const string &path)
     }
 }
 
-void Reservoir::loadWIn(const string &path)
+void Reservoir::saveTraining(const std::string &path)
+{
+    save2DMatrixToTextStd(path + "/wOut.txt", m_wOut);
+    save2DMatrixToTextStd(path + "/wIn.txt", m_wIn);
+    save2DMatrixToTextStd(path + "/w.txt", m_w);    
+    saveParamFile(path);
+}
+
+void Reservoir::loadTraining(const std::string &path)
+{
+    load2DMatrixStd<float>(path + "/wOut.txt", m_wOutLoaded);
+    load2DMatrixStd<float>(path + "/wIn.txt", m_wInLoaded);
+    load2DMatrixStd<float>(path + "/w.txt", m_wLoaded);
+    loadParam(path);
+}
+
+void Reservoir::loadW(const std::string &path)
+{
+    load2DMatrixStd<float>(path + "/w.txt", m_wLoaded);
+    loadParam(path);
+}
+
+void Reservoir::loadWIn(const std::string &path)
 {
     load2DMatrixStd<float>(path + "/wIn.txt", m_wInLoaded);
-
-    QFile l_paramFile(QString::fromStdString(path) + "/param.txt");
-    if(l_paramFile.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        QStringList parameters;
-        QTextStream l_stream(&l_paramFile);
-        QString l_content = l_stream.readAll();
-        parameters = l_content.split(' ');
-        sendLoadedWInParameters(parameters);
-    }
+    loadParam(path);
 }
 
 void Reservoir::updateMatricesWithLoadedTraining()

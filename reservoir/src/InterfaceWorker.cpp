@@ -206,6 +206,7 @@ void InterfaceWorker::start()
             QString l_message = "\nCannot start, " + QString::number(l_OperationInvalid) + " operation are invalid. (Displayed in red)\n";
             sendLogInfo(l_message, QColor(Qt::red));
             std::cerr << l_message.toStdString() << std::endl;
+            lockInterfaceSignal(false);
             return;
         }
 
@@ -306,6 +307,7 @@ void InterfaceWorker::start()
             QString l_message = "W and WIn doesn't have the same parameter file. \n";
             emit sendLogInfo(l_message, QColor(Qt::red));
             std::cerr << l_message.toStdString() << std::endl;
+            lockInterfaceSignal(false);
             return;
         }
     }

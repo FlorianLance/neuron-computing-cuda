@@ -39,7 +39,9 @@ class ReservoirInterface : public QObject
     public slots :
 
 
-        void startReservoir(int actionToDo, ModelParameters parameters,Sentence CCW,Sentence structure);
+        void startReservoir(int actionToDo, ModelParameters parameters,Sentence CCW,Sentence structure,
+                            QString pathTrainingFileToBeSaved, QString pathWMatriceFileToBeSaved, QString pathWInMatriceFileToBeSaved,
+                            QString pathTrainingFileToBeLoaded, QString pathWMatriceFileToBeLoaded, QString pathWInMatriceFileToBeLoaded);
 
 
     signals :
@@ -77,7 +79,7 @@ class YarpInterfaceWorker : public QObject
 
         void readParameters(yarp::os::Bottle *parametersBottle);
 
-        void readData(yarp::os::Bottle *dataBottle);
+//        void readData(yarp::os::Bottle *dataBottle);
 
 
     public slots:
@@ -92,14 +94,14 @@ class YarpInterfaceWorker : public QObject
     signals :
 
 
-        void sendDataToReservoirSignal(int, ModelParameters, Sentence, Sentence);
+        void sendDataToReservoirSignal(int, ModelParameters, Sentence, Sentence, QString, QString, QString, QString, QString, QString);
 
 
     private :
 
         bool m_doLoop;
         bool m_isParameters;
-        bool m_isData;
+//        bool m_isData;
         bool m_reservoirIsRunning;
         bool m_startReservoir;
 
@@ -109,7 +111,7 @@ class YarpInterfaceWorker : public QObject
         QReadWriteLock m_reservoirLock;
 
         yarp::os::BufferedPort<yarp::os::Bottle> m_controlPort;
-        yarp::os::BufferedPort<yarp::os::Bottle> m_dataPort;
+//        yarp::os::BufferedPort<yarp::os::Bottle> m_dataPort;
         yarp::os::BufferedPort<yarp::os::Bottle> m_parametersPort;
 
         yarp::os::BufferedPort<yarp::os::Bottle> m_resultsPort;
@@ -117,6 +119,13 @@ class YarpInterfaceWorker : public QObject
         int m_actionToDo;
         ModelParameters m_currentModelParameters;
         Sentence m_CCWSentence, m_structureSentence;
+        QString m_pathTrainingToBeSaved;
+        QString m_pathWToBeSaved;
+        QString m_pathWInToBeSaved;
+
+        QString m_pathTrainingToBeLoaded;
+        QString m_pathWToBeLoaded;
+        QString m_pathWInToBeLoaded;
 
         cv::Mat m_W;
         cv::Mat m_WIn;

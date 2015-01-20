@@ -139,6 +139,31 @@ class Reservoir  : public QObject
          */
         void setMatricesUse(cbool useCustomW, cbool useCustomWIn);
 
+        /**
+         * @brief saveW
+         * @param path
+         */
+        void saveW(const std::string &path);
+
+        /**
+         * @brief saveWIn
+         * @param path
+         */
+        void saveWIn(const std::string &path);
+
+        /**
+         * @brief saveParamFile
+         * @param path
+         */
+        void saveParamFile(const std::string &path);
+
+        /**
+         * @brief loadParam
+         * @param path
+         */
+        void loadParam(const std::string &path);
+
+
     public slots :
 
         /**

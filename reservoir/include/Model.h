@@ -231,6 +231,24 @@ class Model : public QObject
         void loadWIn(const std::string &pathDirectory);
 
         /**
+         * @brief saveParamFile
+         * @param pathDirectory
+         */
+        void saveParamFile(const std::string &pathDirectory);
+
+        /**
+         * @brief saveW
+         * @param pathDirectory
+         */
+        void saveW(const std::string &pathDirectory);
+
+        /**
+         * @brief saveWIn
+         * @param pathDirectory
+         */
+        void saveWIn(const std::string &pathDirectory);
+
+        /**
          * @brief reservoir
          * @return
          */

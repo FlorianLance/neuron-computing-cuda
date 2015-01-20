@@ -380,6 +380,21 @@ void Model::saveTraining(const std::string &pathDirectory)
     m_reservoir->saveTraining(pathDirectory);
 }
 
+void Model::saveW(const std::string &pathDirectory)
+{
+    m_reservoir->saveW(pathDirectory);
+}
+
+void Model::saveWIn(const std::string &pathDirectory)
+{
+    m_reservoir->saveWIn(pathDirectory);
+}
+
+void Model::saveParamFile(const std::string &pathDirectory)
+{
+    m_reservoir->saveParamFile(pathDirectory);
+}
+
 void Model::saveReplay(const std::string &pathDirectory)
 {
     save3DMatrixToText(QString::fromStdString(pathDirectory) + "/xTot.txt", m_internalStatesTrain);
