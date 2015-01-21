@@ -2,7 +2,8 @@ Language Learning - Reservoir Computing - GPU
 =============================================
 
 An interface for language learning with neuron computing using GPU acceleration.
-A Yarp module of the program is available for remote computing on a CUDA working station.
+
+A Yarp module of the program is also available for remote computing on a CUDA working station.
 
 ![Neuron-computing-cuda](http://i.imgur.com/KFhutJH.jpg?1 "Neuron-computing-cuda")
 
