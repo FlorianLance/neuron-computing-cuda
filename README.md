@@ -11,4 +11,4 @@ Tutorials :
 - [Reservoir Yarp] (https://github.com/FlorianLance/neuron-computing-cuda/wiki/tuto_yarp)
 
 Download :
-- [Release 0.9] (https://mega.co.nz/#!jZsTzZzA!qGoEC-OPrjs1sxMGh8lqbzq4T4_4ZHAslDHta9dkZkI)
+- [Release 0.9 Windows x64] (https://mega.co.nz/#!jZsTzZzA!qGoEC-OPrjs1sxMGh8lqbzq4T4_4ZHAslDHta9dkZkI)
