@@ -16,15 +16,8 @@
 #include <iomanip>
 
 
-
 // qt
 #include <QtGui>
-//#include <QtWidgets>
-//#include <Qtcore/qfile.h>
-//#include <Qtcore/qvector.h>
-//#include <Qtcore/qstringlist.h>
-//#include <Qtcore/qtextstream.h>
-
 
 // opencv
 #include "opencv2/highgui/highgui.hpp"
@@ -204,7 +197,7 @@ static void initMatrix(cv::Mat &mat, const int numDim, int *sizes, bool initWith
  * @param info
  * @param time
  * @param skipNextLine
- * @param verboseAcivated
+ * @param verboseActivated
  * @return
  */
 static std::string displayTime(const std::string info, const clock_t time, const bool skipNextLine = false, const bool verboseActivated = true)

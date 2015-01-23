@@ -254,11 +254,7 @@ namespace swCuda
             l_U  = new float[M.rows * M.rows * sizeof(float)];
 
         // singular value decompostion with cuda
-            printf("avant\n");
             svdDecomposition_all(l_dataM_oVt, M.rows, M.cols, l_S, l_U);
-            std::cout << l_S[0] << " " << l_U[0] << " " << l_dataM_oVt[0] << " " << l_dataM_oVt[1] << std::endl;
-            printf("après\n");
-//                delete[] l_M;
 
         // fill result mat
             if(l_32b)

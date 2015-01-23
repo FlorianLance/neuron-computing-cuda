@@ -19,6 +19,9 @@ class Generalization
 {
     public :
 
+        /**
+         * @brief The RandomPart enum
+         */
         enum RandomPart{MEANING,INFOS,SENTENCES};
 
 

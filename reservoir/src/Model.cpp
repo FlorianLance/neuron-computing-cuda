@@ -410,6 +410,7 @@ void Model::loadW(const std::string &pathDirectory)
     m_reservoir->loadW(pathDirectory);
 }
 
+
 void Model::loadWIn(const std::string &pathDirectory)
 {
     m_reservoir->loadWIn(pathDirectory);
@@ -425,7 +426,7 @@ cv::Mat *Model::xTotMatrice()
     return &m_internalStatesTrain;
 }
 
-void Model::launchTraining()
+bool Model::launchTraining()
 {
     // init time
         clock_t l_trainingTime = clock();
@@ -508,7 +509,11 @@ void Model::launchTraining()
 
     // train reservoir        
         sendLogInfo(QString::fromStdString(displayTime("Start reservoir training ", l_trainingTime, false, m_verbose)), QColor(Qt::black));
-            m_reservoir->train(l_3DMatStimMeanTrain, l_3DMatStimSentTrain, m_3DMatSentencesOutputTrain,m_internalStatesTrain);            
+            if(!m_reservoir->train(l_3DMatStimMeanTrain, l_3DMatStimSentTrain, m_3DMatSentencesOutputTrain,m_internalStatesTrain))
+            {
+                sendLogInfo("Abort training.\n", QColor(Qt::red));
+                return false;
+            }
         sendLogInfo(QString::fromStdString(displayTime("End reservoir training ", l_trainingTime, true, m_verbose)), QColor(Qt::black));
 
         retrieveTrainSentences();
@@ -517,6 +522,8 @@ void Model::launchTraining()
 
     // send output matrix for displaying CCW in the interface
         emit sendOutputMatrix(m_3DMatSentencesOutputTrain, m_recoveredSentencesTrain);
+
+    return true;
 }
 
 

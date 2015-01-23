@@ -29,34 +29,6 @@
          <string/>
         </property>
         <layout class="QGridLayout" name="gridLayout_17">
-         <item row="1" column="0">
-          <widget class="QTabWidget" name="twComputing">
-           <widget class="QWidget" name="gbComputingPage1">
-            <attribute name="title">
-             <string>STATE</string>
-            </attribute>
-            <layout class="QGridLayout" name="gridLayout_9">
-             <item row="0" column="1" colspan="5">
-              <widget class="QProgressBar" name="pbComputing">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="value">
-                <number>0</number>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="6">
-              <widget class="QLabel" name="laStateComputing">
-               <property name="text">
-                <string>Idle</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </widget>
-         </item>
          <item row="0" column="0">
           <widget class="QTabWidget" name="twSettings">
            <property name="currentIndex">
@@ -1018,7 +990,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QGroupBox" name="groupBox_2">
+              <widget class="QGroupBox" name="gbSystem">
                <property name="minimumSize">
                 <size>
                  <width>0</width>
@@ -1110,7 +1082,7 @@
                    </size>
                   </property>
                   <property name="text">
-                   <string>Stop</string>
+                   <string>STOP</string>
                   </property>
                  </widget>
                 </item>
@@ -1650,6 +1622,38 @@
            </widget>
           </widget>
          </item>
+         <item row="1" column="0">
+          <widget class="QGroupBox" name="gbComputing">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>75</height>
+            </size>
+           </property>
+           <property name="title">
+            <string>STATE</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_9">
+            <item row="0" column="1" colspan="5">
+             <widget class="QProgressBar" name="pbComputing">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="value">
+               <number>0</number>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="6">
+             <widget class="QLabel" name="laStateComputing">
+              <property name="text">
+               <string>Idle</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -1669,9 +1673,6 @@
              <string>RESULTS</string>
             </attribute>
             <layout class="QGridLayout" name="gridLayout_13">
-             <item row="0" column="0">
-              <widget class="QTextBrowser" name="tbResults"/>
-             </item>
              <item row="1" column="0">
               <widget class="QPushButton" name="pbClearResults">
                <property name="enabled">
@@ -1686,6 +1687,24 @@
                <property name="text">
                 <string>Clear results</string>
                </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QGroupBox" name="groupBox_7">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>50</height>
+                </size>
+               </property>
+               <property name="title">
+                <string/>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_22">
+                <item row="0" column="0">
+                 <widget class="QTextBrowser" name="tbResults"/>
+                </item>
+               </layout>
               </widget>
              </item>
             </layout>
@@ -1749,7 +1768,7 @@
            </widget>
            <widget class="QWidget" name="tabInput">
             <attribute name="title">
-             <string>Input</string>
+             <string>INPUT</string>
             </attribute>
             <layout class="QGridLayout" name="gridLayout_8">
              <item row="0" column="0">
@@ -1786,7 +1805,7 @@
            </widget>
            <widget class="QWidget" name="tabOutput">
             <attribute name="title">
-             <string>Output</string>
+             <string>OUTPUT</string>
             </attribute>
             <layout class="QVBoxLayout" name="verticalLayout_3">
              <item>
@@ -1847,46 +1866,41 @@
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QTabWidget" name="tabWidget">
+          <widget class="QGroupBox" name="groupBox">
            <property name="maximumSize">
             <size>
              <width>16777215</width>
              <height>150</height>
             </size>
            </property>
-           <property name="currentIndex">
-            <number>0</number>
+           <property name="title">
+            <string>INFOS</string>
            </property>
-           <widget class="QWidget" name="tab">
-            <attribute name="title">
-             <string>INFOS</string>
-            </attribute>
-            <layout class="QVBoxLayout" name="verticalLayout_2">
-             <item>
-              <widget class="QTextBrowser" name="tbInfos">
-               <property name="enabled">
-                <bool>true</bool>
-               </property>
-               <property name="readOnly">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="verticalSpacer_2">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>40</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </widget>
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <item>
+             <widget class="QTextBrowser" name="tbInfos">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="readOnly">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
           </widget>
          </item>
         </layout>
@@ -1905,24 +1919,45 @@
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu">
+   <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionFichier"/>
+    <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="actionAbout"/>
+    <addaction name="actionOnlineDocumentation"/>
    </widget>
-   <addaction name="menu"/>
+   <addaction name="menuFile"/>
    <addaction name="menu_2"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionFichier">
+  <action name="actionExit">
    <property name="text">
     <string>Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionOnlineDocumentation">
+   <property name="text">
+    <string>Online documentation</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
    </property>
   </action>
  </widget>

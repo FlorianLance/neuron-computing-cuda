@@ -22,7 +22,7 @@ RESERVOIR_OBJ=\
     $(LIBDIR)/Generalization.obj $(LIBDIR)/Reservoir.obj $(LIBDIR)/Model.obj $(LIBDIR)/inversions.obj $(LIBDIR)/multiplications.obj $(LIBDIR)/GridSearch.obj\
 
 RESERVOIR_COMMAND_OBJ=\
-    $(RESERVOIR_OBJ) $(LIBDIR)/main.obj\
+    $(RESERVOIR_OBJ) $(LIBDIR)/Example.obj\
 
 RESERVOIR_YARP_OBJ=\
     $(RESERVOIR_OBJ) $(LIBDIR)/YarpInterface.obj\
@@ -89,8 +89,8 @@ $(LIBDIR)/GridSearch.obj: ./src/GridSearch.cpp
 $(LIBDIR)/Generalization.obj: ./src/Generalization.cpp
         $(CC) -c ./src/Generalization.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/Generalization.obj"
 
-$(LIBDIR)/main.obj: ./src/main.cpp
-        $(CC) -c ./src/main.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/main.obj"
+$(LIBDIR)/Example.obj: ./src/Example.cpp
+        $(CC) -c ./src/Example.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/Example.obj"
 
 $(LIBDIR)/Interface.obj: ./src/Interface.cpp
         $(CC) -c ./src/Interface.cpp $(CFLAGS_DYN) $(RESERVOIR_INC) -Fo"$(LIBDIR)/Interface.obj"

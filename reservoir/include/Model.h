@@ -74,9 +74,9 @@ struct ModelParameters
         m_sparcity       = m_nbNeurons / 10.0;
     }
 
-    bool m_useLoadedTraining;
-    bool m_useLoadedW;
-    bool m_useLoadedWIn;
+    bool m_useLoadedTraining;       /**< ...  */
+    bool m_useLoadedW;              /**< ...  */
+    bool m_useLoadedWIn;            /**< ...  */
 
     // cuda
     bool m_useCudaInv;              /**< uses the cuda inversion ? */
@@ -140,8 +140,9 @@ class Model : public QObject
 
         /**
          * @brief launchTraining
+         * @return
          */
-        void launchTraining();
+        bool launchTraining();
 
         /**
          * @brief launchTests
@@ -166,15 +167,8 @@ class Model : public QObject
         void displayResults(const bool trainResults = true, const bool testResults = true);
 
         /**
-         * @brief setResultsTestToCompare
-         * @param resultsTestFilePath
-         */
-//        void setResultsTestToCompare(const std::string &resultsTestFilePath);
-
-        /**
          * @brief computeResultsData
          * @param trainResults
-         * @param pathSaveAllSentenceRes
          * @param diffSizeOCW
          * @param absoluteCCW
          * @param continuousCCW

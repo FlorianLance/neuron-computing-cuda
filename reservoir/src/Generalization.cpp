@@ -11,6 +11,7 @@
 Generalization::Generalization(Model &model) : m_model(&model)
 {}
 
+
 void Generalization::retrieveRandomSentenceList(cint sizeCorpus, cint nbSentence, std::vector<int> &randomSentenceList)
 {
     randomSentenceList.clear();

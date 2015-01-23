@@ -35,25 +35,25 @@ enum ActionToDo
 };
 
 /**
- * @brief The ResultsDisplayReservoir struct
+ * @brief Results from the reservoir
  */
 struct ResultsDisplayReservoir
 {
-    std::vector<double> m_absoluteCCW;
-    std::vector<double> m_absoluteAll;
-    std::vector<double> m_continuousCCW;
-    std::vector<double> m_continuousAll;
+    std::vector<double> m_absoluteCCW;      /**< absolute pairwise CCW results */
+    std::vector<double> m_absoluteAll;      /**< absolute pairwise all results  */
+    std::vector<double> m_continuousCCW;    /**< continuous pairwise CCW results */
+    std::vector<double> m_continuousAll;    /**< continuous pairwise all results */
 
-    Sentences m_trainSentences;
-    Sentences m_trainResults;
-    Sentences m_testResults;
+    Sentences m_trainSentences;             /**< train sentences */
+    Sentences m_trainResults;               /**< train sentences results */
+    Sentences m_testResults;                /**< test sentences results */
 
-    ActionToDo m_action;
+    ActionToDo m_action;                    /**< action to do */
 };
 
 
 /**
- * @brief The GridSearchQt class
+ * @brief Class for doing planifications with custom parameters of resrvoir training and testing
  */
 class GridSearch : public QObject
 {
@@ -86,11 +86,11 @@ class GridSearch : public QObject
          * @brief Start the training with all the parameters defined.
          * @param [in] resultsFilePath      : result file path (readable data)
          * @param [in] resultsRawFilePath   : result file path (raw data, easy to read with gnuplot)
-         * @param doTraining
-         * @param doTest
-         * @param loadTraining
-         * @param loadW
-         * @param loadWIn
+         * @param [in] doTraining           :
+         * @param [in] doTest               :
+         * @param [in] loadTraining         :
+         * @param [in] loadW                :
+         * @param [in] loadWIn              :
          */
         void launchTrainWithAllParameters(const std::string resultsFilePath, const std::string resultsRawFilePath, cbool doTraining = true, cbool doTest = false, cbool loadTraining = false
                 , cbool loadW = false, cbool loadWIn = false);

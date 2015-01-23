@@ -166,7 +166,12 @@ void GridSearch::launchTrainWithAllParameters(const std::string resultsFilePath,
                                 {
                                     emit sendLogInfo("# Start the training number : " +  QString::number(l_currentTrain) + " / " + QString::number(l_nbTrain) + " \n", QColor(Qt::blue));
                                     std::cout << "########## Start the training number : " << l_currentTrain++ << " / " << l_nbTrain << std::endl << std::endl;
-                                    m_model->launchTraining();
+
+                                    if(!m_model->launchTraining())
+                                    {
+                                        emit sendLogInfo("Abort gridsearch. \n", QColor(Qt::red));
+                                        return;
+                                    }
 
                                     double l_time = static_cast<double>((clock() - l_timeTraining)) / CLOCKS_PER_SEC;
 

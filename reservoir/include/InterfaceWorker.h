@@ -92,7 +92,7 @@ struct ReservoirParameters
 
 
 /**
- * @brief The SWViewerWorker class
+ * @brief Qt Worker used by the interface, a dedicated thread for doing the computing work
  */
 class InterfaceWorker : public QObject
 {
@@ -266,24 +266,22 @@ class InterfaceWorker : public QObject
 
     private :
 
-        cv::Mat m_xTot; /**< ... */
+        cv::Mat m_xTot; /**< loaded x tot matrice for the replay */
 
-        int m_nbOfCorpus;   /**< ... */
+        int m_nbOfCorpus;                       /**< number of corpus loaded */
 
-        QString m_absolutePath; /**< ... */
+        QStringList m_parametersTrainingLoaded; /**< loaded parameters of the training */
+        QStringList m_parametersWLoaded;        /**< loaded parameters of the W matrice */
+        QStringList m_parametersWInLoaded;      /**< loaded parameters of the Win matrice */
 
-        QStringList m_parametersTrainingLoaded; /**< ... */
-        QStringList m_parametersWLoaded;        /**< ... */
-        QStringList m_parametersWInLoaded;      /**< ... */
+        ReservoirParameters m_reservoirParameters;  /**< reservoir parameters */
+        LanguageParameters m_languageParameters;    /**< language parameters */
+        ReplayParameters m_replayParameters;        /**< replay parameters */
 
-        ReservoirParameters m_reservoirParameters;  /**< ... */
-        LanguageParameters m_languageParameters;    /**< ... */
-        ReplayParameters m_replayParameters;        /**< ... */
+        Model m_model;              /**< reservoir model */
+        GridSearch *m_gridSearch;   /**< gridseard of the model */
 
-        Model m_model;                /**< ... */
-        GridSearch *m_gridSearch;     /**< ... */
-
-        QStringList m_corpusList;   /**< ... */
+        QStringList m_corpusList;   /**< list of the corpus */
 };
 
 

@@ -12,7 +12,7 @@
 #include "../moc/moc_InterfaceWorker.cpp"
 
 
-InterfaceWorker::InterfaceWorker(QString absolutePath) : m_gridSearch(new GridSearch(m_model)), m_nbOfCorpus(0), m_absolutePath(absolutePath)
+InterfaceWorker::InterfaceWorker(QString absolutePath) : m_gridSearch(new GridSearch(m_model)), m_nbOfCorpus(0)
 {
     qRegisterMetaType<ReplayParameters>("ReplayParameters");
     qRegisterMetaType<ReservoirParameters>("ReservoirParameters");
@@ -313,6 +313,7 @@ void InterfaceWorker::start()
     }
 
 
+
     // launch reservoir computing
     m_gridSearch->launchTrainWithAllParameters(l_pathRes.toStdString(), l_pathResRaw.toStdString(), l_doTrain, l_doTest, m_reservoirParameters.m_useLoadedTraining,
                                                    m_reservoirParameters.m_useLoadedW, m_reservoirParameters.m_useLoadedWIn);
@@ -323,7 +324,7 @@ void InterfaceWorker::start()
 
 void InterfaceWorker::stop()
 {
-    lockInterfaceSignal(false);
+//    lockInterfaceSignal(false);
 }
 
 void InterfaceWorker::saveLastTraining(QString pathDirectory)

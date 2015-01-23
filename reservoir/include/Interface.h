@@ -31,7 +31,7 @@ namespace Ui {
 
 /**
  * \class Interface
- * \brief ...
+ * \brief Qt interface for using the Reservoir model.
  * \author Florian Lance
  * \date 01/12/14
  */
@@ -59,11 +59,16 @@ class Interface : public QMainWindow
 
     public slots:
 
+
         /**
-         * @brief closeEvent
-         * @param event
+         * @brief openOnlineDocumentation
          */
-//        void closeEvent(QCloseEvent *event);
+        void openOnlineDocumentation();
+
+        /**
+         * @brief openAboutWindow
+         */
+        void openAboutWindow();
 
         /**
          * @brief Add a corpus in the list
@@ -170,24 +175,6 @@ class Interface : public QMainWindow
          * @param text
          */
         void updateProgressBar(int currentValue, int valueMax, QString text);
-
-//        /**
-//         * @brief displayXMatrix
-//         * @param values
-//         * @param currentSentenceId
-//         * @param nbSentences
-//         */
-//        void displayXMatrix(QVector<QVector<double> > *values, int currentSentenceId, int nbSentences);
-
-
-//        /**
-//         * @brief initPlot
-//         * @param nbCurves
-//         * @param sizeDim1Meaning
-//         * @param sizeDim2Meaning
-//         * @param name
-//         */
-//        void initPlot(int nbCurves, int sizeDim1Meaning, int sizeDim2Meaning, QString name);
 
         /**
          * @brief cleanResultsDisplay
@@ -365,44 +352,30 @@ class Interface : public QMainWindow
     private :
 
         // miscellanous
-        QString m_absolutePath;         /**< ... */
-        QFile m_logFile;                /**< ... */
+        QString m_absolutePath;         /**< absolute path used for init dialog boxes */
+        QFile m_logFile;                /**< log file, will save all the output displayed in the INFOS part */
         QVector<QColor> m_colorsCCW;    /**< colors used for the CCW display */
 
         // widgets & ui
         //  input
-        QVector<QCustomPlot*> m_plotListTrainSentenceInput;     /**< ... */
-        QVector<QCustomPlot*> m_plotListTrainMeaningInput;      /**< ... */
-        QVector<QLabel*> m_plotLabelListTrainSentenceInput;     /**< ... */
+        QVector<QCustomPlot*> m_plotListTrainSentenceInput;     /**< list of the plots for the sentences input */
+        QVector<QCustomPlot*> m_plotListTrainMeaningInput;      /**< list of the plots for the meaning input */
+        QVector<QLabel*> m_plotLabelListTrainSentenceInput;     /**< labels of the input meaning displayed in the input panel labels of the input sentences displayed in the input panel */
         QVector<QLabel*> m_labelListInputSentences;             /**< labels of the input sentences displayed in the input panel */
         //  output
-        QVector<QCustomPlot*> m_plotListTrainSentenceOutput;    /**< ... */
-        QVector<QLabel*> m_labelListRetrievedSentences;             /**< labels of the retrieved sentences displayed in the output panel */
-        QVector<QLabel*> m_plotLabelListTrainSentenceOutput;    /**< ... */
+        QVector<QCustomPlot*> m_plotListTrainSentenceOutput;    /**< list of the plots for the sentences output */
+        QVector<QLabel*> m_labelListRetrievedSentences;         /**< labels of the retrieved sentences displayed in the output panel */
+        QVector<QLabel*> m_plotLabelListTrainSentenceOutput;    /**< labels of the CCW displayed in the output panel */
         Ui::UI_Reservoir* m_uiInterface;                        /**< qt main window */
 
         //threads / workers
         InterfaceWorker  *m_pWInterface;    /**< viewer worker */
         QThread         m_TInterface;       /**< viewer thread */
 
-        // test
-        QVector<QCustomPlot*> m_replayPlotList;
-        QVector<double> m_replayData;
-
         // replay
-        bool m_replayLoaded;
-        QColor m_colorLine;
-        QVector<QCustomPlot*> m_plotReplay;
-
-        // old
-//        QVector<QCustomPlot*> m_plotListX;   // ?
-        int m_sizeDim1Meaning; // ?
-        int m_sizeDim2Meaning; // ?
-        QVector<QVector<double> > m_allValuesPlot; // ?
-        int m_nbMaxNeuronsSentenceDisplayed; // ?
-        int m_nbSentencesDisplayed; // ?
-        QTime m_timerDisplayNeurons; // ?
-        QMutex m_neuronDisplayMutex; // ?
+        bool m_replayLoaded;                /**< is the replay loaded ? */
+        QColor m_colorLine;                 /**< color of the line */
+        QVector<QCustomPlot*> m_plotReplay; /**< plots of the replay */
 };
 
 

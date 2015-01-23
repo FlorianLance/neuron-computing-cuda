@@ -54,6 +54,8 @@ Reservoir::Reservoir()
     m_useW   = false;
     m_useWIn = false;
 
+    m_stopLoop = false;
+
 }
 
 void Reservoir::setCudaProperties(cbool cudaInv, cbool cudaMult)
@@ -160,7 +162,7 @@ void Reservoir::generateWIn(cuint dimInput)
     }
 }
 
-void Reservoir::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher, cv::Mat &sentencesOutputTrain, cv::Mat &xTot)
+bool Reservoir::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher, cv::Mat &sentencesOutputTrain, cv::Mat &xTot)
 {
     // update progress bar
         int l_steps = 0;
@@ -190,10 +192,20 @@ void Reservoir::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher, 
 
     float l_invLeakRate = 1.f - m_leakRate;
 
+//m_stopLoop = true;
 
     #pragma omp parallel for num_threads(m_numThread)
         for(int ii = 0; ii < meaningInputTrain.size[0]; ++ii)
         {
+            m_stopLocker.lockForRead();
+                bool l_espaceLoop = m_stopLoop;
+            m_stopLocker.unlock();
+
+            if(l_espaceLoop)
+            {
+                continue;
+            }
+
             cv::Mat l_X = l_X2Copy.clone();
             cv::Mat l_xPrev, l_x;
             cv::Mat l_subMean(meaningInputTrain.size[1], meaningInputTrain.size[2], CV_32FC1, meaningInputTrain.data + meaningInputTrain.step[0] *ii);
@@ -284,6 +296,15 @@ void Reservoir::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher, 
         }
     // end pragma
 
+    if(m_stopLoop)
+    {
+        emit sendLogInfo("Stop X construction loop.\n", QColor(Qt::red));
+        emit sendComputingState(0, 100, QString("Aborted."));
+        m_stopLoop = false;
+        return false;
+    }
+
+
     // clean inused matrices
         l_X2Copy.release();
         l_xPrev2Copy.release();
@@ -301,6 +322,16 @@ void Reservoir::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher, 
     #pragma omp parallel for
         for(int ii = 0; ii < xTot.size[0]; ++ii)
         {
+            m_stopLocker.lockForRead();
+                bool l_espaceLoop = m_stopLoop;
+            m_stopLocker.unlock();
+
+            if(l_espaceLoop)
+            {
+                continue;
+            }
+
+
             cv::Mat l_X = cv::Mat::zeros(xTot.size[1], xTot.size[2], CV_32FC1);
 
             for(int jj = 0; jj < l_X.rows; ++jj)
@@ -321,14 +352,22 @@ void Reservoir::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher, 
                 {
                     sentencesOutputTrain.at<float>(ii,jj,kk) = res.at<float>(jj,kk);
                 }
-            }
+            }                                    
         }
         // end pragma
 
-//    cv::Mat *l_outputClone = new cv::Mat; // TODO :
-//    (*l_outputClone) = sentencesOutputTrain.clone();
+    if(m_stopLoop)
+    {
+        emit sendLogInfo("Stop sentencesOutputTrain construction loop.\n", QColor(Qt::red));
+        emit sendComputingState(0, 100, QString("Aborted."));
+        m_stopLoop = false;
+        return false;
+    }
+
     emit sendLogInfo(QString::fromStdString(displayTime("END : train ", m_oTime, false, m_verbose)), QColor(Qt::black));
     emit sendComputingState(100, 100, QString("End training"));    
+
+    return true;
 }
 
 
@@ -661,6 +700,7 @@ void Reservoir::loadParam(const std::string &path)
     }
 }
 
+
 void Reservoir::saveTraining(const std::string &path)
 {
     save2DMatrixToTextStd(path + "/wOut.txt", m_wOut);
@@ -689,6 +729,7 @@ void Reservoir::loadWIn(const std::string &path)
     loadParam(path);
 }
 
+
 void Reservoir::updateMatricesWithLoadedTraining()
 {
     if(m_wOutLoaded.rows > 0)
@@ -711,6 +752,8 @@ void Reservoir::setMatricesUse(cbool useCustomW, cbool useCustomWIn)
     m_useWIn = useCustomWIn;
 }
 
+
+
 void Reservoir::enableMaxOmpThreadNumber(bool enable)
 {
     if(enable)
@@ -723,17 +766,9 @@ void Reservoir::enableMaxOmpThreadNumber(bool enable)
     }
 }
 
-void Reservoir::enableDisplay(bool enable)
+void Reservoir::stopLoop()
 {
-    m_sendMatrices = enable;
+    m_stopLocker.lockForWrite();
+        m_stopLoop = true;
+    m_stopLocker.unlock();
 }
-
-void Reservoir::updateMatrixXDisplayParameters(bool enabled, bool randomNeurons, int nbRandomNeurons, int startIdNeurons, int endIdNeurons)
-{
-    m_displayEnabled    = enabled;
-    m_randomNeurons    = randomNeurons;
-    m_nbRandomNeurons   = nbRandomNeurons;
-    m_startIdNeurons    = startIdNeurons;
-    m_endIdNeurons      = endIdNeurons;
-}
-

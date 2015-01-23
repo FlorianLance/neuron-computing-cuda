@@ -49,7 +49,7 @@ sub buildOrder {
 
 # executables scripts to be generated for each project
 my @ExecScriptParams = (# reservoir
-                        "reservoir-x64",   "amd64",  "reservoir-x64.exe",
+                        "example-x64",   "amd64",  "reservoir-x64.exe",
                         "reservoir-interface-x64",   "amd64",  "reservoir-interface-x64.exe",
                         "reservoir-yarp-x64", "amd64", "reservoir-yarp-x64.exe",
                         "test-yarp-x64", "amd64", "test-yarp-x64.exe"

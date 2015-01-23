@@ -24,6 +24,9 @@
 
 class YarpInterfaceWorker;
 
+/**
+ * @brief The ReservoirInterface class
+ */
 class ReservoirInterface : public QObject
 {
     Q_OBJECT
@@ -31,14 +34,33 @@ class ReservoirInterface : public QObject
 
     public :
 
+        /**
+         * @brief Constructor of ReservoirInterface
+         * @param parent
+         */
         ReservoirInterface(QCoreApplication *parent);
 
+        /**
+         * @brief Destructor of ReservoirInterface
+         */
         ~ReservoirInterface();
 
 
     public slots :
 
-
+        /**
+         * @brief startReservoir
+         * @param actionToDo
+         * @param parameters
+         * @param CCW
+         * @param structure
+         * @param pathTrainingFileToBeSaved
+         * @param pathWMatriceFileToBeSaved
+         * @param pathWInMatriceFileToBeSaved
+         * @param pathTrainingFileToBeLoaded
+         * @param pathWMatriceFileToBeLoaded
+         * @param pathWInMatriceFileToBeLoaded
+         */
         void startReservoir(int actionToDo, ModelParameters parameters,Sentence CCW,Sentence structure,
                             QString pathTrainingFileToBeSaved, QString pathWMatriceFileToBeSaved, QString pathWInMatriceFileToBeSaved,
                             QString pathTrainingFileToBeLoaded, QString pathWMatriceFileToBeLoaded, QString pathWInMatriceFileToBeLoaded);
@@ -46,22 +68,33 @@ class ReservoirInterface : public QObject
 
     signals :
 
+        /**
+         * @brief start
+         */
         void start();
 
+        /**
+         * @brief stop
+         */
         void stop();
 
+        /**
+         * @brief endReservoirComputing
+         */
         void endReservoirComputing(QVector<std::vector<double> > , QVector<std::vector<double> >, Sentences, Sentences, Sentences);
 
     private :
 
-        YarpInterfaceWorker  *m_yarpWorker;
-        QThread         m_yarpWorkerThread;
+        YarpInterfaceWorker  *m_yarpWorker; /**< yarp worker */
+        QThread         m_yarpWorkerThread; /**< yarp worker thread */
 
-        Model m_model;
-        QString m_absolutePath;
+        Model m_model;                      /**< model of the reservoir */
+        QString m_absolutePath;             /**< absolute path initialied at the launching */
 };
 
-
+/**
+ * @brief The YarpInterfaceWorker class
+ */
 class YarpInterfaceWorker : public QObject
 {
     Q_OBJECT
@@ -73,64 +106,78 @@ class YarpInterfaceWorker : public QObject
          */
         YarpInterfaceWorker(QString absolutePath);
 
+
+        /**
+         * @brief Destructor of YarpInterfaceWorker
+         */
         ~YarpInterfaceWorker();
 
     private :
 
+        /**
+         * @brief readParameters
+         * @param parametersBottle
+         */
         void readParameters(yarp::os::Bottle *parametersBottle);
-
-//        void readData(yarp::os::Bottle *dataBottle);
-
 
     public slots:
 
+        /**
+         * @brief doLoop
+         */
         void doLoop();
 
+        /**
+         * @brief stopLoop
+         */
         void stopLoop();
 
+        /**
+         * @brief updateResultsFromReservoir
+         * @param resultsTrain
+         * @param resultsTests
+         * @param trainSentences
+         * @param trainResults
+         * @param testResults
+         */
         void updateResultsFromReservoir(QVector<std::vector<double> > resultsTrain, QVector<std::vector<double> > resultsTests, Sentences trainSentences, Sentences trainResults, Sentences testResults);
 
 
     signals :
 
-
+        /**
+         * @brief sendDataToReservoirSignal
+         */
         void sendDataToReservoirSignal(int, ModelParameters, Sentence, Sentence, QString, QString, QString, QString, QString, QString);
 
 
     private :
 
-        bool m_doLoop;
-        bool m_isParameters;
-//        bool m_isData;
-        bool m_reservoirIsRunning;
-        bool m_startReservoir;
+        bool m_doLoop;              /**< do the main loop ? */
+        bool m_isParameters;        /**< is parameters received ? */
+        bool m_reservoirIsRunning;  /**< is the reservoir running ? */
+        bool m_startReservoir;      /**< start the reservoir ? */
 
-        QString m_absolutePath;
+        QString m_absolutePath;     /**< absolute path initialized at the launching */
 
-        QReadWriteLock m_loopLock;
-        QReadWriteLock m_reservoirLock;
+        QReadWriteLock m_loopLock;      /**< mutex lock for the loop */
+        QReadWriteLock m_reservoirLock; /**< mutex lock for the reservoir */
 
-        yarp::os::BufferedPort<yarp::os::Bottle> m_controlPort;
-//        yarp::os::BufferedPort<yarp::os::Bottle> m_dataPort;
-        yarp::os::BufferedPort<yarp::os::Bottle> m_parametersPort;
+        yarp::os::BufferedPort<yarp::os::Bottle> m_controlPort;     /**< port for receiving control data */
+        yarp::os::BufferedPort<yarp::os::Bottle> m_parametersPort;  /**< port for receiving parameters data */
+        yarp::os::BufferedPort<yarp::os::Bottle> m_resultsPort;     /**< port for sending results data */
 
-        yarp::os::BufferedPort<yarp::os::Bottle> m_resultsPort;
+        int m_actionToDo;                               /**< what to do ? train 0 / test 1 / both 2 */
+        ModelParameters m_currentModelParameters;       /**< last parameters received for the model */
+        Sentence m_CCWSentence;                         /**< current CCW sentence */
+        Sentence m_structureSentence;                   /**< current structure sentence */
+        QString m_pathTrainingToBeSaved;                /**< path for saving the training */
+        QString m_pathWToBeSaved;                       /**< path for saving the W matrice */
+        QString m_pathWInToBeSaved;                     /**< path for saving the WIn matrice */
 
-        int m_actionToDo;
-        ModelParameters m_currentModelParameters;
-        Sentence m_CCWSentence, m_structureSentence;
-        QString m_pathTrainingToBeSaved;
-        QString m_pathWToBeSaved;
-        QString m_pathWInToBeSaved;
-
-        QString m_pathTrainingToBeLoaded;
-        QString m_pathWToBeLoaded;
-        QString m_pathWInToBeLoaded;
-
-        cv::Mat m_W;
-        cv::Mat m_WIn;
-        cv::Mat m_WOut;
-
+        QString m_pathTrainingToBeLoaded;               /**< path for loading the training */
+        QString m_pathWToBeLoaded;                      /**< path for loading the W matrice */
+        QString m_pathWInToBeLoaded;                    /**< path for loading the WIn matrice */
 };
 
 

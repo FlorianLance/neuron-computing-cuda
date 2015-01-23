@@ -57,7 +57,7 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         m_uiInterface->setupUi(this);
 
     // set icon/title
-        this->setWindowTitle(QString("RESERVOIR COMPUTING - CUDA"));
+        this->setWindowTitle(QString("LANGUAGE LEARNING - RESERVOIR COMPUTING - GPU"));
         this->setWindowIcon(QIcon(m_absolutePath + "../data/images/iconeN.png"));
 
     // create log file
@@ -78,13 +78,18 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
     // init connections
         GridSearch *l_gridSearchQt = m_pWInterface->gridSearch();
         Model *l_model = m_pWInterface->model();
+        Reservoir *l_reservoir = l_model->reservoir();
 
         QObject::connect(this, SIGNAL(leaveProgram()), parent, SLOT(quit()));
+        QObject::connect(m_uiInterface->actionExit, SIGNAL(triggered()), parent, SLOT(quit()));
+        QObject::connect(m_uiInterface->actionOnlineDocumentation, SIGNAL(triggered()), this, SLOT(openOnlineDocumentation()));
+        QObject::connect(m_uiInterface->actionAbout, SIGNAL(triggered()), this, SLOT(openAboutWindow()));
         // listwidgets
         QObject::connect(m_uiInterface->lwCorpus,  SIGNAL(doubleClicked(QModelIndex)), this, SLOT(openCorpus(QModelIndex)));
         // push button
         QObject::connect(m_uiInterface->pbStart,                SIGNAL(clicked()), m_pWInterface,   SLOT(start()));        
         QObject::connect(m_uiInterface->pbStop,                 SIGNAL(clicked()), m_pWInterface,   SLOT(stop()));
+        QObject::connect(m_uiInterface->pbStop,                 SIGNAL(clicked()), l_reservoir,     SLOT(stopLoop()));
         QObject::connect(m_uiInterface->pbStartReplay,          SIGNAL(clicked()), m_pWInterface,   SLOT(startReplay()));                
         QObject::connect(m_uiInterface->pbColor,                SIGNAL(clicked()), this,            SLOT(setColorLine()));
         QObject::connect(m_uiInterface->pbSaveX,                SIGNAL(clicked()), this,            SLOT(saveXPlot()));
@@ -155,7 +160,7 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(m_uiInterface->cbWIn,                  SIGNAL(stateChanged(int)), SLOT(disableTraining(int)));
         QObject::connect(m_uiInterface->cbOnlyStartValue,       SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
         QObject::connect(m_uiInterface->cbEnableGPU,            SIGNAL(stateChanged(int)), SLOT(updateReservoirParameters(int)));
-        QObject::connect(m_uiInterface->cbEnableMultiThread,    SIGNAL(toggled(bool)), l_model->reservoir(), SLOT(enableMaxOmpThreadNumber(bool)));
+        QObject::connect(m_uiInterface->cbEnableMultiThread,    SIGNAL(toggled(bool)), l_reservoir, SLOT(enableMaxOmpThreadNumber(bool)));
         // lineedit
         QObject::connect(m_uiInterface->leNeuronsOperation,         SIGNAL(editingFinished()), SLOT(updateReservoirParameters()));
         QObject::connect(m_uiInterface->leLeakRateOperation,        SIGNAL(editingFinished()), SLOT(updateReservoirParameters()));
@@ -168,7 +173,6 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         // lock
         QObject::connect(m_pWInterface, SIGNAL(lockInterfaceSignal(bool)), this, SLOT(lockInterface(bool)));
         // this
-        QObject::connect(this, SIGNAL(sendMatrixXDisplayParameters(bool,bool,int,int,int)), l_model->reservoir(),   SLOT(updateMatrixXDisplayParameters(bool,bool,int,int,int)));
         QObject::connect(this, SIGNAL(addCorpusSignal(QString)),                            m_pWInterface,          SLOT(addCorpus(QString)));
         QObject::connect(this, SIGNAL(removeCorpusSignal(int)),                             m_pWInterface,          SLOT(removeCorpus(int)));
         QObject::connect(this, SIGNAL(sendReservoirParametersSignal(ReservoirParameters)),  m_pWInterface,          SLOT(updateReservoirParameters(ReservoirParameters)));
@@ -189,11 +193,11 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(l_model,SIGNAL(sendOutputMatrix(cv::Mat, Sentences)),                  this,  SLOT(displayOutputMatrix(cv::Mat, Sentences)));
         QObject::connect(l_model,SIGNAL(sendTrainInputMatrixSignal(cv::Mat,cv::Mat,Sentences)), this,  SLOT(displayTrainInputMatrix(cv::Mat,cv::Mat, Sentences)));
         // reservoir
-        QObject::connect(l_model->reservoir(),  SIGNAL(sendLogInfo(QString, QColor)),               this,           SLOT(displayLogInfo(QString, QColor)));
-        QObject::connect(l_model->reservoir(),  SIGNAL(sendComputingState(int,int,QString)),        this,           SLOT(updateProgressBar(int, int, QString)));
-        QObject::connect(l_model->reservoir(),  SIGNAL(sendLoadedTrainingParameters(QStringList)),  m_pWInterface,  SLOT(setLoadedTrainingParameters(QStringList)));
-        QObject::connect(l_model->reservoir(),  SIGNAL(sendLoadedWParameters(QStringList)),         m_pWInterface,  SLOT(setLoadedWParameters(QStringList)));
-        QObject::connect(l_model->reservoir(),  SIGNAL(sendLoadedWInParameters(QStringList)),       m_pWInterface,  SLOT(setLoadedWInParameters(QStringList)));
+        QObject::connect(l_reservoir,  SIGNAL(sendLogInfo(QString, QColor)),               this,           SLOT(displayLogInfo(QString, QColor)));
+        QObject::connect(l_reservoir,  SIGNAL(sendComputingState(int,int,QString)),        this,           SLOT(updateProgressBar(int, int, QString)));
+        QObject::connect(l_reservoir,  SIGNAL(sendLoadedTrainingParameters(QStringList)),  m_pWInterface,  SLOT(setLoadedTrainingParameters(QStringList)));
+        QObject::connect(l_reservoir,  SIGNAL(sendLoadedWParameters(QStringList)),         m_pWInterface,  SLOT(setLoadedWParameters(QStringList)));
+        QObject::connect(l_reservoir,  SIGNAL(sendLoadedWInParameters(QStringList)),       m_pWInterface,  SLOT(setLoadedWInParameters(QStringList)));
         // worker
         QObject::connect(m_pWInterface, SIGNAL(sendLogInfo(QString, QColor)),               this,                                   SLOT(displayLogInfo(QString, QColor)));
         QObject::connect(m_pWInterface, SIGNAL(displayValidityOperationSignal(bool, int)),  this,                                   SLOT(displayValidityOperation(bool, int)));
@@ -207,7 +211,6 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         // pushbuttons
         m_uiInterface->pbComputing->setRange(0,100);
         m_uiInterface->pbComputing->setValue(0);
-        m_uiInterface->pbStop->setVisible(false);
         m_uiInterface->pbAddCorpus->setStyleSheet("* { font-weight: bold }");
         m_uiInterface->pbStart->setStyleSheet("* { font-weight: bold }");
         m_uiInterface->pbLoadSettings->setStyleSheet("* { font-weight: bold }");
@@ -222,9 +225,16 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         // spin boxes
         m_uiInterface->sbStartSpectralRadius->setRange(0,10000);
         m_uiInterface->sbEndSpectralRadius->setRange(0,10000);
-        // interface
-        setStyleSheet("QGroupBox { color: blue; } ");        
 
+
+//        setStyleSheet("QGroupBox { padding: 10 0px 0 0px; color: blue; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #E0E0E0, stop: 1 #FFFFFF); border: 2px solid gray; border-radius: 5px; margin-top: 1ex; /* leave space at the top for the title */}");
+        setStyleSheet("QGroupBox { padding: 10 0px 0 0px; color: blue; border: 1px solid gray; border-radius: 5px; margin-top: 1ex; /* leave space at the top for the title */}");
+
+        QFont l_font;
+        l_font.setBold(true);
+        l_font.setPointSize(10);
+        m_uiInterface->twDisplay->setFont(l_font);
+        m_uiInterface->twSettings->setFont(l_font);
 
     // init thread
         m_pWInterface->moveToThread(&m_TInterface);
@@ -235,13 +245,27 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         updateReplayParameters();
 }
 
-
 Interface::~Interface()
 {
     m_TInterface.quit();
     m_TInterface.wait();
 
     delete m_pWInterface;
+}
+
+void Interface::openOnlineDocumentation()
+{
+    QDesktopServices::openUrl(QUrl("https://github.com/FlorianLance/neuron-computing-cuda/wiki/tuto_interface", QUrl::TolerantMode));
+}
+
+void Interface::openAboutWindow()
+{
+    QString l_text("<p>An interface for language learning with neuron computing using GPU acceleration.<br /><br />");
+    l_text += "Developped in the Robotic Cognition Laboratory of the <a href=\"http://www.sbri.fr/\"> SBRI</a> under the direction of  <b>Peter Ford Dominey. </b>";
+    l_text += "<br /><br /> Author : <b>Lance Florian </b> <a href=\"https://github.com/FlorianLance\"> Github profile</a>";
+    l_text += "<br /><br /> Language model by <b>Xavier Hinaut</b> and <b>Colas Droin</b>. <br /></p>";
+    l_text += "<a href=\"https://github.com/FlorianLance/neuron-computing-cuda\">Repository</a>";
+    QMessageBox::about(this, "About the software", l_text);
 }
 
 
@@ -629,7 +653,14 @@ void Interface::updateReservoirParameters()
 
 void Interface::lockInterface(bool lock)
 {
-    m_uiInterface->twSettings->setEnabled(!lock);
+    m_uiInterface->gbCorpusList->setEnabled(!lock);
+    m_uiInterface->gbCCWStructure->setEnabled(!lock);
+    m_uiInterface->gbReservoirParameters->setEnabled(!lock);
+    m_uiInterface->gbSystem->setEnabled(!lock);
+    m_uiInterface->gbTrainTest->setEnabled(!lock);
+    m_uiInterface->tabReplay->setEnabled(!lock);
+    m_uiInterface->pbStart->setEnabled(!lock);
+    m_uiInterface->pbStop->setEnabled(lock);
 }
 
 void Interface::displayValidityOperation(bool operationValid, int indexParameter)

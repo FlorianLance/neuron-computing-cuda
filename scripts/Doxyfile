@@ -677,7 +677,9 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                  = ../dist/include \
+INPUT                  = ../dist/include/Model.h ../dist/include/Reservoir.h ../dist/include/Generalization.h ../dist/include/CorpusProcessing.h  \
+                         ../dist/include/GridSearch.h ../dist/include/gpuMat/cudaInversion.h ../dist/include/gpuMat/cudaMultiplications.h ../dist/include/Interface.h \
+                         ../dist/include/InterfaceWorker.h ../dist/include/Utility.h ../dist/include/YarpInterface.h \
 
 
 # This tag can be used to specify the character encoding of the source files
