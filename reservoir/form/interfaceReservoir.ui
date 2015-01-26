@@ -1137,7 +1137,7 @@
                    </size>
                   </property>
                   <property name="minimum">
-                   <number>1</number>
+                   <number>0</number>
                   </property>
                   <property name="maximum">
                    <number>500000</number>
@@ -1153,7 +1153,7 @@
                    <number>1</number>
                   </property>
                   <property name="maximum">
-                   <number>1000</number>
+                   <number>500000</number>
                   </property>
                   <property name="value">
                    <number>10</number>
@@ -1279,7 +1279,7 @@
                 <item row="0" column="4">
                  <widget class="QSpinBox" name="sbEndRangeSentencesDisplay">
                   <property name="minimum">
-                   <number>1</number>
+                   <number>0</number>
                   </property>
                   <property name="value">
                    <number>5</number>

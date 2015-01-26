@@ -1,4 +1,25 @@
 
+/*******************************************************************************
+**                                                                            **
+**  Language Learning - Reservoir Computing - GPU                             **
+**  An interface for language learning with neuron computing using GPU        **
+**  acceleration.                                                             **
+**                                                                            **
+**  This program is free software: you can redistribute it and/or modify      **
+**  it under the terms of the GNU Lesser General Public License as published  **
+**  by the Free Software Foundation, either version 3 of the License, or      **
+**  (at your option) any later version.                                       **
+**                                                                            **
+**  This program is distributed in the hope that it will be useful,           **
+**  but WITHOUT ANY WARRANTY; without even the implied warranty of            **
+**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             **
+**  GNU Lesser General Public License for more details.                       **
+**                                                                            **
+**  You should have received a copy of the GNU Lesser General Public License  **
+**  along with Foobar.  If not, see <http://www.gnu.org/licenses/>.           **
+**                                                                            **
+********************************************************************************/
+
 
 /**
  * \file Reservoir.cpp
@@ -312,7 +333,13 @@ bool Reservoir::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher, 
     emit sendLogInfo(QString::fromStdString(displayTime("END : sub train ", m_oTime, false, m_verbose)), QColor(Qt::black));
 
     emit sendComputingState(50, 100, QString("Tychonov-start"));
-    tikhonovRegularization(xTot, teacher, meaningInputTrain.size[2]);
+    if(!tikhonovRegularization(xTot, teacher, meaningInputTrain.size[2]))
+    {
+        emit sendLogInfo("Stop tikhonovRegularization.\n", QColor(Qt::red));
+        emit sendComputingState(0, 100, QString("Aborted."));
+        m_stopLoop = false;
+        return false;
+    }
     emit sendComputingState(95, 100, QString("Tychonov-end"));
 
     sentencesOutputTrain = teacher.clone();
@@ -484,7 +511,22 @@ void Reservoir::test(const cv::Mat &meaningInputTest, cv::Mat &sentencesOutputTe
     emit sendComputingState(100, 100, QString("End test"));
 }
 
-void Reservoir::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTeacher, cuint dimInput)
+bool Reservoir::checkStop()
+{
+    m_stopLocker.lockForRead();
+        bool l_stopLoop = m_stopLoop;
+    m_stopLocker.unlock();
+
+    if(l_stopLoop)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+
+bool Reservoir::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTeacher, cuint dimInput)
 {
     int l_subdivisionBlocks = 2;
     if(m_nbNeurons > 3000)
@@ -517,6 +559,12 @@ void Reservoir::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTeac
         }
     // end pragma
 
+    if(!checkStop())
+    {
+        return false;
+    }
+
+
     emit sendLogInfo(QString::fromStdString(displayTime("1 : tikhonovRegularization ", m_oTime, false, m_verbose)), QColor(Qt::black));
     emit sendComputingState(60, 100, QString("Tikhonov-1"));
 
@@ -529,6 +577,11 @@ void Reservoir::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTeac
     else
     {
         l_mat2inv = (l_xTotReshaped * l_xTotReshaped.t());
+    }
+
+    if(!checkStop())
+    {
+        return false;
     }
 
     emit sendComputingState(70, 100, QString("Tikhonov-2"));
@@ -545,6 +598,7 @@ void Reservoir::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTeac
             std::string l_error("-ERROR : squareMatrixSingularValueDecomposition");
             std::cerr << l_error << std::endl;
             emit sendLogInfo(QString::fromStdString(l_error), QColor(Qt::red));
+            return false;
         }
         l_mat2inv.release();
 
@@ -577,6 +631,12 @@ void Reservoir::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTeac
             invCuda = (matCudaVT.t() * matCudaS * matCudaU.t());
         }
 
+
+        if(!checkStop())
+        {
+            return false;
+        }
+
         emit sendLogInfo(QString::fromStdString(displayTime("3 : tikhonovRegularization ", m_oTime, false, m_verbose)), QColor(Qt::black));
         emit sendComputingState(90, 100, QString("Tikhonov-4"));
 
@@ -588,6 +648,11 @@ void Reservoir::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTeac
             swCuda::blockMatrixMultiplicationF(l_xTotReshaped, invCuda, l_tempCudaMult, l_subdivisionBlocks);
             invCuda.release();
             l_xTotReshaped.release();
+
+            if(!checkStop())
+            {
+                return false;
+            }
 
             cv::Mat l_yTeacherReshaped(yTeacher.size[0] *yTeacher.size[1],  yTeacher.size[2], CV_32FC1);
 
@@ -602,6 +667,12 @@ void Reservoir::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTeac
                         }
                     }
                 }
+
+            if(!checkStop())
+            {
+                return false;
+            }
+
             // end pragma
             m_wOut = l_yTeacherReshaped.t() * l_tempCudaMult;
         }
@@ -621,6 +692,11 @@ void Reservoir::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTeac
                 }
             // end pragma
 
+            if(!checkStop())
+            {
+                return false;
+            }
+
             m_wOut = l_yTeacherReshaped.t() * l_xTotReshaped.t() * invCuda;
         }
     }
@@ -634,6 +710,10 @@ void Reservoir::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTeac
         emit sendLogInfo(QString::fromStdString(displayTime("2-3 : tikhonovRegularization ", m_oTime, false, m_verbose)), QColor(Qt::black));
         emit sendComputingState(90, 100, QString("Tikhonov-4"));
 
+        if(!checkStop())
+        {
+            return false;
+        }
 
         cv::Mat l_yTeacherReshaped(yTeacher.size[0] *yTeacher.size[1],  yTeacher.size[2], CV_32FC1);
         #pragma omp parallel for
@@ -649,11 +729,22 @@ void Reservoir::tikhonovRegularization(const cv::Mat &xTot, const cv::Mat &yTeac
             }
         // end pragma
 
+        if(!checkStop())
+        {
+            return false;
+        }
+
         m_wOut = (l_yTeacherReshaped.t() * l_xTotReshaped.t()) * invCV;
 
     }
 
+    if(!checkStop())
+    {
+        return false;
+    }
+
     emit sendLogInfo(QString::fromStdString(displayTime("END : tikhonovRegularization ", m_oTime, false, m_verbose)), QColor(Qt::black));
+    return true;
 }
 
 void Reservoir::saveParamFile(const std::string &path)
