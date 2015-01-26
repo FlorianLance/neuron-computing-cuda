@@ -19,5 +19,8 @@ Build :
  - [With Visual Studio MSV2013](https://github.com/FlorianLance/neuron-computing-cuda/wiki/tuto_visual)
  - [With CMake](https://github.com/FlorianLance/neuron-computing-cuda/wiki/tuto_cmake)
 
+Documentation :
+ - [Doxygen](https://drive.google.com/open?id=0BywmJqNNU7owcEJyTDI5Nm9yVDg&authuser=0)
+
 Download :
 - [Release 0.9 Windows x64] (https://mega.co.nz/#!jZsTzZzA!qGoEC-OPrjs1sxMGh8lqbzq4T4_4ZHAslDHta9dkZkI)
