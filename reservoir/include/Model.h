@@ -64,6 +64,8 @@ struct ModelParameters
     {
         m_useCudaInv  = true;
         m_useCudaMult = true;
+        m_randomSeedNumberGenerator = true;
+        m_seedNumberGenerator = 1;
         m_nbNeurons      = 800;
         m_spectralRadius = 3;
         m_inputScaling   = 0.1;
@@ -98,6 +100,9 @@ struct ModelParameters
     bool m_useLoadedTraining;       /**< ...  */
     bool m_useLoadedW;              /**< ...  */
     bool m_useLoadedWIn;            /**< ...  */
+    bool m_randomSeedNumberGenerator; /**< ... */
+    int  m_seedNumberGenerator;       /**< ... */
+
 
     // cuda
     bool m_useCudaInv;              /**< uses the cuda inversion ? */

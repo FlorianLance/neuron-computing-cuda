@@ -526,6 +526,16 @@ bool Model::launchTraining()
     // send train input matrices to be displayed
         sendTrainInputMatrixSignal(l_3DMatStimMeanTrain,l_3DMatStimSentTrain,m_trainSentence);
 
+    // set random generator
+        if(m_parameters.m_randomSeedNumberGenerator)
+        {
+            srand (time(NULL));
+        }
+        else
+        {
+            srand(m_parameters.m_seedNumberGenerator);
+        }
+
     // train reservoir        
         sendLogInfo(QString::fromStdString(displayTime("Start reservoir training ", l_trainingTime, false, m_verbose)), QColor(Qt::black));
             if(!m_reservoir->train(l_3DMatStimMeanTrain, l_3DMatStimSentTrain, m_3DMatSentencesOutputTrain,m_internalStatesTrain))

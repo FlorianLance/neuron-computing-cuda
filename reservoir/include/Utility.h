@@ -540,7 +540,7 @@ static void save2DMatrixToTextStd(const std::string &pathFile, const cv::Mat &ma
     }
     else
     {
-        std::cerr << "Can not write 3D matrix in file. " << std::endl;
+        std::cerr << "Can not write éD matrix in file. " << std::endl;
     }
 }
 

@@ -104,6 +104,13 @@ class GridSearch : public QObject
         void setCudaParameters(cbool useCudaInversion, cbool useCudaMultiplication);
 
         /**
+         * @brief setNumberGeneratorParameters
+         * @param randomSeed
+         * @param seed
+         */
+        void setNumberGeneratorParameters(cbool randomSeed, cint seed);
+
+        /**
          * @brief Start the training with all the parameters defined.
          * @param [in] resultsFilePath      : result file path (readable data)
          * @param [in] resultsRawFilePath   : result file path (raw data, easy to read with gnuplot)
@@ -200,8 +207,11 @@ class GridSearch : public QObject
             }
         }
 
+        bool m_randomSeed;
         bool m_useCudaInv;                          /**< uses cuda inversion ? */
         bool m_useCudaMult;                         /**< uses cuda multiplication ? */
+
+        int m_seed;
 
         std::vector<int> m_nbNeuronsValues;         /**< neurons nb grid search values */
         std::vector<double> m_leakRateValues;       /**< leakrate grid search values */

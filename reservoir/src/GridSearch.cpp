@@ -42,6 +42,12 @@ void GridSearch::setCudaParameters(cbool useCudaInversion, cbool useCudaMultipli
     m_useCudaMult   = useCudaMultiplication;
 }
 
+void GridSearch::setNumberGeneratorParameters(cbool randomSeed, cint seed)
+{
+    m_seed = seed;
+    m_randomSeed = randomSeed;
+}
+
 void GridSearch::launchTrainWithAllParameters(const std::string resultsFilePath, const std::string resultsRawFilePath, cbool doTraining, cbool doTest, cbool loadTraining, cbool loadW, cbool loadWIn)
 {
     if(m_corpusList.size() == 0)
@@ -171,6 +177,9 @@ void GridSearch::launchTrainWithAllParameters(const std::string resultsFilePath,
                                 l_currentParameters.m_useLoadedTraining = loadTraining;
                                 l_currentParameters.m_useLoadedW        = loadW;
                                 l_currentParameters.m_useLoadedWIn      = loadWIn;
+
+                                l_currentParameters.m_randomSeedNumberGenerator = m_randomSeed;
+                                l_currentParameters.m_seedNumberGenerator = m_seed;
 
                                 emit sendCurrentParametersSignal(l_currentParameters);
 

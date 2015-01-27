@@ -1007,7 +1007,7 @@
                    <bool>true</bool>
                   </property>
                   <property name="text">
-                   <string>Enable mutlithread</string>
+                   <string>Multithread</string>
                   </property>
                   <property name="checked">
                    <bool>true</bool>
@@ -1020,10 +1020,57 @@
                    <bool>true</bool>
                   </property>
                   <property name="text">
-                   <string>Enable gpu acceleration</string>
+                   <string>GPU </string>
                   </property>
                   <property name="checked">
                    <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="Line" name="line_23">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="laSeed">
+                  <property name="text">
+                   <string>Number generator seed :</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="rbRandomSeed">
+                  <property name="text">
+                   <string>random</string>
+                  </property>
+                  <property name="checked">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="rbDefinedSeed">
+                  <property name="text">
+                   <string>defined :</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="sbDefinedSeed">
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
+                  <property name="maximum">
+                   <number>100000</number>
+                  </property>
+                  <property name="value">
+                   <number>1</number>
                   </property>
                  </widget>
                 </item>

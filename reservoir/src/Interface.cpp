@@ -34,7 +34,6 @@
 
 int main(int argc, char* argv[])
 {
-    srand(1);
     culaWarmup(1);
 
     QApplication l_oApp(argc, argv);
@@ -133,6 +132,8 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(m_uiInterface->rbTrain,                SIGNAL(clicked()), SLOT(updateReservoirParameters()));
         QObject::connect(m_uiInterface->rbTest,                 SIGNAL(clicked()), SLOT(updateReservoirParameters()));
         QObject::connect(m_uiInterface->rbBoth,                 SIGNAL(clicked()), SLOT(updateReservoirParameters()));
+        QObject::connect(m_uiInterface->rbRandomSeed,           SIGNAL(clicked()), SLOT(updateReservoirParameters()));
+        QObject::connect(m_uiInterface->rbDefinedSeed,           SIGNAL(clicked()), SLOT(updateReservoirParameters()));
         QObject::connect(m_uiInterface->rbRangeNeurons,         SIGNAL(clicked()), SLOT(updateReplayParameters()));
         QObject::connect(m_uiInterface->rbRandomNeurons,        SIGNAL(clicked()), SLOT(updateReplayParameters()));
         QObject::connect(m_uiInterface->rbRangeSentences,       SIGNAL(clicked()), SLOT(updateReplayParameters()));
@@ -161,6 +162,7 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(m_uiInterface->sbNbUseSpectralRadius,  SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
         QObject::connect(m_uiInterface->sbNbUseRidge,           SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
         QObject::connect(m_uiInterface->sbNbUseSparcity,        SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
+        QObject::connect(m_uiInterface->sbDefinedSeed,          SIGNAL(valueChanged(int)),    SLOT(updateReservoirParameters(int)));
         QObject::connect(m_uiInterface->sbStartRangeNeuronDisplay,      SIGNAL(valueChanged(int)),    SLOT(updateReplayParameters(int)));
         QObject::connect(m_uiInterface->sbEndRangeNeuronDisplay,        SIGNAL(valueChanged(int)),    SLOT(updateReplayParameters(int)));
         QObject::connect(m_uiInterface->sbNbRandomNeurons,              SIGNAL(valueChanged(int)),    SLOT(updateReplayParameters(int)));
@@ -386,7 +388,7 @@ void Interface::loadTraining()
 
     QPalette l_palette;
     if(l_fileW.exists() && l_fileWin.exists() && l_fileWOut.exists() && l_fileParam.exists())
-    {
+    {                
         // send directory path
         l_palette.setColor(QPalette::Text,Qt::black);
         m_uiInterface->leCurrentTrainingFile->setText(l_sPathTrainingFile);
@@ -422,23 +424,33 @@ void Interface::loadTraining()
 
 void Interface::loadWMatrix()
 {
-    QString l_sPathWFile = QFileDialog::getExistingDirectory(this, "Select directory", m_absolutePath + "../data/input/Matrices/W");
+    QString l_sPathWFile = QFileDialog::getOpenFileName(this, "Select w matrice file", m_absolutePath + "../data/input/Matrices/W");
 
     if(l_sPathWFile.size() == 0 )
     {
         return;
     }
 
-    QFile l_fileW(l_sPathWFile    + "/w.txt");
-    QFile l_fileParam(l_sPathWFile + "/param.txt");
+    QFile l_fileW(l_sPathWFile);
 
     QPalette l_palette;
-    if(l_fileW.exists() && l_fileParam.exists())
-    {
+    if(l_fileW.exists())
+    {                
+        // check w neurons
+        int l_neuronNumber;
+        cv::Mat l_wLoaded;
+        load2DMatrixStd<float>(l_sPathWFile.toStdString(), l_wLoaded);
+        l_neuronNumber = l_wLoaded.rows;
+        m_uiInterface->sbStartNeurons->setValue(l_neuronNumber);
+        m_uiInterface->sbEndNeurons->setValue(l_neuronNumber);
+        m_uiInterface->cbNeurons->setEnabled(true);
+
         // send directory path
         l_palette.setColor(QPalette::Text,Qt::black);
         m_uiInterface->leW->setText(l_sPathWFile);
         m_uiInterface->cbW->setEnabled(true);
+
+        displayLogInfo("w matrice loaded, number of neurons defined.\n", QColor(Qt::blue));
 
         emit loadWSignal(l_sPathWFile);
     }
@@ -447,46 +459,44 @@ void Interface::loadWMatrix()
         l_palette.setColor(QPalette::Text,Qt::red);
 
         QString l_message;
-
-
-        if(!l_fileW.exists())
-        {
-            m_uiInterface->leW->setText("W matrice not found in the directory...");
-            l_message = "W matrice not found, loading not done. \n";
-        }
-        else
-        {
-            m_uiInterface->leW->setText("Parameter file not found in the directory...");
-            l_message = "Parameter file not found, loading not done. \n";
-        }
-
+        m_uiInterface->leW->setText("W matrice not found in the directory...");
+        l_message = "w matrice not found, loading not done. \n";
         std::cerr << l_message.toStdString() << std::endl;
         displayLogInfo(l_message, QColor(Qt::red));
     }
-
     m_uiInterface->leW->setPalette(l_palette);
 }
 
 
 void Interface::loadWInMatrix()
 {
-    QString l_sPathWInFile = QFileDialog::getExistingDirectory(this, "Select directory", m_absolutePath + "../data/input/Matrices/WIn");
+    QString l_sPathWInFile = QFileDialog::getOpenFileName(this, "Select wIn matrice file", m_absolutePath + "../data/input/Matrices/WIn");
 
     if(l_sPathWInFile.size() == 0 )
     {
         return;
     }
 
-    QFile l_fileWIn(l_sPathWInFile    + "/wIn.txt");
-    QFile l_fileParam(l_sPathWInFile + "/param.txt");
+    QFile l_fileWIn(l_sPathWInFile);
 
     QPalette l_palette;
-    if(l_fileWIn.exists() && l_fileParam.exists())
+    if(l_fileWIn.exists())
     {
+        // check wIn neurons
+        int l_neuronNumber;
+        cv::Mat l_wInLoaded;
+        load2DMatrixStd<float>(l_sPathWInFile.toStdString(), l_wInLoaded);
+        l_neuronNumber = l_wInLoaded.rows;
+        m_uiInterface->sbStartNeurons->setValue(l_neuronNumber);
+        m_uiInterface->sbEndNeurons->setValue(l_neuronNumber);
+        m_uiInterface->cbNeurons->setEnabled(true);
+
         // send directory path
         l_palette.setColor(QPalette::Text,Qt::black);
         m_uiInterface->leWIn->setText(l_sPathWInFile);
         m_uiInterface->cbWIn->setEnabled(true);
+
+        displayLogInfo("wIn matrice loaded, number of neurons defined.\n", QColor(Qt::blue));
 
         emit loadWInSignal(l_sPathWInFile);
     }
@@ -495,18 +505,8 @@ void Interface::loadWInMatrix()
         l_palette.setColor(QPalette::Text,Qt::red);
 
         QString l_message;
-
-
-        if(!l_fileWIn.exists())
-        {
-            m_uiInterface->leWIn->setText("WIn matrice not found in the directory...");
-            l_message = "WIn matrice not found, loading not done. \n";
-        }
-        else
-        {
-            m_uiInterface->leWIn->setText("Parameter file not found in the directory...");
-            l_message = "Parameter file not found, loading not done. \n";
-        }
+        m_uiInterface->leWIn->setText("WIn matrice not found in the directory...");
+        l_message = "wIn matrice not found, loading not done. \n";
 
         std::cerr << l_message.toStdString() << std::endl;
         displayLogInfo(l_message, QColor(Qt::red));
@@ -646,8 +646,11 @@ void Interface::updateReservoirParameters()
     l_params.m_ridgeOperation           = m_uiInterface->leRidgeOperation->text();
     l_params.m_sparcityOperation        = m_uiInterface->leSparcityOperation->text();
 
-    // disable parameters interface if a training file is used
-        if(m_uiInterface->cbTrainingFile->isChecked() || m_uiInterface->cbW->isChecked() || m_uiInterface->cbWIn->isChecked())
+    l_params.m_randomSeedGenerator      = m_uiInterface->rbRandomSeed->isChecked();
+    l_params.m_seedNumberGenerator      = m_uiInterface->sbDefinedSeed->value();
+
+    // disable parameters interface if a training file or a loaded matrice is used
+        if(m_uiInterface->cbTrainingFile->isChecked())
         {
             m_uiInterface->gbReservoirParameters->setEnabled(false);
         }
@@ -655,7 +658,43 @@ void Interface::updateReservoirParameters()
         {
             m_uiInterface->gbReservoirParameters->setEnabled(true);
         }
-
+        if(m_uiInterface->cbW->isChecked() || m_uiInterface->cbWIn->isChecked())
+        {
+            m_uiInterface->sbStartNeurons->setEnabled(false);
+            m_uiInterface->sbEndNeurons->setEnabled(false);
+            m_uiInterface->cbNeurons->setEnabled(false);
+            m_uiInterface->cbNeurons->setChecked(true);
+        }
+        else
+        {
+            m_uiInterface->sbStartNeurons->setEnabled(true);
+            m_uiInterface->sbEndNeurons->setEnabled(true);
+            m_uiInterface->cbNeurons->setEnabled(true);
+        }
+        if(m_uiInterface->cbW->isChecked())
+        {
+            m_uiInterface->sbStartSpectralRadius->setEnabled(false);
+            m_uiInterface->sbEndSpectralRadius->setEnabled(false);
+            m_uiInterface->cbSpectralRadius->setEnabled(false);
+        }
+        else
+        {
+            m_uiInterface->sbStartSpectralRadius->setEnabled(true);
+            m_uiInterface->sbEndSpectralRadius->setEnabled(true);
+            m_uiInterface->cbSpectralRadius->setEnabled(true);
+        }
+        if(m_uiInterface->cbWIn->isChecked())
+        {
+            m_uiInterface->sbStartIS->setEnabled(false);
+            m_uiInterface->sbEndIS->setEnabled(false);
+            m_uiInterface->cbIS->setEnabled(false);
+        }
+        else
+        {
+            m_uiInterface->sbStartIS->setEnabled(true);
+            m_uiInterface->sbEndIS->setEnabled(true);
+            m_uiInterface->cbIS->setEnabled(true);
+        }
 
     if(m_uiInterface->rbTrain->isChecked())
     {

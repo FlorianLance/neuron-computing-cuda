@@ -152,6 +152,7 @@ void InterfaceWorker::start()
     // define all grid search parameters
         m_gridSearch->deleteParameterValues();
         m_gridSearch->setCudaParameters(m_reservoirParameters.m_useCuda, m_reservoirParameters.m_useCuda);
+        m_gridSearch->setNumberGeneratorParameters(m_reservoirParameters.m_randomSeedGenerator, m_reservoirParameters.m_seedNumberGenerator);
 
         bool l_operationValid;
         int l_OperationInvalid = 0;

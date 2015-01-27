@@ -198,6 +198,35 @@ bool Reservoir::train(const cv::Mat &meaningInputTrain, const cv::Mat &teacher, 
         generateMatrixW();
         generateWIn(meaningInputTrain.size[2]);
 
+    // check if loaded w and loaded wIn have the same dimension 0
+        if(m_useW && m_useWIn)
+        {
+            if(m_w.rows != m_wIn.rows)
+            {
+                emit sendLogInfo("Loaded w and loaded wIn don't use the same number of neurons : W -> " + QString::number(m_w.rows) +" wIn -> " + QString::number(m_wIn.rows) + "\n", QColor(Qt::red));
+                emit sendComputingState(0, 100, QString("Error with loaded matrices."));
+                return false;
+            }
+        }
+        else if(m_useW)
+        {
+            if(m_w.rows != m_nbNeurons)
+            {
+                emit sendLogInfo("Loaded w number of neurons is different from the current Neurons number : W -> " + QString::number(m_w.rows) +" N -> " + QString::number(m_nbNeurons) + "\n", QColor(Qt::red));
+                emit sendComputingState(0, 100, QString("Error with loaded matrices."));
+                return false;
+            }
+        }
+        else if(m_useWIn)
+        {
+            if(m_wIn.rows != m_nbNeurons)
+            {
+                emit sendLogInfo("Loaded wIn number of neurons is different from the current Neurons number : W -> " + QString::number(m_wIn.rows) +" N -> " + QString::number(m_nbNeurons) + "\n", QColor(Qt::red));
+                emit sendComputingState(0, 100, QString("Error with loaded matrices."));
+                return false;
+            }
+        }
+
     emit sendLogInfo(QString::fromStdString(displayTime("START : sub train ", m_oTime, false, m_verbose)), QColor(Qt::black));
 
     // init x tot
@@ -810,14 +839,12 @@ void Reservoir::loadTraining(const std::string &path)
 
 void Reservoir::loadW(const std::string &path)
 {
-    load2DMatrixStd<float>(path + "/w.txt", m_wLoaded);
-    loadParam(path);
+    load2DMatrixStd<float>(path, m_wLoaded);
 }
 
 void Reservoir::loadWIn(const std::string &path)
 {
-    load2DMatrixStd<float>(path + "/wIn.txt", m_wInLoaded);
-    loadParam(path);
+    load2DMatrixStd<float>(path, m_wInLoaded);
 }
 
 

@@ -66,6 +66,9 @@ struct LanguageParameters
  */
 struct ReservoirParameters
 {
+    bool m_randomSeedGenerator;
+    int m_seedNumberGenerator;
+
     bool m_useCuda; /**< ... */
 
     bool m_useLoadedTraining;   /**< ... */
