@@ -109,7 +109,6 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(m_uiInterface->lwCorpus,  SIGNAL(doubleClicked(QModelIndex)), this, SLOT(openCorpus(QModelIndex)));
         // push button
         QObject::connect(m_uiInterface->pbStart,                SIGNAL(clicked()), m_pWInterface,   SLOT(start()));        
-        QObject::connect(m_uiInterface->pbStop,                 SIGNAL(clicked()), m_pWInterface,   SLOT(stop()));
         QObject::connect(m_uiInterface->pbStop,                 SIGNAL(clicked()), l_reservoir,     SLOT(stopLoop()));
         QObject::connect(m_uiInterface->pbStartReplay,          SIGNAL(clicked()), m_pWInterface,   SLOT(startReplay()));                
         QObject::connect(m_uiInterface->pbColor,                SIGNAL(clicked()), this,            SLOT(setColorLine()));
@@ -230,6 +229,7 @@ Interface::Interface(QApplication *parent) : m_uiInterface(new Ui::UI_Reservoir)
         QObject::connect(m_pWInterface, SIGNAL(endTrainingSignal(bool)),                    m_uiInterface->rbLastTrainingReplay,    SLOT(setEnabled(bool)));
         QObject::connect(m_pWInterface, SIGNAL(replayLoaded()),                             this,                                   SLOT(replayLoaded()));
         QObject::connect(m_pWInterface, SIGNAL(sendReplayData(QVector<QVector<double> > , QVector<int>, QVector<int>)), this,       SLOT(updateDisplayReplay(QVector<QVector<double> > , QVector<int>, QVector<int>)));
+        QObject::connect(m_pWInterface, SIGNAL(updateReservoirParameters()),                this,                                   SLOT(updateReservoirParameters()));
 
     // init widgets
         // pushbuttons
@@ -359,7 +359,7 @@ void Interface::saveTraining()
 
 void Interface::saveReplay()
 {
-    QString l_sPathReplay = QFileDialog::getExistingDirectory(this, "Select directory", m_absolutePath + "../data/replay");
+    QString l_sPathReplay = QFileDialog::getSaveFileName(this, "Enter replay name", m_absolutePath + "../data/replay", "Replay file (*.txt)");
 
     if(l_sPathReplay.size() == 0)
     {
@@ -369,8 +369,6 @@ void Interface::saveReplay()
     // send directory path
     emit saveReplaySignal(l_sPathReplay);
 }
-
-
 
 void Interface::loadTraining()
 {
@@ -517,14 +515,14 @@ void Interface::loadWInMatrix()
 
 void Interface::loadReplay()
 {
-    QString l_pathReplay = QFileDialog::getExistingDirectory(this, "Select directory", m_absolutePath + "../data/replay");
+    QString l_pathReplay = QFileDialog::getOpenFileName(this, "Select replay file ", m_absolutePath + "../data/replay");
 
     if(l_pathReplay.size() == 0 )
     {
         return;
     }
 
-    QFile l_fileReplay(l_pathReplay    + "/xTot.txt");
+    QFile l_fileReplay(l_pathReplay);
 
     QPalette l_palette;
     if(l_fileReplay.exists())
@@ -780,8 +778,19 @@ void Interface::displayCurrentResults(ResultsDisplayReservoir results)
     m_uiInterface->tbResults->setFont(l_font);
     int l_numberCharLine = 2*l_widthTb / pixelsWide;
 
-    QString l_display;
+    // compute mean results
+    double l_meanAll = 0, l_meanCCW = 0;
+    for(int ii = 0; ii < results.m_absoluteAll.size(); ++ii)
+    {
+        l_meanAll += results.m_continuousAll[ii];
+        l_meanCCW += results.m_continuousCCW[ii];
+    }
 
+    l_meanAll /= results.m_continuousAll.size();
+    l_meanCCW /= results.m_continuousCCW.size();
+
+
+    QString l_display;
     if(results.m_action == TRAINING_RES || results.m_action == BOTH_RES)
     {
         if(results.m_trainResults.size() > 0)
@@ -841,6 +850,13 @@ void Interface::displayCurrentResults(ResultsDisplayReservoir results)
 
             l_display += "\n";
             m_uiInterface->tbResults->insertPlainText(l_display);
+        }
+
+        if(results.m_trainResults.size() > 0)
+        {
+            m_uiInterface->tbResults->setTextColor(QColor(Qt::blue));
+            m_uiInterface->tbResults->insertPlainText("# Mean pairwise continuous CCW : "  + QString::number(l_meanCCW, 'g', 4) + " %\n# Mean pairwise continuous ALL : " +  QString::number(l_meanAll, 'g', 4) + " %\n\n");
+            m_uiInterface->tbResults->setTextColor(QColor(Qt::black));
         }
     }
 

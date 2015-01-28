@@ -340,11 +340,7 @@ void InterfaceWorker::start()
     lockInterfaceSignal(false);
 
     emit endTrainingSignal(true);
-}
-
-void InterfaceWorker::stop()
-{
-//    lockInterfaceSignal(false);
+    emit updateReservoirParameters();
 }
 
 void InterfaceWorker::saveLastTraining(QString pathDirectory)
@@ -361,7 +357,7 @@ void InterfaceWorker::saveLastReplay(QString pathDirectory)
     if(pathDirectory.size() > 0)
     {
         m_model.saveReplay(pathDirectory.toStdString());
-        sendLogInfo("Replay saved in the directory : " + pathDirectory + "\n", QColor(0,0,255));
+        sendLogInfo("Replay saved : " + pathDirectory + "\n", QColor(0,0,255));
     }
 }
 
@@ -409,7 +405,7 @@ void InterfaceWorker::setLoadedWInParameters(QStringList loadedParams)
 
 void InterfaceWorker::loadReplay(QString pathReplay)
 {
-    if(load3DMatrixFromNpPythonSaveTextF(pathReplay + "/xTot.txt", m_xTot))
+    if(load3DMatrixFromNpPythonSaveTextF(pathReplay, m_xTot))
     {
         sendLogInfo("Replay matrice xTot loaded in the directory : " + pathReplay + "\n", QColor(Qt::blue));
         emit replayLoaded();

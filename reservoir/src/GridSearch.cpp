@@ -129,7 +129,7 @@ void GridSearch::launchTrainWithAllParameters(const std::string resultsFilePath,
 
     l_flowResFileReadableData << "\nRES 1 : CCW pairwise absolute (0% or 100%) -> ex : goal : the , the  that -s -ed it | res : that, the the -s -ed it\n";
     l_flowResFileReadableData << "RES 2 : CCW pairwise continuous (between 0% and 100%) \n";
-    l_flowResFileReadableData << "RES 3 : ALL pariwise absolute (0% or 100%) -> ex : goal : the X , the X that X -s X -ed it | res : the X X X, the the that X -s X X -ed it \n";
+    l_flowResFileReadableData << "RES 3 : ALL pairwise absolute (0% or 100%) -> ex : goal : the X , the X that X -s X -ed it | res : the X X X, the the that X -s X X -ed it \n";
     l_flowResFileReadableData << "RES 4 : ALL pairwise continuous (between 0% and 100%) \n";
     l_flowResFileReadableData << "\n CORPUS ID | NEURONS | LEAK RATE | SPARCITY | INPUT SCALING |  RIDGE  | SPECTRAL RADIUS |   TIME   |   RES 1   |   RES 2   |   RES 3   |   RES 4   |\n";
 

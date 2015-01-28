@@ -147,7 +147,6 @@ matrixMul( float* C, float* A, float* B, int wA, int wB)
 
  void matMult3(const Matrix &A, const Matrix &B, Matrix &C)
  {
-
    // 1. allocate host memory for matrices A and B
    unsigned int size_A = A.width * A.height;
    unsigned int mem_size_A = sizeof(float) * size_A;
@@ -200,6 +199,13 @@ matrixMul( float* C, float* A, float* B, int wA, int wB)
 
    // 7. clean up memory
    cudaFree(d_C);
+
+
+//   cudaError_t err = cudaGetLastError();
+//   if( cudaSuccess != err) {
+//       fprintf(stderr, "getLastCudaError() CUDA error : (%d) %s.\n",
+//         (int)err, cudaGetErrorString( err ) );
+//    }
 }
 
 

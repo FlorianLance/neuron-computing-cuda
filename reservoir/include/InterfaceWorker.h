@@ -190,11 +190,6 @@ class InterfaceWorker : public QObject
         void start();
 
         /**
-         * @brief stop
-         */
-        void stop();
-
-        /**
          * @brief saveLastTraining
          * @param pathDirectory
          */
@@ -287,6 +282,11 @@ class InterfaceWorker : public QObject
          * @brief sendReplayData
          */
         void sendReplayData(QVector<QVector<double> >, QVector<int>, QVector<int>);
+
+        /**
+         * @brief updateReservoirParameters
+         */
+        void updateReservoirParameters();
 
     private :
 

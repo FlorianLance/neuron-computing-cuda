@@ -416,7 +416,7 @@ void Model::saveParamFile(const std::string &pathDirectory)
 
 void Model::saveReplay(const std::string &pathDirectory)
 {
-    save3DMatrixToText(QString::fromStdString(pathDirectory) + "/xTot.txt", m_internalStatesTrain);
+    save3DMatrixToText(QString::fromStdString(pathDirectory), m_internalStatesTrain);
 }
 
 void Model::loadTraining(const std::string &pathDirectory)
